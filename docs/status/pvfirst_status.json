@@ -1,13 +1,13 @@
 {
     "pc":  "DESKTOP-7341US6",
-    "agent":  "executando",
+    "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "last_action":  "start",
-    "last_result":  "Comando recebido no PC",
+    "last_result":  "Comando iniciado: solar_background.cmd",
     "status":  "OK: Aguardando acao",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "[PV-First] Interface pronta. Clique em Verificar ambiente.",
-    "agent_log":  "[2026-09-22 12:45:47] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 12:45:50] Status enviado ao GitHub via API.\n[2026-09-22 12:45:51] Baseline do comando atual registrado sem reexecutar: 1790090919830-4b6acc45673cc8\n[2026-09-22 12:46:14] Novo comando recebido: id=1790091965913-acdaf0d3b3703 action=start",
-    "updated_at":  "2026-09-22 12:46:14"
+    "agent_log":  "[2026-09-22 12:45:47] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 12:45:50] Status enviado ao GitHub via API.\n[2026-09-22 12:45:51] Baseline do comando atual registrado sem reexecutar: 1790090919830-4b6acc45673cc8\n[2026-09-22 12:46:14] Novo comando recebido: id=1790091965913-acdaf0d3b3703 action=start\n[2026-09-22 12:46:16] Status enviado ao GitHub via API.\n[2026-09-22 12:46:16] Resultado: Comando iniciado: solar_background.cmd",
+    "updated_at":  "2026-09-22 12:46:16"
 }
