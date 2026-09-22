@@ -3,11 +3,11 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "verify",
-    "last_result":  "Finalizado: check.cmd (codigo 0)",
+    "last_action":  "heartbeat",
+    "last_result":  "Agente ativo aguardando comandos",
     "status":  "OK: Ambiente instalado",
     "env":  "READY|Ubuntu",
-    "log":  "",
-    "agent_log":  "[2026-09-22 16:00:14] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 16:00:17] Status enviado ao GitHub via API.\n[2026-09-22 16:00:18] Baseline do comando atual registrado sem reexecutar: 1790099426717-8e0b0be50e7ce8\n[2026-09-22 16:12:09] Novo comando recebido: id=1790104115004-3b985c8d734c5 action=verify\n[2026-09-22 16:12:12] Status enviado ao GitHub via API.\n[2026-09-22 16:12:13] Resultado: Finalizado: check.cmd (codigo 0)",
-    "updated_at":  "2026-09-22 16:12:13"
+    "log":  "Energia vinda da GRID      : 19.2742 kWh\nCO2 emitido pela GRID      : 1927.42 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 15157.9 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 16:19:30\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 276.273 W/m2\nPotencia PV disponivel   : 2358.64 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 131.035 kWh\nEnergia vinda da GRID      : 12.5896 kWh\nCO2 emitido pela GRID      : 1258.96 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 16416.8 gCO2 no dia\nSIMULACAO FINALIZADA",
+    "agent_log":  "[2026-09-22 16:00:14] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 16:00:17] Status enviado ao GitHub via API.\n[2026-09-22 16:00:18] Baseline do comando atual registrado sem reexecutar: 1790099426717-8e0b0be50e7ce8\n[2026-09-22 16:12:09] Novo comando recebido: id=1790104115004-3b985c8d734c5 action=verify\n[2026-09-22 16:12:12] Status enviado ao GitHub via API.\n[2026-09-22 16:12:13] Resultado: Finalizado: check.cmd (codigo 0)\n[2026-09-22 16:12:16] Status enviado ao GitHub via API.",
+    "updated_at":  "2026-09-22 16:19:35"
 }
