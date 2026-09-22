@@ -19,6 +19,7 @@
   <div class="card">
     <div class="statusline"><strong>PC</strong><span id="agentBadge" class="badge">consultando</span></div>
     <div id="status" class="muted" style="margin-top:10px">Aguardando status...</div>
+    <div id="syncState" class="muted" style="margin-top:7px;font-weight:700"></div>
   </div>
 
   <div class="card">
@@ -68,10 +69,138 @@ function headers(){const h={'Accept':'application/vnd.github+json'};if(tok())h.A
 async function saveToken(){const t=tok();if(!t){document.getElementById('tokenState').textContent='Informe o token.';return}localStorage.setItem('pvfirst_mobile_token',t);const r=await fetch('https://api.github.com/user',{headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+t},cache:'no-store'});document.getElementById('tokenState').textContent=r.ok?'Token validado.':'Token recusado pelo GitHub: HTTP '+r.status}
 function clearToken(){localStorage.removeItem('pvfirst_mobile_token');document.getElementById('token').value='';document.getElementById('tokenState').textContent='Token removido deste navegador.'}
 async function getCommandFile(){const r=await fetch(API+COMMAND+'?ref='+BRANCH+'&_='+Date.now(),{headers:headers(),cache:'no-store'});if(r.status===404)return null;if(!r.ok)throw new Error('GitHub HTTP '+r.status);return r.json()}
-async function sendCommand(action){if(!tok()){alert('Abra Configuração do controle e salve o token primeiro.');return}const st=document.getElementById('status');st.textContent='Enviando '+action+'...';try{const old=await getCommandFile();const obj={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action,from:'pvfirst_mobile_v48',created_at:new Date().toISOString()};const body={message:'PV-First remoto: '+action,branch:BRANCH,content:b64(JSON.stringify(obj,null,2))};if(old?.sha)body.sha=old.sha;const r=await fetch(API+COMMAND,{method:'PUT',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());st.textContent='Comando enviado. Aguardando o PC...';setTimeout(loadStatus,3500)}catch(e){st.textContent='Falha ao enviar comando: '+e.message}}
-function compact(text){const ks=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','CO2 evitado pela PV','MODO DA FONTE','SIMULACAO FINALIZADA','SEM INTERNET'];const ls=(text||'').split(/\r?\n/).filter(Boolean).filter(x=>ks.some(k=>x.includes(k)));return ls.slice(-15).join('\n')||'Sem resultado recente.'}
-async function loadStatus(){try{const r=await fetch(RAW+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();const b=document.getElementById('agentBadge');b.textContent=(j.agent||'desconhecido').toUpperCase();b.className='badge '+((j.agent==='rodando'||j.agent==='executando')?'ok':'warn');document.getElementById('status').textContent='PC: '+(j.pc||'-')+' | '+(j.status||'-')+'\nÚltima ação: '+(j.last_action||'-')+' | '+(j.last_result||'-')+'\nAtualizado: '+(j.updated_at||'-');document.getElementById('summary').textContent=compact(j.log||'')}catch(e){document.getElementById('agentBadge').textContent='SEM STATUS';document.getElementById('agentBadge').className='badge warn';document.getElementById('status').textContent='Não foi possível consultar o PC: '+e.message}}
-loadToken();loadStatus();setInterval(loadStatus,30000);
+async function fetchStatus(){
+  const r=await fetch(RAW+'?v='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return await r.json();
+}
+function renderStatus(j){
+  const b=document.getElementById('agentBadge');
+  b.textContent=(j.agent||'desconhecido').toUpperCase();
+  b.className='badge '+((j.agent==='rodando'||j.agent==='executando')?'ok':'warn');
+  document.getElementById('status').textContent=
+    'PC: '+(j.pc||'-')+' | '+(j.status||'-')+
+    '\nÚltima ação: '+(j.last_action||'-')+' | '+(j.last_result||'-')+
+    '\nAtualizado: '+(j.updated_at||'-');
+  document.getElementById('summary').textContent=compact(j.log||'');
+}
+async function loadStatus(){
+  try{
+    const j=await fetchStatus();
+    renderStatus(j);
+    return j;
+  }catch(e){
+    document.getElementById('agentBadge').textContent='SEM STATUS';
+    document.getElementById('agentBadge').className='badge warn';
+    document.getElementById('status').textContent='Não foi possível consultar o PC: '+e.message;
+    return null;
+  }
+}
+function actionLabel(action){
+  return ({runonce:'Rodar teste',start:'Iniciar coleta',pause:'Parar coleta',verify:'Verificar PC',dashboard:'Gerar painel'})[action]||action;
+}
+async function waitForFreshStatus(action,previousUpdatedAt){
+  const sync=document.getElementById('syncState');
+  const started=Date.now();
+  const maxMs=action==='runonce'?120000:60000;
+  let lastSeen=previousUpdatedAt||'';
+  let stable=0;
+  let sawNew=false;
+
+  while(Date.now()-started<maxMs){
+    await new Promise(r=>setTimeout(r,3000));
+    try{
+      const j=await fetchStatus();
+      renderStatus(j);
+
+      const current=j.updated_at||'';
+      const changed=current && current!==lastSeen;
+      if(changed){
+        lastSeen=current;
+        sawNew=true;
+        stable=0;
+        sync.textContent='Atualização recebida do PC: '+current;
+      }else if(sawNew){
+        stable++;
+      }else{
+        sync.textContent='Aguardando atualização mais recente do PC...';
+      }
+
+      const sameAction=(j.last_action||'')===action;
+      const result=String(j.last_result||'').toLowerCase();
+      const looksFinished=
+        action==='runonce'
+          ? (sameAction && (result.includes('finalizado')||result.includes('sucesso')||result.includes('codigo 0')||result.includes('resultado')))
+          : (sameAction && sawNew);
+
+      if(looksFinished && stable>=1){
+        sync.textContent='Status atualizado automaticamente: '+(j.updated_at||'-');
+        return j;
+      }
+
+      // Fallback: after receiving a new update, stop only after it remains stable
+      // long enough to represent the latest state instead of the first acknowledgement.
+      if(sawNew && stable>=3 && action!=='runonce'){
+        sync.textContent='Status atualizado automaticamente: '+(j.updated_at||'-');
+        return j;
+      }
+      if(sawNew && stable>=4 && action==='runonce'){
+        sync.textContent='Último status recebido: '+(j.updated_at||'-');
+        return j;
+      }
+    }catch(e){
+      sync.textContent='Aguardando reconexão com o status do PC...';
+    }
+  }
+  sync.textContent='Tempo de acompanhamento encerrado. Toque em qualquer comando ou aguarde a atualização automática.';
+  return await loadStatus();
+}
+async function sendCommand(action){
+  if(!tok()){
+    alert('Abra Configuração do controle e salve o token primeiro.');
+    return;
+  }
+  const st=document.getElementById('status');
+  const sync=document.getElementById('syncState');
+  let before=null;
+  try{before=await fetchStatus(); if(before)renderStatus(before);}catch(e){}
+  st.textContent='Enviando: '+actionLabel(action)+'...';
+  sync.textContent='Preparando acompanhamento automático...';
+  try{
+    const old=await getCommandFile();
+    const obj={
+      id:String(Date.now())+'-'+Math.random().toString(16).slice(2),
+      action:action,
+      from:'pvfirst_mobile',
+      created_at:new Date().toISOString()
+    };
+    const body={
+      message:'PV-First remoto: '+action,
+      branch:BRANCH,
+      content:b64(JSON.stringify(obj,null,2))
+    };
+    if(old?.sha)body.sha=old.sha;
+    const r=await fetch(API+COMMAND,{
+      method:'PUT',
+      headers:{...headers(),'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());
+
+    st.textContent='Comando enviado: '+actionLabel(action)+'.\nAguardando execução no PC...';
+    sync.textContent='Atualização automática ativa.';
+    await waitForFreshStatus(action,before?.updated_at||'');
+  }catch(e){
+    st.textContent='Falha ao enviar comando: '+e.message;
+    sync.textContent='';
+  }
+}
+function compact(text){
+  const ks=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','CO2 evitado pela PV','MODO DA FONTE','SIMULACAO FINALIZADA','SEM INTERNET'];
+  const ls=(text||'').split(/\r?\n/).filter(Boolean).filter(x=>ks.some(k=>x.includes(k)));
+  return ls.slice(-15).join('\n')||'Sem resultado recente.';
+}
+loadToken();loadStatus();setInterval(loadStatus,15000);
 let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').style.display='block'});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('installBtn').style.display='none'});if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw-v48.js').catch(()=>{});
 </script>
 </body></html>
