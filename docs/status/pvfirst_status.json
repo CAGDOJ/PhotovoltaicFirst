@@ -1,13 +1,13 @@
 {
     "pc":  "DESKTOP-7341US6",
-    "agent":  "executando",
+    "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "last_action":  "verify",
-    "last_result":  "Comando recebido no PC",
-    "status":  "RUNNING: Coleta solar continua",
+    "last_result":  "Finalizado: check.cmd (codigo 0)",
+    "status":  "OK: Ambiente instalado",
     "env":  "READY|Ubuntu",
-    "log":  "CO2 emitido pela GRID      : 1494.29 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 8207.01 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 16:10:39\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 271.332 W/m2\nPotencia PV disponivel   : 2316.28 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 128.682 kWh\nEnergia vinda da GRID      : 14.9429 kWh\nCO2 emitido pela GRID      : 1494.29 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 9701.31 gCO2 no dia\nSIMULACAO FINALIZADA\n[2026-09-22 16:11:39] SEM INTERNET: coleta continua em segundo plano. Nenhuma linha sera salva no CSV ate a internet voltar.",
-    "agent_log":  "[2026-09-22 16:00:14] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 16:00:17] Status enviado ao GitHub via API.\n[2026-09-22 16:00:18] Baseline do comando atual registrado sem reexecutar: 1790099426717-8e0b0be50e7ce8\n[2026-09-22 16:12:09] Novo comando recebido: id=1790104115004-3b985c8d734c5 action=verify",
-    "updated_at":  "2026-09-22 16:12:09"
+    "log":  "",
+    "agent_log":  "[2026-09-22 16:00:14] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 16:00:17] Status enviado ao GitHub via API.\n[2026-09-22 16:00:18] Baseline do comando atual registrado sem reexecutar: 1790099426717-8e0b0be50e7ce8\n[2026-09-22 16:12:09] Novo comando recebido: id=1790104115004-3b985c8d734c5 action=verify\n[2026-09-22 16:12:12] Status enviado ao GitHub via API.\n[2026-09-22 16:12:13] Resultado: Finalizado: check.cmd (codigo 0)",
+    "updated_at":  "2026-09-22 16:12:13"
 }
