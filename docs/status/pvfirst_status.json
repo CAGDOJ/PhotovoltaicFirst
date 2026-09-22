@@ -1,1 +1,13 @@
-{"status":"GitHub Pages publicado; aguardando agente local PV-First","updated_at":""}
+{
+    "pc":  "DESKTOP-7341US6",
+    "agent":  "rodando",
+    "repo":  "CAGDOJ/PhotovoltaicFirst",
+    "branch":  "main",
+    "last_action":  "",
+    "last_result":  "Agente V43 iniciado",
+    "status":  "OK: Aguardando acao",
+    "env":  "UNKNOWN|Aguardando verificacao",
+    "log":  "[PV-First] Interface pronta. Clique em Verificar ambiente.",
+    "agent_log":  "[2026-09-22 12:18:21] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
+    "updated_at":  "2026-09-22 12:18:21"
+}
