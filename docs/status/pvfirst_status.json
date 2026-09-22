@@ -8,6 +8,6 @@
     "status":  "OK: Aguardando acao",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "[PV-First] Interface pronta. Clique em Verificar ambiente.",
-    "agent_log":  "[2026-09-22 12:18:21] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
-    "updated_at":  "2026-09-22 12:18:21"
+    "agent_log":  "[2026-09-22 12:23:28] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
+    "updated_at":  "2026-09-22 12:23:28"
 }
