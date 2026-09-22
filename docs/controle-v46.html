@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>PV-First Controle V46</title>
+<style>
+:root{--bg:#07111f;--card:#101c2d;--line:#26384f;--txt:#edf7ff;--muted:#a9bed2;--blue:#2563eb;--green:#13b981;--red:#ef4444;--yellow:#d99b11}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#07111f,#0b1729);color:var(--txt);font-family:Segoe UI,Arial,sans-serif}.wrap{max-width:780px;margin:auto;padding:16px}.card{background:rgba(16,28,45,.96);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0;box-shadow:0 10px 28px rgba(0,0,0,.22)}h1{margin:0 0 8px;font-size:26px}.muted{color:var(--muted);font-size:14px;line-height:1.45}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{border:0;border-radius:14px;padding:16px 10px;font-size:16px;font-weight:800;cursor:pointer}.white{background:#fff;color:#172033}.green{background:var(--green);color:#fff}.red{background:var(--red);color:#fff}.blue{background:var(--blue);color:#fff}.yellow{background:var(--yellow);color:#111}.wide{grid-column:1/-1}label{font-size:13px;color:var(--muted);font-weight:700}input{width:100%;border:1px solid var(--line);background:#07111f;color:var(--txt);padding:13px;border-radius:12px;font-size:15px;margin:6px 0 12px}pre{white-space:pre-wrap;background:#030812;border:1px solid var(--line);border-radius:14px;padding:12px;max-height:360px;overflow:auto}a{color:#7dd3fc;font-weight:800}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:12px;margin:4px 4px 0 0}.warn{color:#fde68a}.ok{color:#bbf7d0}@media(max-width:480px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>PV-First Controle V46</h1>
+    <div class="muted">Esta página manda comandos para o repositório GitHub. O PC fica com um agente em segundo plano lendo esses comandos e executando no PV-First.</div>
+    <span class="pill">Celular</span><span class="pill">GitHub Pages</span><span class="pill">PC Agent</span>
+  </div>
+
+  <div class="card">
+    <label>Token GitHub deste celular</label>
+    <input id="token" type="password" placeholder="Cole um token com permissão Contents: Read and write neste repositório">
+    <div class="grid">
+      <button class="white" onclick="saveToken()">Salvar / testar token</button>
+      <button class="red" onclick="clearToken()">Limpar token</button>
+      <button class="blue wide" onclick="loadStatus()">Atualizar status do PC</button>
+    </div>
+    <div id="tokenState" class="muted warn">O status do PC e lido pela CDN publica, sem gastar o limite da API. O token e usado somente para enviar comandos.</div>
+  </div>
+
+  <div class="card grid">
+    <button class="white" onclick="sendCommand('verify')">Verificar ambiente</button>
+    <button class="green" onclick="sendCommand('runonce')">Rodar uma vez</button>
+    <button class="green wide" onclick="sendCommand('start')">START coleta 24h</button>
+    <button class="red wide" onclick="sendCommand('pause')">PAUSE / PARAR</button>
+    <button class="white" onclick="sendCommand('dashboard')">Gerar painel</button>
+    <button class="white" onclick="sendCommand('gitstatus')">Verificar Git</button>
+    <button class="blue" onclick="sendCommand('gitpush')">Enviar GitHub</button>
+    <button class="blue" onclick="sendCommand('publish')">Publicar Pages</button>
+    <button class="yellow wide" onclick="sendCommand('lock')">Bloquear as duas telas</button>
+  </div>
+
+  <div class="card">
+    <div class="muted">Links</div>
+    <p><a href="./dashboard.html" target="_blank">Abrir dashboard publicado</a></p>
+    <p><a href="./index.html" target="_blank">Abrir página inicial</a></p>
+  </div>
+
+  <div class="card">
+    <div class="muted">Status vindo do PC</div>
+    <pre id="status">Clique em Atualizar status.</pre>
+  </div>
+
+  <div class="card">
+    <div class="muted">Resumo da última execução</div>
+    <pre id="log">aguardando...</pre>
+    <details style="margin-top:10px">
+      <summary style="cursor:pointer;font-weight:800">Detalhes técnicos do agente</summary>
+      <pre id="agentLog" style="max-height:220px">oculto</pre>
+    </details>
+  </div>
+</div>
+
+<script>
+const OWNER='CAGDOJ';
+const REPO='PhotovoltaicFirst';
+const BRANCH='main';
+const COMMAND_PATH='docs/commands/latest.json';
+const RAW_STATUS='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/docs/status/pvfirst_status.json';
+const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
+
+function cleanToken(v){return (v||'').trim().replace(/^Bearer\s+/i,'').replace(/^['\"]|['\"]$/g,'').trim();}
+function token(){return cleanToken(document.getElementById('token').value)}
+function setTokenState(msg,ok){const el=document.getElementById('tokenState');el.textContent=msg;el.className=ok?'muted ok':'muted warn';}
+async function saveToken(){const t=token();if(!t){setTokenState('Cole um token antes de salvar.',false);return;}localStorage.setItem('pvfirst_github_token',t);document.getElementById('token').value=t;setTokenState('Testando token com o GitHub...',false);try{const r=await fetch('https://api.github.com/user',{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+t},cache:'no-store'});if(r.status===401){localStorage.removeItem('pvfirst_github_token');setTokenState('Token invalido ou expirado (401).',false);return;}if(!r.ok){setTokenState('Token salvo. GitHub respondeu HTTP '+r.status+'.',false);return;}const j=await r.json();setTokenState('Token valido para a conta '+(j.login||'GitHub')+'.',true);}catch(e){setTokenState('Token salvo. Nao foi possivel validar agora: '+e.message,false);}}
+function clearToken(){localStorage.removeItem('pvfirst_github_token');document.getElementById('token').value='';setTokenState('Token removido deste navegador. O status do PC continua sendo lido pela CDN publica.',true);loadStatus();}
+function loadToken(){document.getElementById('token').value=localStorage.getItem('pvfirst_github_token')||'';}
+function b64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
+function authHeaders(){const h={'Accept':'application/vnd.github+json'};if(token())h['Authorization']='Bearer '+token();return h;}
+async function getContentAuth(path){if(!token())throw new Error('Token do celular nao configurado.');const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/')+'?ref='+BRANCH+'&_='+Date.now(),{headers:authHeaders(),cache:'no-store'});if(r.status===404)return null;if(r.status===401)throw new Error('Token invalido ou expirado (401).');if(r.status===403)throw new Error('Token sem permissao suficiente ou limite autenticado atingido (403).');if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());return await r.json();}
+async function putContent(path,obj,message){if(!token())throw new Error('Token do celular nao configurado. Cole o token e clique em Salvar / testar token.');const old=await getContentAuth(path);const body={message:message,branch:BRANCH,content:b64EncodeUnicode(JSON.stringify(obj,null,2))};if(old&&old.sha)body.sha=old.sha;const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/'),{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});const raw=await r.text();if(r.status===401)throw new Error('Token do celular invalido ou expirado (401).');if(r.status===403)throw new Error('Token valido, mas sem Contents: Read and write (403), ou limite autenticado atingido.');if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+raw);return raw?JSON.parse(raw):{};}
+async function sendCommand(action){const cmd={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action:action,from:'github_pages_mobile',created_at:new Date().toISOString()};document.getElementById('status').textContent='Enviando comando '+action+' para o GitHub...';try{await putContent(COMMAND_PATH,cmd,'Comando PV-First: '+action);document.getElementById('status').textContent='Comando enviado: '+action+'\nAguarde o agente do PC processar.';setTimeout(loadStatus,5000);}catch(e){document.getElementById('status').textContent='Erro ao enviar comando:\n'+e.message;}}
+function compactSim(text){const keep=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','MODO DA FONTE','SIMULACAO FINALIZADA','TESTE ENVIADO COM SUCESSO','SEM INTERNET'];const lines=(text||'').split(/\r?\n/).filter(Boolean);const out=lines.filter(line=>keep.some(k=>line.includes(k)));return (out.slice(-18).join('\n')||'Sem resumo disponível.');}
+function compactAgent(text){const lines=(text||'').split(/\r?\n/).filter(Boolean).filter(line=>!/tempo limite|Nao consegui consultar comando|API de comando falhou/i.test(line));return (lines.slice(-8).join('\n')||'Sem mensagens técnicas recentes.');}
+async function loadStatus(){try{const r=await fetch(RAW_STATUS+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status+' ao ler status publico.');const j=await r.json();document.getElementById('status').textContent='PC: '+(j.pc||'')+'\nAgente: '+(j.agent||'')+'\nUltima acao: '+(j.last_action||'')+'\nResultado: '+(j.last_result||'')+'\nStatus: '+(j.status||'')+'\nAmbiente: '+(j.env||'')+'\nAtualizado: '+(j.updated_at||'');document.getElementById('log').textContent=compactSim(j.log||'');const a=document.getElementById('agentLog');if(a)a.textContent=compactAgent(j.agent_log||'');}catch(e){document.getElementById('status').textContent='Erro ao ler status publico:\n'+e.message;}}
+loadToken();if(token())setTokenState('Ha um token salvo neste navegador. Ele e usado somente para ENVIAR comandos.',true);loadStatus();setInterval(loadStatus,30000);
+</script>
+</body>
+</html>
