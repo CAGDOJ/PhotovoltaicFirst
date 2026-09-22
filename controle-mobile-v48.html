@@ -20,6 +20,7 @@
     <div class="statusline"><strong>PC</strong><span id="agentBadge" class="badge">consultando</span></div>
     <div id="status" class="muted" style="margin-top:10px">Aguardando status...</div>
   </div>
+
   <div class="card">
     <strong>Comandos</strong>
     <div class="grid" style="margin-top:12px">
@@ -30,11 +31,13 @@
       <button class="btn light" onclick="sendCommand('dashboard')">GERAR PAINEL</button>
     </div>
   </div>
+
   <div class="card">
     <strong>Último resultado</strong>
     <div id="summary" class="summary">Sem resultado recebido.</div>
     <p class="small"><a href="./dashboard.html" target="_blank">Abrir dashboard completo</a></p>
   </div>
+
   <div class="card tokenbox">
     <details>
       <summary>Configuração do controle</summary>
@@ -47,6 +50,7 @@
       <div id="tokenState" class="muted" style="margin-top:8px"></div>
     </details>
   </div>
+
   <div class="card">
     <button id="installBtn" class="btn light" style="width:100%;display:none">INSTALAR CONTROLE NO CELULAR</button>
     <div class="muted">No celular, você também pode usar o menu do navegador e escolher <b>Adicionar à tela inicial</b>.</div>
@@ -57,7 +61,7 @@ const OWNER='CAGDOJ',REPO='PhotovoltaicFirst',BRANCH='main';
 const COMMAND='docs/commands/latest.json';
 const RAW='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/docs/status/pvfirst_status.json';
 const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
-function tok(){return (document.getElementById('token').value||'').trim().replace(/^Bearer\s+/i,'').replace(/^['"]|['"]$/g,'')}
+function tok(){return (document.getElementById('token').value||'').trim().replace(/^Bearer\s+/i,'').replace(/^['\"]|['\"]$/g,'')}
 function loadToken(){document.getElementById('token').value=localStorage.getItem('pvfirst_mobile_token')||''}
 function b64(s){return btoa(unescape(encodeURIComponent(s)))}
 function headers(){const h={'Accept':'application/vnd.github+json'};if(tok())h.Authorization='Bearer '+tok();return h}
