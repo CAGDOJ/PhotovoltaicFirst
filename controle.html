@@ -21,10 +21,11 @@
     <label>Token GitHub deste celular</label>
     <input id="token" type="password" placeholder="Cole um token com permissão Contents: Read and write neste repositório">
     <div class="grid">
-      <button class="white" onclick="saveToken()">Salvar token</button>
-      <button class="blue" onclick="loadStatus()">Atualizar status</button>
+      <button class="white" onclick="saveToken()">Salvar / testar token</button>
+      <button class="red" onclick="clearToken()">Limpar token</button>
+      <button class="blue wide" onclick="loadStatus()">Atualizar status do PC</button>
     </div>
-    <div class="muted warn">O token fica salvo apenas neste navegador/celular. Não coloque token dentro do código do repositório.</div>
+    <div id="tokenState" class="muted warn">O status do PC é lido publicamente. O token é usado somente para enviar comandos.</div>
   </div>
 
   <div class="card grid">
@@ -64,26 +65,73 @@ const COMMAND_PATH='docs/commands/latest.json';
 const STATUS_PATH='docs/status/pvfirst_status.json';
 const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
 
-function token(){return document.getElementById('token').value.trim()}
-function saveToken(){localStorage.setItem('pvfirst_github_token', token()); alert('Token salvo neste celular.');}
-function loadToken(){document.getElementById('token').value=localStorage.getItem('pvfirst_github_token')||''}
+function cleanToken(v){
+  return (v||'').trim().replace(/^Bearer\s+/i,'').replace(/^['\"]|['\"]$/g,'').trim();
+}
+function token(){return cleanToken(document.getElementById('token').value)}
+function setTokenState(msg, ok){
+  const el=document.getElementById('tokenState');
+  el.textContent=msg;
+  el.className=ok?'muted ok':'muted warn';
+}
+async function saveToken(){
+  const t=token();
+  if(!t){setTokenState('Cole um token antes de salvar.',false);return;}
+  localStorage.setItem('pvfirst_github_token', t);
+  document.getElementById('token').value=t;
+  setTokenState('Testando token com o GitHub...',false);
+  try{
+    const r=await fetch('https://api.github.com/user',{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+t},cache:'no-store'});
+    if(r.status===401){
+      localStorage.removeItem('pvfirst_github_token');
+      setTokenState('Token inválido ou expirado (401). O status do PC continuará funcionando, mas comandos não serão enviados.',false);
+      return;
+    }
+    if(!r.ok){setTokenState('Token salvo. O GitHub respondeu HTTP '+r.status+' ao teste; tente enviar um comando.',false);return;}
+    const j=await r.json();
+    setTokenState('Token válido para a conta '+(j.login||'GitHub')+'. Agora teste Rodar uma vez.',true);
+  }catch(e){
+    setTokenState('Token salvo. Não foi possível validá-lo agora: '+e.message,false);
+  }
+}
+function clearToken(){
+  localStorage.removeItem('pvfirst_github_token');
+  document.getElementById('token').value='';
+  setTokenState('Token do celular removido. O status do PC continua disponível.',true);
+  loadStatus();
+}
+function loadToken(){
+  document.getElementById('token').value=localStorage.getItem('pvfirst_github_token')||'';
+}
 function b64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)))}
 function b64DecodeUnicode(str){return decodeURIComponent(escape(atob(str.replace(/\n/g,''))))}
-function headers(){const h={'Accept':'application/vnd.github+json'}; if(token()) h['Authorization']='Bearer '+token(); return h;}
+function publicHeaders(){return {'Accept':'application/vnd.github+json'};}
+function authHeaders(){
+  const h={'Accept':'application/vnd.github+json'};
+  if(token()) h['Authorization']='Bearer '+token();
+  return h;
+}
 async function getContent(path){
-  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/')+'?ref='+BRANCH+'&_='+Date.now(),{headers:headers(),cache:'no-store'});
+  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/')+'?ref='+BRANCH+'&_='+Date.now(),{headers:publicHeaders(),cache:'no-store'});
   if(r.status===404) return null;
-  if(!r.ok) throw new Error(await r.text());
+  if(!r.ok) throw new Error('Falha ao ler GitHub: HTTP '+r.status+' - '+await r.text());
   return await r.json();
 }
 async function putContent(path, obj, message){
-  if(!token()) throw new Error('Informe e salve o token GitHub primeiro.');
+  if(!token()) throw new Error('Token do celular não configurado. Cole o token e clique em Salvar / testar token.');
   const old=await getContent(path);
   const body={message:message, branch:BRANCH, content:b64EncodeUnicode(JSON.stringify(obj,null,2))};
   if(old && old.sha) body.sha=old.sha;
-  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/'),{method:'PUT',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(!r.ok) throw new Error(await r.text());
-  return await r.json();
+  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/'),{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const raw=await r.text();
+  if(r.status===401){
+    throw new Error('Token do celular inválido ou expirado (401). Clique em Limpar token, cole o token correto e salve novamente.');
+  }
+  if(r.status===403){
+    throw new Error('Token válido, mas sem permissão de escrita (403). Em Repository permissions, defina Contents = Read and write para CAGDOJ/PhotovoltaicFirst.');
+  }
+  if(!r.ok) throw new Error('GitHub HTTP '+r.status+': '+raw);
+  return raw?JSON.parse(raw):{};
 }
 async function sendCommand(action){
   const cmd={id:String(Date.now())+'-'+Math.random().toString(16).slice(2), action:action, from:'github_pages_mobile', created_at:new Date().toISOString()};
@@ -91,19 +139,20 @@ async function sendCommand(action){
   try{
     await putContent(COMMAND_PATH, cmd, 'Comando PV-First: '+action);
     document.getElementById('status').textContent='Comando enviado: '+action+'\nAguarde alguns segundos para o PC buscar no GitHub.';
-    setTimeout(loadStatus, 8000);
+    setTimeout(loadStatus, 5000);
   }catch(e){document.getElementById('status').textContent='Erro ao enviar comando:\n'+e.message;}
 }
 async function loadStatus(){
   try{
     const c=await getContent(STATUS_PATH);
-    if(!c){document.getElementById('status').textContent='Ainda nao existe status publicado pelo PC. Inicie PVFIRST.bat no computador.';return}
+    if(!c){document.getElementById('status').textContent='Ainda não existe status publicado pelo PC. Inicie PVFIRST.bat no computador.';return}
     const j=JSON.parse(b64DecodeUnicode(c.content));
     document.getElementById('status').textContent='PC: '+(j.pc||'')+'\nAgente: '+(j.agent||'')+'\nUltima acao: '+(j.last_action||'')+'\nResultado: '+(j.last_result||'')+'\nStatus: '+(j.status||'')+'\nAmbiente: '+(j.env||'')+'\nAtualizado: '+(j.updated_at||'');
     document.getElementById('log').textContent=(j.log||'')+'\n\n--- AGENTE ---\n'+(j.agent_log||'');
-  }catch(e){document.getElementById('status').textContent='Erro ao ler status:\n'+e.message;}
+  }catch(e){document.getElementById('status').textContent='Erro ao ler status público:\n'+e.message;}
 }
 loadToken();
+if(token()) setTokenState('Há um token salvo neste navegador. O status do PC é lido sem usar esse token.',true);
 loadStatus();
 setInterval(loadStatus,15000);
 </script>
