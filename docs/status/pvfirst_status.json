@@ -1,13 +1,13 @@
 {
     "pc":  "DESKTOP-7341US6",
-    "agent":  "rodando",
+    "agent":  "executando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "",
-    "last_result":  "Agente V43 iniciado",
+    "last_action":  "runonce",
+    "last_result":  "Comando recebido no PC",
     "status":  "OK: Aguardando acao",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "[PV-First] Interface pronta. Clique em Verificar ambiente.",
-    "agent_log":  "[2026-09-22 12:27:12] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
-    "updated_at":  "2026-09-22 12:27:12"
+    "agent_log":  "[2026-09-22 12:27:12] Agente V43 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-22 12:27:15] Status enviado ao GitHub via API.\n[2026-09-22 12:27:15] Baseline do comando atual registrado sem reexecutar: 1790089592403-761dc8c4e25b68\n[2026-09-22 12:27:45] Novo comando recebido: id=1790090863469-0831226a727ad8 action=runonce",
+    "updated_at":  "2026-09-22 12:27:45"
 }
