@@ -148,12 +148,12 @@ async function sendCommand(action){
 }
 async function loadStatus(){
   try{
-    const c=await getContent(STATUS_PATH);
-    if(!c){document.getElementById('status').textContent='Ainda não existe status publicado pelo PC. Inicie PVFIRST.bat no computador.';return}
-    const j=JSON.parse(b64DecodeUnicode(c.content));
+    const r=await fetch(RAW_STATUS+'?v='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status+' ao ler status publico.');
+    const j=await r.json();
     document.getElementById('status').textContent='PC: '+(j.pc||'')+'\nAgente: '+(j.agent||'')+'\nUltima acao: '+(j.last_action||'')+'\nResultado: '+(j.last_result||'')+'\nStatus: '+(j.status||'')+'\nAmbiente: '+(j.env||'')+'\nAtualizado: '+(j.updated_at||'');
     document.getElementById('log').textContent=(j.log||'')+'\n\n--- AGENTE ---\n'+(j.agent_log||'');
-  }catch(e){document.getElementById('status').textContent='Erro ao ler status público:\n'+e.message;}
+  }catch(e){document.getElementById('status').textContent='Erro ao ler status publico:\n'+e.message;}
 }
 loadToken();
 if(token()) setTokenState('Há um token salvo neste navegador. O status do PC é lido sem usar esse token.',true);
