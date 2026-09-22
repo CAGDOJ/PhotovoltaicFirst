@@ -72,21 +72,96 @@ const COMMAND_PATH='docs/commands/latest.json';
 const RAW_STATUS='https://raw.githubusercontent.com/'+OWNER+'/'+REPO+'/'+BRANCH+'/docs/status/pvfirst_status.json';
 const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
 
-function cleanToken(v){return (v||'').trim().replace(/^Bearer\s+/i,'').replace(/^['\"]|['\"]$/g,'').trim();}
+function cleanToken(v){
+  return (v||'').trim().replace(/^Bearer\s+/i,'').replace(/^['\"]|['\"]$/g,'').trim();
+}
 function token(){return cleanToken(document.getElementById('token').value)}
-function setTokenState(msg,ok){const el=document.getElementById('tokenState');el.textContent=msg;el.className=ok?'muted ok':'muted warn';}
-async function saveToken(){const t=token();if(!t){setTokenState('Cole um token antes de salvar.',false);return;}localStorage.setItem('pvfirst_github_token',t);document.getElementById('token').value=t;setTokenState('Testando token com o GitHub...',false);try{const r=await fetch('https://api.github.com/user',{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+t},cache:'no-store'});if(r.status===401){localStorage.removeItem('pvfirst_github_token');setTokenState('Token invalido ou expirado (401).',false);return;}if(!r.ok){setTokenState('Token salvo. GitHub respondeu HTTP '+r.status+'.',false);return;}const j=await r.json();setTokenState('Token valido para a conta '+(j.login||'GitHub')+'.',true);}catch(e){setTokenState('Token salvo. Nao foi possivel validar agora: '+e.message,false);}}
-function clearToken(){localStorage.removeItem('pvfirst_github_token');document.getElementById('token').value='';setTokenState('Token removido deste navegador. O status do PC continua sendo lido pela CDN publica.',true);loadStatus();}
+function setTokenState(msg, ok){
+  const el=document.getElementById('tokenState');
+  el.textContent=msg;
+  el.className=ok?'muted ok':'muted warn';
+}
+async function saveToken(){
+  const t=token();
+  if(!t){setTokenState('Cole um token antes de salvar.',false);return;}
+  localStorage.setItem('pvfirst_github_token',t);
+  document.getElementById('token').value=t;
+  setTokenState('Testando token com o GitHub...',false);
+  try{
+    const r=await fetch('https://api.github.com/user',{headers:{'Accept':'application/vnd.github+json','Authorization':'Bearer '+t},cache:'no-store'});
+    if(r.status===401){localStorage.removeItem('pvfirst_github_token');setTokenState('Token invalido ou expirado (401).',false);return;}
+    if(!r.ok){setTokenState('Token salvo. GitHub respondeu HTTP '+r.status+'.',false);return;}
+    const j=await r.json();
+    setTokenState('Token valido para a conta '+(j.login||'GitHub')+'.',true);
+  }catch(e){setTokenState('Token salvo. Nao foi possivel validar agora: '+e.message,false);}
+}
+function clearToken(){
+  localStorage.removeItem('pvfirst_github_token');
+  document.getElementById('token').value='';
+  setTokenState('Token removido deste navegador. O status do PC continua sendo lido pela CDN publica.',true);
+  loadStatus();
+}
 function loadToken(){document.getElementById('token').value=localStorage.getItem('pvfirst_github_token')||'';}
 function b64EncodeUnicode(str){return btoa(unescape(encodeURIComponent(str)));}
-function authHeaders(){const h={'Accept':'application/vnd.github+json'};if(token())h['Authorization']='Bearer '+token();return h;}
-async function getContentAuth(path){if(!token())throw new Error('Token do celular nao configurado.');const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/')+'?ref='+BRANCH+'&_='+Date.now(),{headers:authHeaders(),cache:'no-store'});if(r.status===404)return null;if(r.status===401)throw new Error('Token invalido ou expirado (401).');if(r.status===403)throw new Error('Token sem permissao suficiente ou limite autenticado atingido (403).');if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());return await r.json();}
-async function putContent(path,obj,message){if(!token())throw new Error('Token do celular nao configurado. Cole o token e clique em Salvar / testar token.');const old=await getContentAuth(path);const body={message:message,branch:BRANCH,content:b64EncodeUnicode(JSON.stringify(obj,null,2))};if(old&&old.sha)body.sha=old.sha;const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/'),{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});const raw=await r.text();if(r.status===401)throw new Error('Token do celular invalido ou expirado (401).');if(r.status===403)throw new Error('Token valido, mas sem Contents: Read and write (403), ou limite autenticado atingido.');if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+raw);return raw?JSON.parse(raw):{};}
-async function sendCommand(action){const cmd={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action:action,from:'github_pages_mobile',created_at:new Date().toISOString()};document.getElementById('status').textContent='Enviando comando '+action+' para o GitHub...';try{await putContent(COMMAND_PATH,cmd,'Comando PV-First: '+action);document.getElementById('status').textContent='Comando enviado: '+action+'\nAguarde o agente do PC processar.';setTimeout(loadStatus,5000);}catch(e){document.getElementById('status').textContent='Erro ao enviar comando:\n'+e.message;}}
-function compactSim(text){const keep=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','MODO DA FONTE','SIMULACAO FINALIZADA','TESTE ENVIADO COM SUCESSO','SEM INTERNET'];const lines=(text||'').split(/\r?\n/).filter(Boolean);const out=lines.filter(line=>keep.some(k=>line.includes(k)));return (out.slice(-18).join('\n')||'Sem resumo disponível.');}
-function compactAgent(text){const lines=(text||'').split(/\r?\n/).filter(Boolean).filter(line=>!/tempo limite|Nao consegui consultar comando|API de comando falhou/i.test(line));return (lines.slice(-8).join('\n')||'Sem mensagens técnicas recentes.');}
-async function loadStatus(){try{const r=await fetch(RAW_STATUS+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status+' ao ler status publico.');const j=await r.json();document.getElementById('status').textContent='PC: '+(j.pc||'')+'\nAgente: '+(j.agent||'')+'\nUltima acao: '+(j.last_action||'')+'\nResultado: '+(j.last_result||'')+'\nStatus: '+(j.status||'')+'\nAmbiente: '+(j.env||'')+'\nAtualizado: '+(j.updated_at||'');document.getElementById('log').textContent=compactSim(j.log||'');const a=document.getElementById('agentLog');if(a)a.textContent=compactAgent(j.agent_log||'');}catch(e){document.getElementById('status').textContent='Erro ao ler status publico:\n'+e.message;}}
-loadToken();if(token())setTokenState('Ha um token salvo neste navegador. Ele e usado somente para ENVIAR comandos.',true);loadStatus();setInterval(loadStatus,30000);
+function authHeaders(){
+  const h={'Accept':'application/vnd.github+json'};
+  if(token())h['Authorization']='Bearer '+token();
+  return h;
+}
+async function getContentAuth(path){
+  if(!token()) throw new Error('Token do celular nao configurado.');
+  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/')+'?ref='+BRANCH+'&_='+Date.now(),{headers:authHeaders(),cache:'no-store'});
+  if(r.status===404)return null;
+  if(r.status===401)throw new Error('Token invalido ou expirado (401).');
+  if(r.status===403)throw new Error('Token sem permissao suficiente ou limite autenticado atingido (403).');
+  if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());
+  return await r.json();
+}
+async function putContent(path,obj,message){
+  if(!token())throw new Error('Token do celular nao configurado. Cole o token e clique em Salvar / testar token.');
+  const old=await getContentAuth(path);
+  const body={message:message,branch:BRANCH,content:b64EncodeUnicode(JSON.stringify(obj,null,2))};
+  if(old&&old.sha)body.sha=old.sha;
+  const r=await fetch(API+encodeURIComponent(path).replace(/%2F/g,'/'),{method:'PUT',headers:{...authHeaders(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const raw=await r.text();
+  if(r.status===401)throw new Error('Token do celular invalido ou expirado (401).');
+  if(r.status===403)throw new Error('Token valido, mas sem Contents: Read and write (403), ou limite autenticado atingido.');
+  if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+raw);
+  return raw?JSON.parse(raw):{};
+}
+async function sendCommand(action){
+  const cmd={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action:action,from:'github_pages_mobile',created_at:new Date().toISOString()};
+  document.getElementById('status').textContent='Enviando comando '+action+' para o GitHub...';
+  try{
+    await putContent(COMMAND_PATH,cmd,'Comando PV-First: '+action);
+    document.getElementById('status').textContent='Comando enviado: '+action+'\nAguarde o agente do PC processar.';
+    setTimeout(loadStatus,5000);
+  }catch(e){document.getElementById('status').textContent='Erro ao enviar comando:\n'+e.message;}
+}
+function compactSim(text){
+  const keep=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','MODO DA FONTE','SIMULACAO FINALIZADA','TESTE ENVIADO COM SUCESSO','SEM INTERNET'];
+  const lines=(text||'').split(/\r?\n/).filter(Boolean);
+  const out=lines.filter(line=>keep.some(k=>line.includes(k)));
+  return (out.slice(-18).join('\n')||'Sem resumo disponível.');
+}
+function compactAgent(text){
+  const lines=(text||'').split(/\r?\n/).filter(Boolean).filter(line=>!/tempo limite|Nao consegui consultar comando|API de comando falhou/i.test(line));
+  return (lines.slice(-8).join('\n')||'Sem mensagens técnicas recentes.');
+}
+async function loadStatus(){
+  try{
+    const r=await fetch(RAW_STATUS+'?v='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status+' ao ler status publico.');
+    const j=await r.json();
+    document.getElementById('status').textContent='PC: '+(j.pc||'')+'\nAgente: '+(j.agent||'')+'\nUltima acao: '+(j.last_action||'')+'\nResultado: '+(j.last_result||'')+'\nStatus: '+(j.status||'')+'\nAmbiente: '+(j.env||'')+'\nAtualizado: '+(j.updated_at||'');
+    document.getElementById('log').textContent=compactSim(j.log||'');
+    const a=document.getElementById('agentLog'); if(a)a.textContent=compactAgent(j.agent_log||'');
+  }catch(e){document.getElementById('status').textContent='Erro ao ler status publico:\n'+e.message;}
+}
+loadToken();
+if(token())setTokenState('Ha um token salvo neste navegador. Ele e usado somente para ENVIAR comandos.',true);
+loadStatus();
+setInterval(loadStatus,30000);
 </script>
 </body>
 </html>
