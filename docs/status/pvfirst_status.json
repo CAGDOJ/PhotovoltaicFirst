@@ -1,13 +1,13 @@
 {
     "pc":  "DESKTOP-7341US6",
-    "agent":  "executando",
+    "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "last_action":  "pause",
-    "last_result":  "Comando recebido no PC",
-    "status":  "RUNNING: Coleta solar continua",
+    "last_result":  "Finalizado: stop.cmd (codigo 0)",
+    "status":  "FAIL: Erro. Veja o log",
     "env":  "READY|Ubuntu",
-    "log":  "",
-    "agent_log":  "[2026-09-22 16:34:52] Falha ao enviar status via API: O nome remoto não pôde ser resolvido: \u0027api.github.com\u0027\n[2026-09-22 16:37:12] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 16:42:13] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 16:47:14] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:44:28] Status enviado ao GitHub via API.\n[2026-09-22 20:50:50] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:59:36] Status enviado ao GitHub via API.\n[2026-09-23 10:55:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-23 10:55:20] Status enviado ao GitHub via API.\n[2026-09-23 10:55:21] Novo comando recebido: id=1790122613081-ea1e8266fe4478 action=pause",
-    "updated_at":  "2026-09-23 10:55:21"
+    "log":  "[PV-First] Sem internet: o processo continua vivo, mas nao salva CSV.",
+    "agent_log":  "[2026-09-22 16:42:13] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 16:47:14] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:44:28] Status enviado ao GitHub via API.\n[2026-09-22 20:50:50] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:59:36] Status enviado ao GitHub via API.\n[2026-09-23 10:55:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-23 10:55:20] Status enviado ao GitHub via API.\n[2026-09-23 10:55:21] Novo comando recebido: id=1790122613081-ea1e8266fe4478 action=pause\n[2026-09-23 10:55:22] Status enviado ao GitHub via API.\n[2026-09-23 10:55:35] Resultado: Finalizado: stop.cmd (codigo 0)",
+    "updated_at":  "2026-09-23 10:55:36"
 }
