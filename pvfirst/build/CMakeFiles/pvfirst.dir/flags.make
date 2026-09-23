@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/src
+CXX_INCLUDES = -I/mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/src
 
 CXX_FLAGS = -std=c++17
 

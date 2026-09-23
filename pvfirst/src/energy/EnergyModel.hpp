@@ -1,7 +1,7 @@
 #ifndef ENERGY_MODEL_HPP
 #define ENERGY_MODEL_HPP
 
-#include "policy/PVFirstPolicy.hpp"
+#include "model/PVFirstModel.hpp"
 
 struct EnergyStats {
     double E_total = 0.0;
@@ -18,12 +18,18 @@ public:
                 double P_pv,
                 double delta_t_seconds);
 
+    // Esta funcao usa diretamente a energia medida pelo SimGrid.
+    // Assim o PV-First divide a demanda energetica simulada entre PV e rede.
+    void updateFromSimGridEnergy(double simgridEnergyKWh,
+                                 double pvPowerKW,
+                                 double durationSeconds);
+
     EnergyStats getStats() const;
 
 private:
     double CI_grid;
     EnergyStats stats;
-    PVFirstPolicy policy;
+    PVFirstModel pvFirstModel;
 };
 
 #endif

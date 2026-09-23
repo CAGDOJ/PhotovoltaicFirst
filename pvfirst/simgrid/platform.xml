@@ -2,14 +2,9 @@
 <!DOCTYPE platform SYSTEM "https://simgrid.org/simgrid.dtd">
 <platform version="4.1">
   <zone id="AS0" routing="Full">
-    <!--
-      Esse host representa o no computacional onde o job vai rodar.
-      speed="50Gf" significa 50 gigaFLOPs por segundo.
-      Os parametros de wattage sao usados pelo plugin de energia do SimGrid.
-    -->
-    <host id="hpc-node" speed="50Gf" core="1">
-      <prop id="wattage_per_state" value="120:250:250" />
-      <prop id="wattage_off" value="10" />
+    <host id="hpc-node" speed="5000Gf" core="1">
+      <prop id="wattage_per_state" value="600:1800:1800" />
+      <prop id="wattage_off" value="30" />
     </host>
   </zone>
 </platform>

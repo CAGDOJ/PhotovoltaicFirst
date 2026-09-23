@@ -1,4 +1,4 @@
-# Install script for directory: /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst
+# Install script for directory: /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -50,5 +50,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

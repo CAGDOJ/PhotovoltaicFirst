@@ -1,3 +1,3 @@
-/mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/CMakeFiles/pvfirst.dir
-/mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/CMakeFiles/edit_cache.dir
-/mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/CMakeFiles/pvfirst.dir
+/mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/CMakeFiles/rebuild_cache.dir

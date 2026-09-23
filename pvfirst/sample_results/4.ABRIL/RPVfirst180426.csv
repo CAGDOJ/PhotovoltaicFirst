@@ -1,0 +1,2 @@
+run_id,run_date,run_time,run_datetime,day_of_year,city,latitude,longitude,simulation_duration_s,cloud_cover_pct,rain_mm,temperature_c,wind_speed_kmh,irradiance_theoretical_w_m2,irradiance_adjusted_w_m2,pv_efficiency,pv_power_kw,job_power_kw,energy_total_kwh,energy_pv_kwh,energy_grid_kwh,co2_g
+run_20260418_233054,2026-04-18,23:30:54,2026-04-18 23:30:54,108,"Belém",-1.4537,-48.5078,3600,100,0.5,25.4,3.2,0,0,0.200151,0,2,2,0,2,200

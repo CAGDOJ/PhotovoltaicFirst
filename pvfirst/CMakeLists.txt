@@ -13,7 +13,7 @@ pkg_check_modules(SIMGRID REQUIRED IMPORTED_TARGET simgrid)
 file(GLOB_RECURSE SOURCES
     src/*.cpp
     src/energy/*.cpp
-    src/policy/*.cpp
+    src/model/*.cpp
     src/sensors/*.cpp
     src/simulation/*.cpp
 )

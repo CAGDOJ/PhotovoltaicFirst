@@ -9,15 +9,9 @@ void EnergyModel::update(double P_job,
                          double P_pv,
                          double delta_t_seconds)
 {
-    // Aqui eu mantenho o raciocinio mais direto:
-    // 1) o job pede uma certa potencia media
-    // 2) a placa tem uma potencia disponivel naquele instante
-    // 3) a politica PV-First decide o que vem da placa e o que sobra para a rede
-    // 4) no fim eu transformo isso em energia no intervalo do job
-
     double delta_t_hours = delta_t_seconds / 3600.0;
 
-    PowerSplit split = policy.apply(P_job, P_pv);
+    PowerSplit split = pvFirstModel.apply(P_job, P_pv);
 
     double E_interval      = P_job * delta_t_hours;
     double E_pv_interval   = split.pv * delta_t_hours;
@@ -26,9 +20,37 @@ void EnergyModel::update(double P_job,
     stats.E_total += E_interval;
     stats.E_pv    += E_pv_interval;
     stats.E_grid  += E_grid_interval;
+    stats.CO2     += E_grid_interval * CI_grid;
+}
 
-    // O CO2 so entra em cima do que veio da rede.
-    stats.CO2 += E_grid_interval * CI_grid;
+void EnergyModel::updateFromSimGridEnergy(double simgridEnergyKWh,
+                                          double pvPowerKW,
+                                          double durationSeconds)
+{
+    // Aqui a energia total do job vem diretamente do SimGrid.
+    // O SimGrid executa a carga em FLOPs e mede o consumo do host.
+    // Depois o PV-First calcula quanto dessa energia caberia na PV.
+
+    double delta_t_hours = durationSeconds / 3600.0;
+    double pvAvailableKWh = pvPowerKW * delta_t_hours;
+
+    double E_pv_interval = pvAvailableKWh;
+
+    if (E_pv_interval > simgridEnergyKWh)
+        E_pv_interval = simgridEnergyKWh;
+
+    if (E_pv_interval < 0.0)
+        E_pv_interval = 0.0;
+
+    double E_grid_interval = simgridEnergyKWh - E_pv_interval;
+
+    if (E_grid_interval < 0.0)
+        E_grid_interval = 0.0;
+
+    stats.E_total += simgridEnergyKWh;
+    stats.E_pv    += E_pv_interval;
+    stats.E_grid  += E_grid_interval;
+    stats.CO2     += E_grid_interval * CI_grid;
 }
 
 EnergyStats EnergyModel::getStats() const

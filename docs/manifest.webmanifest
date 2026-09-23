@@ -1,0 +1,13 @@
+{
+  "name": "PV-First Controle",
+  "short_name": "PV-First",
+  "description": "Controle remoto do simulador PV-First",
+  "start_url": "/PhotovoltaicFirst/controle-mobile-v48.html",
+  "scope": "/PhotovoltaicFirst/",
+  "display": "standalone",
+  "background_color": "#f3f7fb",
+  "theme_color": "#082f5b",
+  "icons": [
+    {"src":"/PhotovoltaicFirst/pvfirst-icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

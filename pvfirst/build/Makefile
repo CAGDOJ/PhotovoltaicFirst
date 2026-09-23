@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst
+CMAKE_SOURCE_DIR = /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build
+CMAKE_BINARY_DIR = /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/CMakeFiles /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/CMakeFiles /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/stel-adm/Documents/GitHub/pvfirst/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/stel-adm/Downloads/PVFIRST_VISUAL_V50_5_REABRIVEL/pvfirst/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -177,29 +177,29 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/policy/PVFirstPolicy.o: src/policy/PVFirstPolicy.cpp.o
-.PHONY : src/policy/PVFirstPolicy.o
+src/model/PVFirstModel.o: src/model/PVFirstModel.cpp.o
+.PHONY : src/model/PVFirstModel.o
 
 # target to build an object file
-src/policy/PVFirstPolicy.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/policy/PVFirstPolicy.cpp.o
-.PHONY : src/policy/PVFirstPolicy.cpp.o
+src/model/PVFirstModel.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/model/PVFirstModel.cpp.o
+.PHONY : src/model/PVFirstModel.cpp.o
 
-src/policy/PVFirstPolicy.i: src/policy/PVFirstPolicy.cpp.i
-.PHONY : src/policy/PVFirstPolicy.i
+src/model/PVFirstModel.i: src/model/PVFirstModel.cpp.i
+.PHONY : src/model/PVFirstModel.i
 
 # target to preprocess a source file
-src/policy/PVFirstPolicy.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/policy/PVFirstPolicy.cpp.i
-.PHONY : src/policy/PVFirstPolicy.cpp.i
+src/model/PVFirstModel.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/model/PVFirstModel.cpp.i
+.PHONY : src/model/PVFirstModel.cpp.i
 
-src/policy/PVFirstPolicy.s: src/policy/PVFirstPolicy.cpp.s
-.PHONY : src/policy/PVFirstPolicy.s
+src/model/PVFirstModel.s: src/model/PVFirstModel.cpp.s
+.PHONY : src/model/PVFirstModel.s
 
 # target to generate assembly for a file
-src/policy/PVFirstPolicy.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/policy/PVFirstPolicy.cpp.s
-.PHONY : src/policy/PVFirstPolicy.cpp.s
+src/model/PVFirstModel.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/pvfirst.dir/build.make CMakeFiles/pvfirst.dir/src/model/PVFirstModel.cpp.s
+.PHONY : src/model/PVFirstModel.cpp.s
 
 src/sensors/GeoSensor.o: src/sensors/GeoSensor.cpp.o
 .PHONY : src/sensors/GeoSensor.o
@@ -336,9 +336,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/policy/PVFirstPolicy.o"
-	@echo "... src/policy/PVFirstPolicy.i"
-	@echo "... src/policy/PVFirstPolicy.s"
+	@echo "... src/model/PVFirstModel.o"
+	@echo "... src/model/PVFirstModel.i"
+	@echo "... src/model/PVFirstModel.s"
 	@echo "... src/sensors/GeoSensor.o"
 	@echo "... src/sensors/GeoSensor.i"
 	@echo "... src/sensors/GeoSensor.s"

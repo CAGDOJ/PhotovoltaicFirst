@@ -1,0 +1,2 @@
+# Esta versao do dashboard usa apenas biblioteca padrao do Python.
+# O arquivo existe apenas para documentacao/compatibilidade.

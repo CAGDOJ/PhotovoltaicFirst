@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate">
+<title>PV-First | Resultados</title>
+<style>
+:root{--navy:#0b2d5c;--blue:#08a9e6;--gold:#f5b400;--bg:#f4f7fb;--card:#fff;--text:#172033;--muted:#69798b;--green:#1f7a3f;--red:#b42318;--line:#e1e8f0}
+*{box-sizing:border-box}body{margin:0;font-family:Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{background:linear-gradient(135deg,#fff 0%,#eef9ff 48%,#fff7d7 100%);border-bottom:1px solid #dde6ef;padding:18px 24px;display:flex;gap:18px;align-items:center;position:sticky;top:0;z-index:10}
+.logo{width:76px;height:76px;object-fit:contain;background:#fff;border-radius:16px;padding:6px;box-shadow:0 6px 18px rgba(0,0,0,.08)}h1{margin:0;color:var(--navy);font-size:30px}.sub{color:#506173;font-size:14px;margin-top:6px}
+main{max-width:1400px;margin:auto;padding:20px}.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:16px}.field{display:flex;flex-direction:column;gap:5px}.field label{font-size:12px;color:var(--muted);font-weight:700}.field select,.field input{padding:9px 10px;border:1px solid #ccd8e4;border-radius:9px;background:#fff}.btn{border:0;border-radius:9px;padding:10px 13px;background:var(--navy);color:#fff;font-weight:800;cursor:pointer;text-decoration:none;display:inline-block}.btn.secondary{background:var(--blue)}.btn.light{background:#eaf1f7;color:#17324d}
+.cards{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:16px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 5px 14px rgba(20,45,80,.05)}.label{font-size:12px;color:var(--muted);margin-bottom:7px}.value{font-size:22px;font-weight:900;color:var(--navy)}.small{font-size:12px;color:var(--muted)}
+.sources{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}.source{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px}.source img{width:64px;height:54px;object-fit:contain}.state{padding:5px 9px;border-radius:999px;font-size:12px;font-weight:900}.on{background:#e8f7ed;color:var(--green)}.off{background:#fdecec;color:var(--red)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 5px 14px rgba(20,45,80,.05)}.panel h2{margin:0 0 12px;color:var(--navy);font-size:19px}.latestGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kv{background:#f8fbfe;border:1px solid #e6edf5;border-radius:10px;padding:10px}.kv b{display:block;color:var(--navy);margin-top:3px}
+.tablewrap{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:12px}table{border-collapse:collapse;width:100%;font-size:12px}th{position:sticky;top:0;background:var(--navy);color:#fff;z-index:1}th,td{padding:8px 9px;border-bottom:1px solid #e9eef4;white-space:nowrap;text-align:left}tr:hover td{background:#f8fbfe}.empty{padding:30px;text-align:center;color:var(--muted)}
+footer{color:var(--muted);font-size:11px;padding:4px 0 16px}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(3,1fr)}.latestGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){header{position:static;align-items:flex-start}.logo{width:58px;height:58px}.cards{grid-template-columns:1fr 1fr}.sources,.latestGrid{grid-template-columns:1fr}.toolbar{display:grid;grid-template-columns:1fr 1fr}.wide{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header>
+  <img class="logo" src="../pvfirst-icon.svg" alt="PV-First">
+  <div><h1>PV-First</h1><div class="sub">Resultados centralizados no GitHub • mesma base para PC, celular e web</div></div>
+</header>
+<main>
+  <section class="toolbar">
+    <div class="field"><label>Perfil</label><select id="fProfile"><option value="">Todos</option></select></div>
+    <div class="field"><label>Fonte</label><select id="fSource"><option value="">Todas</option><option>PHOTOVOLTAIC</option><option>PHOTOVOLTAIC+GRID</option><option>GRID</option></select></div>
+    <div class="field"><label>Cobertura PV</label><select id="fCoverage"><option value="">Todas</option><option value="100">100% PV</option><option value="partial">PV + GRID</option><option value="grid">Somente GRID</option></select></div>
+    <div class="field"><label>Data</label><input id="fDate" type="date"></div>
+    <button class="btn" id="btnApply">Aplicar filtros</button>
+    <button class="btn light" id="btnClear">Limpar</button>
+    <a class="btn secondary" href="results/all.csv" download>Baixar CSV completo</a>
+    <a class="btn light" href="https://github.com/CAGDOJ/PhotovoltaicFirst/tree/main/docs/results" target="_blank">Abrir results no GitHub</a>
+  </section>
+
+  <section class="cards">
+    <div class="card"><div class="label">Registros filtrados</div><div class="value" id="cCount">0</div></div>
+    <div class="card"><div class="label">Energia total</div><div class="value" id="cTotal">0 kWh</div></div>
+    <div class="card"><div class="label">Energia PV</div><div class="value" id="cPv">0 kWh</div></div>
+    <div class="card"><div class="label">Energia GRID</div><div class="value" id="cGrid">0 kWh</div></div>
+    <div class="card"><div class="label">Cobertura PV</div><div class="value" id="cShare">0%</div></div>
+    <div class="card"><div class="label">CO₂ evitado</div><div class="value" id="cAvoid">0 g</div></div>
+  </section>
+
+  <section class="sources">
+    <div class="source"><div style="font-size:42px">☀</div><div><strong>PHOTOVOLTAIC</strong><div><span id="pvState" class="state off">SEM DADOS</span></div></div></div>
+    <div class="source"><div style="font-size:42px">⚡</div><div><strong>GRID</strong><div><span id="gridState" class="state off">SEM DADOS</span></div></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Última execução do filtro</h2>
+    <div class="latestGrid" id="latestGrid"><div class="empty">Nenhum registro disponível.</div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Registros</h2>
+    <div class="tablewrap"><table><thead><tr>
+      <th>Data/hora</th><th>Perfil</th><th>Cidade</th><th>Irrad. ajustada</th><th>PV kW</th><th>Total kWh</th><th>PV kWh</th><th>GRID kWh</th><th>Cobertura</th><th>CO₂ g</th><th>Fonte</th><th>Área m²</th><th>Eficiência</th><th>Ganho bifacial</th><th>Servidores</th><th>PUE</th>
+    </tr></thead><tbody id="tbody"></tbody></table></div>
+  </section>
+  <footer>Fonte central: <b>docs/results/all.csv</b>. O PC envia execuções válidas para esta base; todos os dispositivos leem o mesmo conjunto.</footer>
+</main>
+<script>
+const CSV='results/all.csv';let all=[];
+function parseCsv(text){const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];function row(line){let a=[],c='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){c+='"';i++;}else q=!q}else if(ch===';'&&!q){a.push(c);c=''}else c+=ch}a.push(c);return a}const h=row(lines[0]);return lines.slice(1).map(l=>{const v=row(l),o={};h.forEach((k,i)=>o[k]=v[i]??'');return o})}
+function n(v){const x=Number(String(v??'').replace(',','.'));return Number.isFinite(x)?x:0}function fmt(v,d=3){return n(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})}
+function coverage(r){const t=n(r.energy_total_kwh),p=n(r.energy_pv_kwh);return t>0?100*p/t:0}
+function profiles(){const s=[...new Set(all.map(r=>r.simulation_profile).filter(Boolean))].sort();const el=document.getElementById('fProfile');s.forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;el.appendChild(o)})}
+function filtered(){const p=document.getElementById('fProfile').value,s=document.getElementById('fSource').value,c=document.getElementById('fCoverage').value,d=document.getElementById('fDate').value;return all.filter(r=>{if(p&&r.simulation_profile!==p)return false;if(s&&r.source_mode!==s)return false;if(d&&r.run_date!==d)return false;const cv=coverage(r);if(c==='100'&&cv<99.95)return false;if(c==='partial'&&!(cv>0&&cv<99.95))return false;if(c==='grid'&&cv>0.01)return false;return true})}
+function render(){const rows=filtered();const sum=k=>rows.reduce((a,r)=>a+n(r[k]),0),total=sum('energy_total_kwh'),pv=sum('energy_pv_kwh'),grid=sum('energy_grid_kwh');document.getElementById('cCount').textContent=rows.length;document.getElementById('cTotal').textContent=fmt(total)+' kWh';document.getElementById('cPv').textContent=fmt(pv)+' kWh';document.getElementById('cGrid').textContent=fmt(grid)+' kWh';document.getElementById('cShare').textContent=(total?fmt(100*pv/total,1):'0,0')+'%';document.getElementById('cAvoid').textContent=fmt(sum('co2_avoided_by_pv_g'),2)+' g';const last=rows.at(-1);const tb=document.getElementById('tbody');tb.innerHTML='';if(!last){document.getElementById('latestGrid').innerHTML='<div class="empty">Nenhum registro disponível para este filtro.</div>';document.getElementById('pvState').textContent='SEM DADOS';document.getElementById('gridState').textContent='SEM DADOS';return}document.getElementById('pvState').textContent=last.photovoltaic_status==='ON'?'ON':'OFF';document.getElementById('pvState').className='state '+(last.photovoltaic_status==='ON'?'on':'off');document.getElementById('gridState').textContent=last.grid_status==='ON'?'ON':'OFF';document.getElementById('gridState').className='state '+(last.grid_status==='ON'?'on':'off');const items=[['Data/hora',last.run_datetime],['Perfil',last.simulation_profile],['Cidade',last.city],['Irradiância ajustada',fmt(last.irradiance_adjusted_w_m2,1)+' W/m²'],['Potência PV',fmt(last.pv_power_kw,2)+' kW'],['Energia total',fmt(last.energy_total_kwh)+' kWh'],['Energia PV',fmt(last.energy_pv_kwh)+' kWh'],['Energia GRID',fmt(last.energy_grid_kwh)+' kWh'],['Cobertura PV',fmt(coverage(last),1)+'%'],['CO₂ GRID',fmt(last.co2_g,2)+' g'],['Área PV',fmt(last.panel_area_m2,0)+' m²'],['Modo',last.source_mode]];document.getElementById('latestGrid').innerHTML=items.map(([k,v])=>`<div class="kv"><span class="small">${k}</span><b>${v||'-'}</b></div>`).join('');rows.slice(-500).reverse().forEach(r=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${r.run_datetime||''}</td><td>${r.simulation_profile||''}</td><td>${r.city||''}</td><td>${fmt(r.irradiance_adjusted_w_m2,1)}</td><td>${fmt(r.pv_power_kw,2)}</td><td>${fmt(r.energy_total_kwh)}</td><td>${fmt(r.energy_pv_kwh)}</td><td>${fmt(r.energy_grid_kwh)}</td><td>${fmt(coverage(r),1)}%</td><td>${fmt(r.co2_g,2)}</td><td>${r.source_mode||''}</td><td>${fmt(r.panel_area_m2,0)}</td><td>${fmt(r.panel_base_efficiency,3)}</td><td>${fmt(r.panel_bifacial_gain_configured,2)}</td><td>${r.dc_active_servers||''}</td><td>${r.dc_pue||''}</td>`;tb.appendChild(tr)})}
+async function load(){try{const r=await fetch(CSV+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);all=parseCsv(await r.text());profiles();render()}catch(e){document.getElementById('latestGrid').innerHTML='<div class="empty">Não foi possível carregar results/all.csv: '+e.message+'</div>'}}
+document.getElementById('btnApply').onclick=render;document.getElementById('btnClear').onclick=()=>{document.getElementById('fProfile').value='';document.getElementById('fSource').value='';document.getElementById('fCoverage').value='';document.getElementById('fDate').value='';render()};load();setInterval(load,60000);
+</script>
+</body>
+</html>

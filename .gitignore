@@ -1,3 +1,8 @@
-*.csv
-*.zip
-Fitlyne/
+_interno/*.pid
+_interno/*.log
+_interno/current.log
+_interno/status.txt
+_interno/env_status.txt
+_interno/last_github_pages_command.txt
+pvfirst/build/
+pvfirst/solar_window.log

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -e
+cd "$(dirname "$0")/.."
+
+if [ -f config/pvfirst.env ]; then
+  # shellcheck disable=SC1091
+  source config/pvfirst.env
+fi
+
+bash ./_launcher/apply_config.sh
+FLOPS="${1:-${PVFIRST_DEFAULT_FLOPS:-5e10}}"
+
+check_internet() {
+  curl -fsS --connect-timeout 5 --max-time 8 \
+    "https://api.open-meteo.com/v1/forecast?latitude=${PVFIRST_LOCATION_LATITUDE:--1.4537}&longitude=${PVFIRST_LOCATION_LONGITUDE:--48.5078}&current=temperature_2m" \
+    >/dev/null 2>&1
+}
+
+echo "[PV-First] Rodando simulacao unica com FLOPs=$FLOPS"
+echo "[PV-First] Modo data center: SimGrid mede o job, PUE e cargas auxiliares completam a demanda."
+echo "[PV-First] Abaixo aparece o log real do simulador C++/SimGrid."
+
+if ! check_internet; then
+  echo "[PV-First] SEM INTERNET: a simulacao unica nao sera executada e nenhum CSV sera salvo."
+  echo "[PV-First] A coleta continua fica em segundo plano e tenta novamente quando a internet voltar."
+  exit 0
+fi
+
+printf '%s\n' "$FLOPS" | stdbuf -oL -eL ./run.sh
+python3 dashboard/build_dashboard.py >/dev/null 2>&1 || true
+bash ./_launcher/publish_pages.sh stage >/dev/null 2>&1 || true
+bash ./_launcher/git_sync.sh auto || true

@@ -3,6 +3,8 @@
 #include <curl/curl.h>
 
 #include <chrono>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <thread>
@@ -15,6 +17,45 @@ static size_t WriteCallback(void* contents,
     size_t total = size * nmemb;
     output->append(static_cast<char*>(contents), total);
     return total;
+}
+
+
+static std::string shellQuote(const std::string& s)
+{
+    std::string out = "'";
+    for (char c : s) {
+        if (c == '\'') out += "'\\\"'\\\"'";
+        else out += c;
+    }
+    out += "'";
+    return out;
+}
+
+static bool fetchViaWindowsProxy(const std::string& url, std::string& response)
+{
+    const char* autoProxy = std::getenv("PVFIRST_PROXY_AUTO");
+    const char* proxy = std::getenv("PVFIRST_PROXY_URL");
+    if (autoProxy == nullptr || std::string(autoProxy) != "1" || proxy == nullptr || std::string(proxy).empty())
+        return false;
+
+    std::string command =
+        "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File \"$(wslpath -w ./_launcher/windows_fetch.ps1)\" -Url " +
+        shellQuote(url) + " -Proxy " + shellQuote(proxy) + " 2>/dev/null";
+
+    FILE* pipe = popen(command.c_str(), "r");
+    if (pipe == nullptr)
+        return false;
+
+    char buffer[4096];
+    std::string data;
+    while (fgets(buffer, sizeof(buffer), pipe) != nullptr)
+        data += buffer;
+    int rc = pclose(pipe);
+    if (rc == 0 && !data.empty()) {
+        response = data;
+        return true;
+    }
+    return false;
 }
 
 static double extractNumber(const std::string& json, const std::string& key, double defaultValue)
@@ -52,6 +93,35 @@ static std::string extractText(const std::string& json, const std::string& keyPr
     return json.substr(start, end - start);
 }
 
+
+static std::string getEnvText(const char* name, const std::string& defaultValue)
+{
+    const char* value = std::getenv(name);
+    if (value == nullptr || std::string(value).empty())
+        return defaultValue;
+    return std::string(value);
+}
+
+static double getEnvNumber(const char* name, double defaultValue)
+{
+    const char* value = std::getenv(name);
+    if (value == nullptr || std::string(value).empty())
+        return defaultValue;
+
+    try {
+        return std::stod(value);
+    }
+    catch (...) {
+        return defaultValue;
+    }
+}
+
+static bool useManualLocation()
+{
+    std::string mode = getEnvText("PVFIRST_LOCATION_MODE", "manual");
+    return mode == "manual" || mode == "MANUAL" || mode == "Manual";
+}
+
 static bool hasValidLocationPayload(const std::string& response)
 {
     return response.find("\"lat\"") != std::string::npos &&
@@ -61,6 +131,18 @@ static bool hasValidLocationPayload(const std::string& response)
 GPSData GeoSensor::getLocation()
 {
     GPSData gps;
+
+    // Por padrao, o PV-First usa localizacao manual para evitar erro de geolocalizacao por IP.
+    // A geolocalizacao por IP pode indicar outra cidade por causa de operadora, VPN, proxy ou roteamento.
+    if (useManualLocation()) {
+        gps.city = getEnvText("PVFIRST_LOCATION_CITY", gps.city);
+        gps.latitude = getEnvNumber("PVFIRST_LOCATION_LATITUDE", gps.latitude);
+        gps.longitude = getEnvNumber("PVFIRST_LOCATION_LONGITUDE", gps.longitude);
+
+        std::cout << "Localizacao configurada manualmente: "
+                  << gps.city << " (" << gps.latitude << ", " << gps.longitude << ")\n";
+        return gps;
+    }
 
     while (true)
     {
@@ -88,7 +170,13 @@ GPSData GeoSensor::getLocation()
 
         curl_easy_cleanup(curl);
 
-        if (res == CURLE_OK && httpCode >= 200 && httpCode < 300 && hasValidLocationPayload(response)) {
+        if (!(res == CURLE_OK && httpCode >= 200 && httpCode < 300 && hasValidLocationPayload(response))) {
+            std::string winResponse;
+            if (fetchViaWindowsProxy("http://ip-api.com/json/", winResponse) && hasValidLocationPayload(winResponse))
+                response = winResponse;
+        }
+
+        if (hasValidLocationPayload(response)) {
             gps.latitude  = extractNumber(response, "\"lat\"", gps.latitude);
             gps.longitude = extractNumber(response, "\"lon\"", gps.longitude);
             gps.city      = extractText(response, "\"city\":\"", gps.city);
