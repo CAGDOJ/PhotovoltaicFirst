@@ -1,9 +1,9 @@
 {
     "schema":  "PVFIRST_RESULTS_V50",
-    "records":  833,
+    "records":  834,
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "canonical":  "docs/results/all.csv",
-    "updated_at":  "2026-09-26 17:40:40",
+    "updated_at":  "2026-09-26 17:41:04",
     "policy":  "Somente perfis V50 dimensionados para cobertura PV total quando a irradiancia e suficiente; GRID complementa quando necessario."
 }
