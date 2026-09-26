@@ -3,11 +3,11 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "pause",
-    "last_result":  "Finalizado: stop.cmd (codigo 0)",
-    "status":  "FAIL: Erro. Veja o log",
+    "last_action":  "heartbeat",
+    "last_result":  "Agente ativo aguardando comandos",
+    "status":  "OK: Simulacao unica finalizada",
     "env":  "READY|Ubuntu",
-    "log":  "[PV-First] Sem internet: o processo continua vivo, mas nao salva CSV.",
-    "agent_log":  "[2026-09-22 16:42:13] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 16:47:14] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:44:28] Status enviado ao GitHub via API.\n[2026-09-22 20:50:50] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-22 20:59:36] Status enviado ao GitHub via API.\n[2026-09-23 10:55:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-09-23 10:55:20] Status enviado ao GitHub via API.\n[2026-09-23 10:55:21] Novo comando recebido: id=1790122613081-ea1e8266fe4478 action=pause\n[2026-09-23 10:55:22] Status enviado ao GitHub via API.\n[2026-09-23 10:55:35] Resultado: Finalizado: stop.cmd (codigo 0)",
-    "updated_at":  "2026-09-23 10:55:36"
+    "log":  "Energia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 11:25:52\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 928.988 W/m2\nPotencia PV disponivel   : 7805.82 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 143.625 kWh\nEnergia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA",
+    "agent_log":  "[2026-09-25 02:13:12] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-25 02:18:13] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-25 02:22:14] Falha ao enviar status via API: O nome remoto não pôde ser resolvido: \u0027api.github.com\u0027\n[2026-09-25 02:23:14] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-25 02:28:15] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-25 02:33:16] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-25 02:37:17] Falha ao enviar status via API: O nome remoto não pôde ser resolvido: \u0027api.github.com\u0027\n[2026-09-25 02:38:17] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-26 11:12:37] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-09-26 11:12:40] Falha ao enviar status via API: O nome remoto não pôde ser resolvido: \u0027api.github.com\u0027",
+    "updated_at":  "2026-09-26 11:27:48"
 }
