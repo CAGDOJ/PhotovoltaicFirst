@@ -149,40 +149,43 @@ async function readProgrammaticAnnex(file,onProgress){
   const total=doc.numPages;
   let annexStart=-1;
 
-  // First search backwards because programmatic annexes are commonly near the end.
+  const isProgrammaticPage=(txt)=>{
+    const k=searchKey(txt);
+    const hasProgram=k.includes('CONTEUDO PROGRAMATICO');
+    const hasAnnex=k.includes('ANEXO I') || k.includes('ANEXO 1');
+    const hasCargo=k.includes('DELEGADO DE POLICIA CIVIL') || k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL');
+    return hasProgram && (hasAnnex || hasCargo);
+  };
+
   const initialStart=Math.max(1,total-24);
   for(let p=total;p>=initialStart;p--){
     onProgress?.('Procurando o Anexo I... página '+p+' de '+total);
     const txt=await pageText(doc,p);
-    const u=txt.toUpperCase();
-    if(u.includes('ANEXO I') && (u.includes('CONTEÚDO PROGRAMÁTICO') || u.includes('CONTEUDO PROGRAMATICO'))){
-      annexStart=p;
-      break;
-    }
+    if(isProgrammaticPage(txt)){annexStart=p;break;}
   }
 
-  // Fallback: scan the rest of the document if it was not found near the end.
   if(annexStart<0){
     for(let p=initialStart-1;p>=1;p--){
-      onProgress?.('Procurando o Anexo I... página '+p+' de '+total);
+      onProgress?.('Procurando o conteúdo programático... página '+p+' de '+total);
       const txt=await pageText(doc,p);
-      const u=txt.toUpperCase();
-      if(u.includes('ANEXO I') && (u.includes('CONTEÚDO PROGRAMÁTICO') || u.includes('CONTEUDO PROGRAMATICO'))){
-        annexStart=p;
-        break;
-      }
+      if(isProgrammaticPage(txt)){annexStart=p;break;}
     }
   }
 
-  if(annexStart<0) throw new Error('Não encontrei o ANEXO I - CONTEÚDO PROGRAMÁTICO.');
+  if(annexStart<0){
+    throw new Error('Não encontrei o bloco de CONTEÚDO PROGRAMÁTICO no PDF.');
+  }
 
+  onProgress?.('Conteúdo programático encontrado na página '+annexStart+'.');
   let text='';
   for(let p=annexStart;p<=total;p++){
     onProgress?.('Lendo conteúdo programático... página '+p+' de '+total);
     const txt=await pageText(doc,p);
-    const upper=txt.toUpperCase();
-    if(p>annexStart && upper.includes('ANEXO II')) break;
-    text+='\n'+txt;
+    const k=searchKey(txt);
+    if(p>annexStart && (k.includes('ANEXO II') || k.includes('ANEXO 2'))){
+      break;
+    }
+    text+='\\n'+txt;
   }
 
   return {text,pages:total,annexStart};
@@ -190,6 +193,16 @@ async function readProgrammaticAnnex(file,onProgress){
 
 function cleanLine(s){
   return String(s||'').replace(/\s+/g,' ').trim();
+}
+
+function searchKey(s){
+  return String(s||'')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
 }
 
 function normalizeText(text){
@@ -204,20 +217,48 @@ function normalizeText(text){
 
 function extractCargoSections(text){
   const t=normalizeText(text);
-  const upper=t.toUpperCase();
-  let start=upper.lastIndexOf('ANEXO I - CONTEÚDO PROGRAMÁTICO');
-  if(start<0) start=upper.lastIndexOf('ANEXO I - CONTEUDO PROGRAMATICO');
-  if(start<0) throw new Error('Não encontrei o ANEXO I - CONTEÚDO PROGRAMÁTICO.');
-  let end=upper.indexOf('ANEXO II',start+20);
-  if(end<0) end=t.length;
-  const annex=t.slice(start,end);
-  const re=/CONTE[ÚU]DO PROGRAM[ÁA]TICO\s*-\s*([^\n]+)/gi;
-  const matches=[...annex.matchAll(re)];
-  if(!matches.length) throw new Error('Encontrei o Anexo I, mas não consegui identificar os cargos.');
-  return matches.map((m,i)=>{
-    const a=m.index+m[0].length;
-    const b=i+1<matches.length?matches[i+1].index:annex.length;
-    return {cargo:cleanLine(m[1]),body:annex.slice(a,b).trim()};
+
+  // Tolerate different dash characters, line breaks and missing accents.
+  const cargoPatterns=[
+    {cargo:'DELEGADO DE POLÍCIA CIVIL', re:/CONTE[ÚU]DO\\s+PROGRAM[ÁA]TICO\\s*[-–—:]?\\s*DELEGADO\\s+DE\\s+POL[ÍI]CIA\\s+CIVIL/i},
+    {cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL', re:/CONTE[ÚU]DO\\s+PROGRAM[ÁA]TICO\\s*[-–—:]?\\s*OFICIAL\\s+INVESTIGADOR\\s+DE\\s+POL[ÍI]CIA\\s+CIVIL/i}
+  ];
+
+  const hits=[];
+  for(const p of cargoPatterns){
+    const m=p.re.exec(t);
+    if(m) hits.push({cargo:p.cargo,index:m.index,end:m.index+m[0].length});
+  }
+  hits.sort((a,b)=>a.index-b.index);
+
+  // Fallback for PDFs whose text extraction strips accents or punctuation.
+  if(!hits.length){
+    const k=searchKey(t);
+    const markers=[
+      ['DELEGADO DE POLICIA CIVIL','DELEGADO DE POLÍCIA CIVIL'],
+      ['OFICIAL INVESTIGADOR DE POLICIA CIVIL','OFICIAL INVESTIGADOR DE POLÍCIA CIVIL']
+    ];
+    for(const [needle,cargo] of markers){
+      const phrase='CONTEUDO PROGRAMATICO '+needle;
+      const idx=k.indexOf(phrase);
+      if(idx>=0){
+        // Index in normalized string is not safe for slicing raw text, so locate cargo words in raw text.
+        const rawRe=new RegExp('CONTE[ÚU]DO\\\\s+PROGRAM[ÁA]TICO[\\\\s\\\\S]{0,80}?'+
+          (cargo.startsWith('DELEGADO')?'DELEGADO\\\\s+DE\\\\s+POL[ÍI]CIA\\\\s+CIVIL':'OFICIAL\\\\s+INVESTIGADOR\\\\s+DE\\\\s+POL[ÍI]CIA\\\\s+CIVIL'),'i');
+        const rm=rawRe.exec(t);
+        if(rm) hits.push({cargo,index:rm.index,end:rm.index+rm[0].length});
+      }
+    }
+    hits.sort((a,b)=>a.index-b.index);
+  }
+
+  if(!hits.length){
+    throw new Error('Encontrei o conteúdo programático, mas não consegui identificar os cargos.');
+  }
+
+  return hits.map((h,i)=>{
+    const end=i+1<hits.length?hits[i+1].index:t.length;
+    return {cargo:h.cargo,body:t.slice(h.end,end).trim()};
   });
 }
 
