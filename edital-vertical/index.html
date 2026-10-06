@@ -18,6 +18,11 @@
 .app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}.side{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff;padding:18px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto}.brandLogo{width:100%;max-width:220px;height:auto;display:block}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#dce8f5;padding:12px;border-radius:12px;text-align:left;cursor:pointer;font-weight:700;transition:.16s}.nav button.active,.nav button:hover{background:var(--blue);color:#fff}.sideFoot{margin-top:auto;color:#b9c9da;font-size:12px}.main{min-width:0}.top{position:sticky;top:0;z-index:20;background:rgba(13,39,70,.96);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;backdrop-filter:blur(12px)}.mobileLogo{display:none;width:42px;height:42px}.search{flex:1;max-width:720px;background:#17385c;border:1px solid #315271;color:#fff;border-radius:12px;padding:11px 13px}.topright{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue));font-weight:800}.content{padding:24px}.view{display:none}.view.active{display:block}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}.emptyHero{padding:42px 24px;text-align:center}.emptyHero img{width:92px;height:92px}.emptyIcon{font-size:52px}.btn{border:0;background:var(--blue);color:#fff;padding:12px 15px;border-radius:12px;font-weight:800;cursor:pointer}.btn.secondary{background:#eef4ff;color:#245a9c}.btn:disabled{opacity:.55;cursor:not-allowed}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.kpi strong{font-size:24px;display:block}.muted{color:var(--muted)}.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tab{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;font-weight:700}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}.panel{display:none}.panel.active{display:block}.upload{border:2px dashed #8ebcf6;border-radius:16px;padding:34px;text-align:center;background:#f8fbff;cursor:pointer}.upload.drag{background:#edf6ff}.fileBox{margin-top:12px;padding:12px;border-radius:12px;background:#eef4ff}.filters{display:grid;grid-template-columns:1fr 180px 220px;gap:8px;margin:12px 0}.filters input,.filters select{padding:10px;border:1px solid var(--line);border-radius:10px}.tableWrap{overflow:auto}.tableWrap table{border-collapse:collapse;width:100%;min-width:1040px}.tableWrap th,.tableWrap td{border-bottom:1px solid #e9eef4;padding:9px;text-align:left;font-size:12px}.tableWrap th{background:#f7f9fc}.status{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}.status.gray{background:#eef1f5;color:#607086}.status.green{background:#eaf8f1;color:#118452}.status.yellow{background:#fff5da;color:#a56c00}.hamb,.bottom,.shade{display:none}.build{font-size:11px;color:#9fb5ca;margin-top:6px}
 @media(max-width:900px){.app{grid-template-columns:1fr}.side{position:fixed;left:0;top:0;bottom:0;width:min(320px,88vw);z-index:50;transform:translateX(-102%);transition:.2s}.menuOpen .side{transform:translateX(0)}.shade{position:fixed;inset:0;background:#071a2f99;z-index:45}.menuOpen .shade{display:block}.hamb{display:grid;place-items:center;border:0;background:#17385c;color:#fff;width:42px;height:42px;border-radius:10px}.mobileLogo{display:block}.top{padding:10px}.content{padding:14px 12px 92px}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.topright span{display:none}.bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:35;padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:5px}.bottom button{border:0;background:transparent;padding:8px 4px;border-radius:10px;color:#58697f;font-size:11px}.bottom button.active{background:#eef4ff;color:var(--blue);font-weight:800}}
 @media(max-width:560px){.kpis{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}.emptyHero{padding:28px 16px}.top .search{font-size:14px}.content h1{font-size:25px}.mobileLogo{width:38px;height:38px}}
+
+.loadingBox{display:flex;align-items:center;gap:14px;padding:16px;border-radius:14px;background:#eef6ff;border:1px solid #cfe2ff;margin-top:12px}
+.spinner{width:34px;height:34px;border:4px solid #cfe2ff;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;flex:0 0 34px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loadingBox b{display:block;margin-bottom:3px}.loadingBox span{color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -113,12 +118,12 @@ function setFile(f){
   if(!(f.type==='application/pdf'||/\.pdf$/i.test(f.name))){alert('Selecione um arquivo PDF.');pdf.value='';return}
   currentFile=f;
   fileInfo.classList.remove('hidden');
-  fileInfo.innerHTML='<b>📄 '+esc(f.name)+'</b><div class="muted">'+(f.size/1048576).toFixed(2)+' MB</div>';
+  fileInfo.innerHTML='<b>📄 '+esc(f.name)+'</b><div class="muted">'+(f.size/1048576).toFixed(2)+' MB · arquivo carregado</div>';
   analyze.disabled=false;
   analyze.textContent='Analisar edital';
   const box=qs('#analysis');
   box.classList.remove('hidden');
-  box.innerHTML='<h3>PDF pronto para análise</h3><p class="muted">Clique em <b>Analisar edital</b> para localizar o Anexo I, os cargos e as disciplinas.</p>';
+  box.innerHTML='<div class="loadingBox"><div class="spinner"></div><div><b>Edital carregado</b><span>Arquivo pronto. Clique em “Analisar edital”.</span></div></div>';
 }
 pdf.addEventListener('change',()=>setFile(pdf.files?.[0]));
 drop.addEventListener('click',()=>pdf.click());
@@ -218,42 +223,50 @@ function normalizeText(text){
 function extractCargoSections(text){
   const t=normalizeText(text);
 
-  // Tolerate different dash characters, line breaks and missing accents.
-  const cargoPatterns=[
-    {cargo:'DELEGADO DE POLÍCIA CIVIL', re:/CONTE[ÚU]DO\\s+PROGRAM[ÁA]TICO\\s*[-–—:]?\\s*DELEGADO\\s+DE\\s+POL[ÍI]CIA\\s+CIVIL/i},
-    {cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL', re:/CONTE[ÚU]DO\\s+PROGRAM[ÁA]TICO\\s*[-–—:]?\\s*OFICIAL\\s+INVESTIGADOR\\s+DE\\s+POL[ÍI]CIA\\s+CIVIL/i}
+  const patterns=[
+    {
+      cargo:'DELEGADO DE POLÍCIA CIVIL',
+      re:/CONTE[ÚU]DO[\s\S]{0,120}?PROGRAM[ÁA]TICO[\s\S]{0,160}?DELEGADO[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i,
+      fallback:/DELEGADO[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i
+    },
+    {
+      cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',
+      re:/CONTE[ÚU]DO[\s\S]{0,120}?PROGRAM[ÁA]TICO[\s\S]{0,200}?OFICIAL[\s\S]{0,60}?INVESTIGADOR[\s\S]{0,60}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i,
+      fallback:/OFICIAL[\s\S]{0,60}?INVESTIGADOR[\s\S]{0,60}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i
+    }
   ];
 
-  const hits=[];
-  for(const p of cargoPatterns){
-    const m=p.re.exec(t);
+  let hits=[];
+  for(const p of patterns){
+    let m=p.re.exec(t);
+    if(!m) m=p.fallback.exec(t);
     if(m) hits.push({cargo:p.cargo,index:m.index,end:m.index+m[0].length});
   }
+
   hits.sort((a,b)=>a.index-b.index);
 
-  // Fallback for PDFs whose text extraction strips accents or punctuation.
   if(!hits.length){
-    const k=searchKey(t);
-    const markers=[
+    // Final fallback using accent/punctuation-free text.
+    const key=searchKey(t);
+    const specs=[
       ['DELEGADO DE POLICIA CIVIL','DELEGADO DE POLÍCIA CIVIL'],
       ['OFICIAL INVESTIGADOR DE POLICIA CIVIL','OFICIAL INVESTIGADOR DE POLÍCIA CIVIL']
     ];
-    for(const [needle,cargo] of markers){
-      const phrase='CONTEUDO PROGRAMATICO '+needle;
-      const idx=k.indexOf(phrase);
-      if(idx>=0){
-        // Index in normalized string is not safe for slicing raw text, so locate cargo words in raw text.
-        const rawRe=new RegExp('CONTE[ÚU]DO\\\\s+PROGRAM[ÁA]TICO[\\\\s\\\\S]{0,80}?'+
-          (cargo.startsWith('DELEGADO')?'DELEGADO\\\\s+DE\\\\s+POL[ÍI]CIA\\\\s+CIVIL':'OFICIAL\\\\s+INVESTIGADOR\\\\s+DE\\\\s+POL[ÍI]CIA\\\\s+CIVIL'),'i');
-        const rm=rawRe.exec(t);
-        if(rm) hits.push({cargo,index:rm.index,end:rm.index+rm[0].length});
+    for(const [needle,cargo] of specs){
+      if(key.includes(needle)){
+        // Locate a broad raw equivalent for slicing.
+        const raw = cargo.startsWith('DELEGADO')
+          ? /DELEGADO[\s\S]{0,100}?POL[ÍI]CIA[\s\S]{0,50}?CIVIL/i
+          : /OFICIAL[\s\S]{0,80}?INVESTIGADOR[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,50}?CIVIL/i;
+        const m=raw.exec(t);
+        if(m) hits.push({cargo,index:m.index,end:m.index+m[0].length});
       }
     }
     hits.sort((a,b)=>a.index-b.index);
   }
 
   if(!hits.length){
-    throw new Error('Encontrei o conteúdo programático, mas não consegui identificar os cargos.');
+    throw new Error('O conteúdo programático foi encontrado, mas os nomes dos cargos não foram reconhecidos no texto extraído.');
   }
 
   return hits.map((h,i)=>{
@@ -369,40 +382,41 @@ async function runAnalysis(){
   const box=qs('#analysis');
   box.classList.remove('hidden');
   box.innerHTML=
-    '<h3 id="analysisTitle">Iniciando análise...</h3>'+
-    '<p id="analysisProgress" class="muted">Preparando o PDF.</p>'+
+    '<div class="loadingBox">'+
+      '<div class="spinner"></div>'+
+      '<div><b id="analysisTitle">Carregando edital...</b><span id="analysisProgress">Preparando o PDF.</span></div>'+
+    '</div>'+
     '<div style="height:9px;background:#e9eef5;border-radius:999px;overflow:hidden;margin-top:12px">'+
-      '<div id="analysisBar" style="height:100%;width:10%;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:.2s"></div>'+
+      '<div id="analysisBar" style="height:100%;width:8%;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:.2s"></div>'+
     '</div>';
 
-  let progressTick=10;
+  let progressTick=8;
   const updateProgress=(msg)=>{
     const p=qs('#analysisProgress');
     if(p)p.textContent=msg;
-    progressTick=Math.min(92,progressTick+4);
+    const title=qs('#analysisTitle');
+    if(title)title.textContent='Analisando edital...';
+    progressTick=Math.min(94,progressTick+4);
     const bar=qs('#analysisBar');
     if(bar)bar.style.width=progressTick+'%';
   };
 
   try{
     const {text,pages,annexStart}=await readProgrammaticAnnex(currentFile,updateProgress);
-    updateProgress('Identificando cargos no Anexo I...');
+    updateProgress('Conteúdo programático encontrado. Identificando cargos...');
     const sections=extractCargoSections(text);
     pendingAnalysis={sections,pages,annexStart};
 
     const bar=qs('#analysisBar');
     if(bar)bar.style.width='100%';
 
-    if(sections.length===1){
-      applyCargo(sections[0],pages);
-    }else{
-      chooseCargoUI(sections,pages);
-    }
+    if(sections.length===1) applyCargo(sections[0],pages);
+    else chooseCargoUI(sections,pages);
   }catch(e){
     box.innerHTML=
       '<h3>Não foi possível analisar o edital</h3>'+
       '<p class="muted">'+esc(e?.message||e)+'</p>'+
-      '<p>O arquivo pode ser escaneado, ter uma estrutura diferente ou ter ocorrido falha ao carregar o leitor de PDF.</p>'+
+      '<p><b>O PDF foi carregado corretamente.</b> O erro ocorreu somente na interpretação automática do conteúdo.</p>'+
       '<button id="retryAnalysis" class="btn">Tentar novamente</button>';
     qs('#retryAnalysis')?.addEventListener('click',runAnalysis);
   }finally{
