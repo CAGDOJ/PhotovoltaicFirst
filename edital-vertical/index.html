@@ -124,45 +124,173 @@ drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDe
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
 drop.addEventListener('drop',e=>{const f=e.dataTransfer?.files?.[0];if(f)setFile(f)});
 
+
+let pendingAnalysis=null;
+
 async function readPdf(file){
   const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');
   pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';
   const data=new Uint8Array(await file.arrayBuffer());
   const doc=await pdfjs.getDocument({data}).promise;
   let text='';
-  for(let i=1;i<=Math.min(doc.numPages,100);i++){const p=await doc.getPage(i);const c=await p.getTextContent();text+='\n'+c.items.map(x=>x.str).join(' ')}
+  for(let i=1;i<=Math.min(doc.numPages,120);i++){
+    const p=await doc.getPage(i);
+    const c=await p.getTextContent();
+    text+='\n'+c.items.map(x=>x.str+(x.hasEOL?'\n':' ')).join('');
+  }
   return{text,pages:doc.numPages};
 }
-function detectTopics(text){
-  const clean=text.replace(/\s+/g,' ').trim();
-  const marker=/conte[uú]do program[aá]tico/i.exec(clean);
-  const chunk=marker?clean.slice(marker.index,marker.index+40000):clean.slice(0,40000);
-  let arr=chunk.split(/(?=\b\d{1,3}[\.)]\s)|;\s+(?=[A-ZÁÉÍÓÚÇ])/).map(x=>x.trim()).filter(x=>x.length>15&&x.length<420);
-  const bad=/inscri[cç][aã]o|pagamento|resultado|endere[cç]o|telefone|documentos? pessoais?/i;
-  return [...new Set(arr.filter(x=>!bad.test(x)))].slice(0,150);
+
+function cleanLine(s){
+  return String(s||'').replace(/\s+/g,' ').trim();
 }
+
+function normalizeText(text){
+  return text
+    .replace(/\u00ad/g,'')
+    .replace(/[‐‑‒–—]/g,'-')
+    .replace(/[ \t]+\n/g,'\n')
+    .replace(/\n[ \t]+/g,'\n')
+    .replace(/\n{3,}/g,'\n\n');
+}
+
+function extractCargoSections(text){
+  const t=normalizeText(text);
+  const upper=t.toUpperCase();
+  let start=upper.lastIndexOf('ANEXO I - CONTEÚDO PROGRAMÁTICO');
+  if(start<0) start=upper.lastIndexOf('ANEXO I - CONTEUDO PROGRAMATICO');
+  if(start<0) throw new Error('Não encontrei o ANEXO I - CONTEÚDO PROGRAMÁTICO.');
+  let end=upper.indexOf('ANEXO II',start+20);
+  if(end<0) end=t.length;
+  const annex=t.slice(start,end);
+  const re=/CONTE[ÚU]DO PROGRAM[ÁA]TICO\s*-\s*([^\n]+)/gi;
+  const matches=[...annex.matchAll(re)];
+  if(!matches.length) throw new Error('Encontrei o Anexo I, mas não consegui identificar os cargos.');
+  return matches.map((m,i)=>{
+    const a=m.index+m[0].length;
+    const b=i+1<matches.length?matches[i+1].index:annex.length;
+    return {cargo:cleanLine(m[1]),body:annex.slice(a,b).trim()};
+  });
+}
+
+function looksLikeDiscipline(line,next){
+  line=cleanLine(line); next=cleanLine(next);
+  if(!line || line.length>125) return false;
+  if(/^\d+(?:\.\d+)*\.\s/.test(line)) return false;
+  if(/^ANEXO\b/i.test(line) || /^OBSERVA/i.test(line) || /^CONTE[ÚU]DO PROGRAM/i.test(line)) return false;
+  if(/^(História do Amapá|Geografia do Amapá|Legislação Institucional)\s*:/i.test(line)) return false;
+  return /^\d+(?:\.\d+)*\.\s/.test(next) ||
+         /^(História do Amapá|Geografia do Amapá|Legislação Institucional)\s*:\s*\d+\./i.test(next);
+}
+
+function splitNumberedTopics(block){
+  const text=block.replace(/\n+/g,' ').replace(/\s+/g,' ').trim();
+  const re=/(?:^|\s)(\d{1,3}(?:\.\d{1,3})*)\.\s+(?=[A-ZÁÉÍÓÚÇ])/g;
+  const marks=[...text.matchAll(re)];
+  if(!marks.length) return text?[text]:[];
+  const out=[];
+  for(let i=0;i<marks.length;i++){
+    const start=marks[i].index+(marks[i][0].startsWith(' ')?1:0);
+    const end=i+1<marks.length?marks[i+1].index:text.length;
+    const item=cleanLine(text.slice(start,end));
+    if(item.length>2) out.push(item);
+  }
+  return out;
+}
+
+function parseDisciplineTopics(body,cargo){
+  const rawLines=body.split(/\n/).map(cleanLine).filter(Boolean);
+  const headings=[];
+  for(let i=0;i<rawLines.length;i++){
+    let j=i+1; while(j<rawLines.length && !rawLines[j]) j++;
+    if(looksLikeDiscipline(rawLines[i],rawLines[j]||'')) headings.push({i,name:rawLines[i].replace(/:$/,'')});
+  }
+  if(!headings.length) throw new Error('Não consegui reconhecer as disciplinas desse cargo.');
+
+  const result=[];
+  for(let h=0;h<headings.length;h++){
+    const start=headings[h].i+1;
+    const end=h+1<headings.length?headings[h+1].i:rawLines.length;
+    const area=headings[h].name;
+    const block=rawLines.slice(start,end).join(' ');
+    const items=splitNumberedTopics(block);
+    items.forEach(content=>result.push({
+      id:result.length+1,
+      knowledge:'PROVA OBJETIVA',
+      area,
+      content,
+      status:'A Estudar',
+      q:0,c:0,e:0,note:''
+    }));
+  }
+  return result;
+}
+
+function chooseCargoUI(sections,pages){
+  const box=qs('#analysis');
+  box.classList.remove('hidden');
+  box.innerHTML=
+    '<h3>Escolha o cargo</h3>'+
+    '<p class="muted">O edital possui mais de um conteúdo programático. A verticalização será feita somente para o cargo escolhido.</p>'+
+    '<div id="cargoChoices" style="display:grid;gap:10px;margin-top:12px">'+
+    sections.map((s,i)=>'<button class="btn secondary cargoChoice" data-i="'+i+'" style="text-align:left;padding:14px">'+esc(s.cargo)+'</button>').join('')+
+    '</div>';
+  qsa('.cargoChoice').forEach(btn=>btn.addEventListener('click',()=>{
+    const sec=sections[+btn.dataset.i];
+    applyCargo(sec,pages);
+  }));
+}
+
+function applyCargo(section,pages){
+  topics=parseDisciplineTopics(section.body,section.cargo);
+  render();
+  qs('#emptyState').classList.add('hidden');
+  qs('#loadedState').classList.remove('hidden');
+  clear.classList.remove('hidden');
+  qs('#loadedFileName').textContent=currentFile.name+' — '+section.cargo;
+  const areas=[...new Set(topics.map(t=>t.area))];
+  qs('#summaryText').textContent=
+    'Cargo: '+section.cargo+' · '+pages+' páginas no PDF · '+
+    areas.length+' disciplinas · '+topics.length+' tópicos verticalizados.';
+  qs('#globalSearch').disabled=false;
+  const box=qs('#analysis');
+  box.innerHTML=
+    '<h3>Verticalização gerada corretamente</h3>'+
+    '<p><b>'+esc(section.cargo)+'</b></p>'+
+    '<p><b>'+areas.length+'</b> disciplinas reconhecidas · <b>'+topics.length+'</b> tópicos.</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+      '<button id="seeVertical" class="btn">Ver verticalização</button>'+
+      '<button id="changeCargo" class="btn secondary">Trocar cargo</button>'+
+    '</div>';
+  qs('#seeVertical').onclick=()=>{setView('inicio');qs('.tab[data-tab="vertical"]')?.click()};
+  qs('#changeCargo').onclick=()=>chooseCargoUI(pendingAnalysis.sections,pendingAnalysis.pages);
+  setView('inicio');
+  qs('.tab[data-tab="vertical"]')?.click();
+}
+
 async function runAnalysis(){
   if(!currentFile||running)return;
-  running=true;analyze.disabled=true;analyze.textContent='Analisando...';
-  const box=qs('#analysis');box.classList.remove('hidden');box.innerHTML='<h3>Processando PDF...</h3><p class="muted">Extraindo o texto do edital.</p>';
+  running=true;
+  analyze.disabled=true;
+  analyze.textContent='Analisando...';
+  const box=qs('#analysis');
+  box.classList.remove('hidden');
+  box.innerHTML='<h3>Processando PDF...</h3><p class="muted">Localizando o Anexo I, cargos, disciplinas e tópicos.</p>';
   try{
     const{text,pages}=await readPdf(currentFile);
-    const found=detectTopics(text);
-    topics=found.map((content,i)=>({id:i+1,knowledge:'IMPORTADO',area:'A CLASSIFICAR',content,status:'A Estudar',q:0,c:0,e:0,note:''}));
-    render();
-    qs('#emptyState').classList.add('hidden');
-    qs('#loadedState').classList.remove('hidden');
-    clear.classList.remove('hidden');
-    qs('#loadedFileName').textContent=currentFile.name;
-    qs('#summaryText').textContent='Arquivo: '+currentFile.name+' · '+pages+' páginas · '+found.length+' tópicos detectados para revisão.';
-    qs('#globalSearch').disabled=false;
-    box.innerHTML='<h3>PDF carregado e painel atualizado</h3><p><b>'+pages+'</b> páginas · <b>'+found.length+'</b> possíveis tópicos encontrados.</p><button id="seeVertical" class="btn">Ver verticalização</button>';
-    qs('#seeVertical').onclick=()=>{setView('inicio');qs('.tab[data-tab="vertical"]')?.click()};
-    setView('inicio');qs('.tab[data-tab="vertical"]')?.click();
+    const sections=extractCargoSections(text);
+    pendingAnalysis={sections,pages};
+    if(sections.length===1) applyCargo(sections[0],pages);
+    else chooseCargoUI(sections,pages);
   }catch(e){
-    box.innerHTML='<h3>Não foi possível ler o PDF</h3><p class="muted">'+esc(e?.message||e)+'</p><p>Se o edital for escaneado, será necessário OCR.</p>';
-  }finally{running=false;analyze.disabled=false;analyze.textContent='Analisar novamente'}
+    box.innerHTML='<h3>Não foi possível verticalizar</h3><p class="muted">'+esc(e?.message||e)+'</p><p>Se o edital for escaneado como imagem, será necessário OCR.</p>';
+  }finally{
+    running=false;
+    analyze.disabled=false;
+    analyze.textContent='Analisar novamente';
+  }
 }
+
 analyze.addEventListener('click',runAnalysis);
 
 function calc(t){return t.q?Math.round(t.c/t.q*100):null}
