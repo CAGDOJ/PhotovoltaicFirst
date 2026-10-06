@@ -35,7 +35,7 @@
 <header class="top"><button id="hamb" class="hamb">☰</button><input id="globalSearch" class="search" placeholder="Buscar disciplina ou tópico..."><div class="topright">🔔 <span>Sem notificações</span><div class="avatar">CJ</div></div></header>
 <div class="content">
   <section id="view-inicio" class="view active">
-    <div class="row"><div><h1 style="margin:0">Edital Vertical</h1><p class="muted">Carregue um edital em PDF para iniciar.</p></div><button class="btn" data-view="novo">Carregar edital em PDF</button></div>
+    <div class="row"><div><h1 style="margin:0">Edital Vertical</h1><p class="muted">Carregue um edital em PDF para iniciar.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="clearEdital" class="btn secondary hidden">Limpar edital</button><button class="btn" data-view="novo">Carregar edital em PDF</button></div></div>
     <div id="emptyState" class="card emptyHero" style="margin-top:16px"><div class="emptyIcon">📄</div><h2>Nenhum edital carregado</h2><p class="muted">Envie um PDF para o sistema tentar identificar conteúdo programático e gerar a verticalização automaticamente.</p><button class="btn" data-view="novo">Escolher PDF</button></div>
     <div id="loadedState" class="hidden">
       <section class="kpis"><div class="card kpi"><span class="muted">Tópicos</span><strong id="kTopics">0</strong></div><div class="card kpi"><span class="muted">Estudados</span><strong id="kStudied">0</strong></div><div class="card kpi"><span class="muted">Questões</span><strong id="kQuestions">0</strong></div><div class="card kpi"><span class="muted">Desempenho</span><strong id="kPerf">—</strong></div></section>
@@ -52,7 +52,7 @@
     <input id="pdf" type="file" accept=".pdf,application/pdf" style="display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:12px">
     <div id="drop" class="upload" tabindex="0" role="button" aria-label="Área para arrastar PDF"><div style="font-size:48px">⇧</div><h2>Ou arraste o PDF aqui</h2><p class="muted">Também pode clicar nesta área para escolher o arquivo.</p></div>
     <div id="fileInfo" class="fileBox hidden"></div>
-    <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button>
+    <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button><p id="autoHint" class="muted" style="font-size:12px;margin:8px 0 0">A análise começará automaticamente após selecionar o PDF.</p>
   </div><div class="card"><h3>O teste faz agora</h3><p>✓ lê o texto do PDF</p><p>✓ procura “conteúdo programático”</p><p>✓ quebra trechos em tópicos</p><p>✓ gera a tabela para revisão</p><p class="muted">PDF escaneado ainda exige OCR no backend.</p></div></div>
     <div id="analysis" class="card hidden" style="margin-top:14px"></div>
   </section>
@@ -96,6 +96,8 @@ const pdf = qs('#pdf');
 const drop = qs('#drop');
 const fileInfo = qs('#fileInfo');
 const analyze = qs('#analyze');
+const clearEdital = qs('#clearEdital');
+let analysisRunning = false;
 
 function setFile(f) {
   if (!f) return;
@@ -110,6 +112,7 @@ function setFile(f) {
   fileInfo.innerHTML = '<b>📄 ' + escapeHtml(f.name) + '</b><div class="muted">' + (f.size / 1048576).toFixed(2) + ' MB</div>';
   analyze.disabled = false;
   analyze.textContent = 'Analisar edital';
+  setTimeout(() => runAnalysis(), 250);
 }
 
 pdf.addEventListener('change', () => setFile(pdf.files?.[0]));
@@ -170,12 +173,9 @@ function detectTopics(text) {
   return [...new Set(arr)].slice(0, 120);
 }
 
-analyze.addEventListener('click', async () => {
-  if (!currentFile) {
-    alert('Escolha um PDF primeiro.');
-    return;
-  }
-
+async function runAnalysis() {
+  if (!currentFile || analysisRunning) return;
+  analysisRunning = true;
   analyze.disabled = true;
   analyze.textContent = 'Analisando...';
   const box = qs('#analysis');
@@ -186,44 +186,67 @@ analyze.addEventListener('click', async () => {
     const { text, pages } = await readPdf(currentFile);
     const found = detectTopics(text);
 
+    topics = found.map((content, i) => ({
+      id: i + 1,
+      knowledge: 'IMPORTADO',
+      area: 'A CLASSIFICAR',
+      content,
+      status: 'A Estudar',
+      q: 0,
+      c: 0,
+      e: 0,
+      note: ''
+    }));
+
+    render();
+    qs('#emptyState').classList.add('hidden');
+    qs('#loadedState').classList.remove('hidden');
+    clearEdital?.classList.remove('hidden');
+    qs('#summaryText').textContent =
+      'Arquivo: ' + currentFile.name + ' · ' + pages + ' páginas · ' +
+      found.length + ' tópicos detectados para revisão.';
+
     box.innerHTML =
-      '<h3>Análise concluída</h3>' +
-      '<p><b>' + pages + '</b> páginas · <b>' + found.length + '</b> possíveis tópicos encontrados.</p>' +
-      '<button id="generate" class="btn">Gerar verticalização</button>' +
+      '<h3>Verticalização atualizada</h3>' +
+      '<p><b>' + pages + '</b> páginas · <b>' + found.length + '</b> possíveis tópicos encontrados e carregados.</p>' +
+      '<button id="goVertical" class="btn">Ver verticalização</button>' +
       '<details style="margin-top:12px"><summary>Ver amostra detectada</summary><ol>' +
       found.slice(0, 15).map(x => '<li>' + escapeHtml(x) + '</li>').join('') +
       '</ol></details>';
 
-    qs('#generate').addEventListener('click', () => {
-      topics = found.map((content, i) => ({
-        id: i + 1,
-        knowledge: 'IMPORTADO',
-        area: 'A CLASSIFICAR',
-        content,
-        status: 'A Estudar',
-        q: 0,
-        c: 0,
-        e: 0,
-        note: ''
-      }));
-
-      render();
-      qs('#emptyState').classList.add('hidden');
-      qs('#loadedState').classList.remove('hidden');
-      qs('#summaryText').textContent =
-        'Arquivo: ' + currentFile.name + ' · ' + pages + ' páginas · ' +
-        found.length + ' tópicos detectados para revisão.';
+    qs('#goVertical')?.addEventListener('click', () => {
       setView('inicio');
+      qs('.tab[data-tab="vertical"]')?.click();
     });
+
+    setView('inicio');
+    qs('.tab[data-tab="vertical"]')?.click();
   } catch (e) {
     box.innerHTML =
       '<h3>Não foi possível ler o PDF</h3>' +
       '<p class="muted">' + escapeHtml(e?.message || String(e)) + '</p>' +
       '<p>Se o arquivo for escaneado como imagem, será necessário OCR no backend.</p>';
   } finally {
+    analysisRunning = false;
     analyze.disabled = false;
-    analyze.textContent = 'Analisar edital';
+    analyze.textContent = 'Analisar edital novamente';
   }
+}
+analyze.addEventListener('click', runAnalysis);
+
+clearEdital?.addEventListener('click', () => {
+  topics = [];
+  currentFile = null;
+  pdf.value = '';
+  qs('#emptyState').classList.remove('hidden');
+  qs('#loadedState').classList.add('hidden');
+  qs('#analysis').classList.add('hidden');
+  fileInfo.classList.add('hidden');
+  clearEdital.classList.add('hidden');
+  analyze.disabled = true;
+  analyze.textContent = 'Analisar edital';
+  qs('#globalSearch').value = '';
+  setView('inicio');
 });
 
 function calc(t) {
