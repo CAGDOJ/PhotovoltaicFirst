@@ -41,7 +41,7 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 3 · 06/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 4 · 06/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -210,43 +210,55 @@ async function readProgrammaticAnnex(file,onProgress){
   const total=doc.numPages;
   let annexStart=-1;
 
-  const isProgrammaticPage=(txt)=>{
+  const isExactAnnexPage=(txt)=>{
     const k=searchKey(txt);
-    const hasProgram=k.includes('CONTEUDO PROGRAMATICO');
-    const hasAnnex=k.includes('ANEXO I') || k.includes('ANEXO 1');
-    const hasCargo=k.includes('DELEGADO DE POLICIA CIVIL') || k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL');
-    return hasProgram && (hasAnnex || hasCargo);
+    return (k.includes('ANEXO I') || k.includes('ANEXO 1')) &&
+           k.includes('CONTEUDO PROGRAMATICO');
   };
 
-  const initialStart=Math.max(1,total-24);
-  for(let p=total;p>=initialStart;p--){
-    onProgress?.('Procurando o Anexo I... página '+p+' de '+total);
+  const isCargoProgramPage=(txt)=>{
+    const k=searchKey(txt);
+    return k.includes('CONTEUDO PROGRAMATICO') &&
+      (k.includes('DELEGADO DE POLICIA CIVIL') ||
+       k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL'));
+  };
+
+  // IMPORTANT: find the actual ANEXO I first, not the later Oficial heading.
+  for(let p=total;p>=1;p--){
+    onProgress?.('Procurando o início do Anexo I... página '+p+' de '+total);
     const txt=await pageText(doc,p);
-    if(isProgrammaticPage(txt)){annexStart=p;break;}
+    if(isExactAnnexPage(txt)){
+      annexStart=p;
+      break;
+    }
   }
 
+  // Fallback only when the PDF extraction lost the "ANEXO I" text.
   if(annexStart<0){
-    for(let p=initialStart-1;p>=1;p--){
+    let firstCargoPage=-1;
+    for(let p=1;p<=total;p++){
       onProgress?.('Procurando o conteúdo programático... página '+p+' de '+total);
       const txt=await pageText(doc,p);
-      if(isProgrammaticPage(txt)){annexStart=p;break;}
+      if(isCargoProgramPage(txt)){
+        firstCargoPage=p;
+        break;
+      }
     }
+    annexStart=firstCargoPage;
   }
 
   if(annexStart<0){
     throw new Error('Não encontrei o bloco de CONTEÚDO PROGRAMÁTICO no PDF.');
   }
 
-  onProgress?.('Conteúdo programático encontrado na página '+annexStart+'.');
+  onProgress?.('Anexo I encontrado na página '+annexStart+'.');
   let text='';
   for(let p=annexStart;p<=total;p++){
     onProgress?.('Lendo conteúdo programático... página '+p+' de '+total);
     const txt=await pageText(doc,p);
     const k=searchKey(txt);
-    if(p>annexStart && (k.includes('ANEXO II') || k.includes('ANEXO 2'))){
-      break;
-    }
-    text+='\\n'+txt;
+    if(p>annexStart && (k.includes('ANEXO II') || k.includes('ANEXO 2'))) break;
+    text+='\n'+txt;
   }
 
   return {text,pages:total,annexStart};
@@ -330,11 +342,30 @@ function looksLikeDiscipline(line,next){
          /^(História do Amapá|Geografia do Amapá|Legislação Institucional)\s*:\s*\d+\./i.test(next);
 }
 
+function repairNumbering(text){
+  let s=String(text||'')
+    .replace(/\u00ad/g,'')
+    .replace(/\s+/g,' ')
+    .trim();
+
+  // Repair labels damaged by PDF extraction: "6 ." -> "6.", "1 0 ." -> "10.", "3 . 1 ." -> "3.1."
+  for(let n=0;n<4;n++){
+    s=s.replace(/(\d)\s+(\d)(?=\s*\.)/g,'$1$2');
+  }
+  s=s.replace(/(\d)\s+\./g,'$1.');
+  s=s.replace(/(\d)\s*\.\s+(\d)\s*\./g,'$1.$2.');
+  s=s.replace(/(\d+\.\d+)\s+\./g,'$1.');
+
+  return s;
+}
+
 function splitNumberedTopics(block){
-  const text=block.replace(/\n+/g,' ').replace(/\s+/g,' ').trim();
+  const text=repairNumbering(block);
   const re=/(?:^|\s)(\d{1,3}(?:\.\d{1,3})*)\.\s+(?=[A-ZÁÉÍÓÚÇ])/g;
   const marks=[...text.matchAll(re)];
+
   if(!marks.length) return text?[text]:[];
+
   const out=[];
   for(let i=0;i<marks.length;i++){
     const start=marks[i].index+(marks[i][0].startsWith(' ')?1:0);
