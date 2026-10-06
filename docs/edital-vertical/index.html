@@ -47,7 +47,13 @@
   </section>
   <section id="view-novo" class="view">
     <div class="row"><div><h1 style="margin:0">Novo Edital</h1><p class="muted">Envie o PDF para testar a extração.</p></div></div>
-    <div class="grid2" style="margin-top:14px"><div class="card"><input id="pdf" type="file" accept="application/pdf" hidden><div id="drop" class="upload"><div style="font-size:48px">⇧</div><h2>Arraste ou clique para selecionar</h2><p class="muted">PDF textual funciona melhor neste protótipo.</p></div><div id="fileInfo" class="fileBox hidden"></div><button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button></div><div class="card"><h3>O teste faz agora</h3><p>✓ lê o texto do PDF</p><p>✓ procura “conteúdo programático”</p><p>✓ quebra trechos em tópicos</p><p>✓ gera a tabela para revisão</p><p class="muted">PDF escaneado ainda exige OCR no backend.</p></div></div>
+    <div class="grid2" style="margin-top:14px"><div class="card">
+    <label for="pdf" style="display:block;font-weight:800;margin-bottom:8px">Selecione o edital em PDF</label>
+    <input id="pdf" type="file" accept=".pdf,application/pdf" style="display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:12px">
+    <div id="drop" class="upload" tabindex="0" role="button" aria-label="Área para arrastar PDF"><div style="font-size:48px">⇧</div><h2>Ou arraste o PDF aqui</h2><p class="muted">Também pode clicar nesta área para escolher o arquivo.</p></div>
+    <div id="fileInfo" class="fileBox hidden"></div>
+    <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button>
+  </div><div class="card"><h3>O teste faz agora</h3><p>✓ lê o texto do PDF</p><p>✓ procura “conteúdo programático”</p><p>✓ quebra trechos em tópicos</p><p>✓ gera a tabela para revisão</p><p class="muted">PDF escaneado ainda exige OCR no backend.</p></div></div>
     <div id="analysis" class="card hidden" style="margin-top:14px"></div>
   </section>
   <section id="view-editais" class="view"><div class="card emptyHero"><div class="emptyIcon">▣</div><h2>Meus Editais</h2><p class="muted">Nenhum edital salvo ainda.</p><button class="btn" data-view="novo">Adicionar primeiro edital</button></div></section>
@@ -62,26 +68,229 @@
 </div>
 <nav class="bottom"><button class="active" data-view="inicio">⌂<br>Início</button><button data-view="editais">▣<br>Editais</button><button data-view="novo">＋<br>Novo</button><button data-view="monitor">♢<br>Monitor</button><button data-view="desempenho">↗<br>Desempenho</button></nav>
 <script type="module">
-let topics=[]; let currentFile=null;
-const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
-function setView(v){qsa('.view').forEach(x=>x.classList.remove('active'));qs('#view-'+v)?.classList.add('active');qsa('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));document.body.classList.remove('menuOpen')}
-qsa('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
-qs('#hamb').onclick=()=>document.body.classList.toggle('menuOpen');qs('#shade').onclick=()=>document.body.classList.remove('menuOpen');
-qsa('.tab').forEach(b=>b.onclick=()=>{qsa('.tab').forEach(x=>x.classList.remove('active'));qsa('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');qs('#panel-'+b.dataset.tab).classList.add('active')});
-const pdf=qs('#pdf'),drop=qs('#drop'),fileInfo=qs('#fileInfo'),analyze=qs('#analyze');drop.onclick=()=>pdf.click();pdf.onchange=()=>setFile(pdf.files[0]);['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
-function setFile(f){if(!f)return;if(f.type!=='application/pdf'){alert('Selecione um PDF');return}currentFile=f;fileInfo.classList.remove('hidden');fileInfo.innerHTML='<b>📄 '+f.name+'</b><div class="muted">'+(f.size/1048576).toFixed(2)+' MB</div>';analyze.disabled=false}
-async function readPdf(file){const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';const data=new Uint8Array(await file.arrayBuffer());const doc=await pdfjs.getDocument({data}).promise;let text='';for(let i=1;i<=Math.min(doc.numPages,100);i++){const p=await doc.getPage(i);const c=await p.getTextContent();text+='
-'+c.items.map(x=>x.str).join(' ')}return {text,pages:doc.numPages}}
-function detectTopics(text){const clean=text.replace(/s+/g,' ').trim();const m=/conte[uú]do program[aá]tico/i.exec(clean);let chunk=m?clean.slice(m.index,m.index+30000):clean.slice(0,30000);let arr=chunk.split(/(?=d{1,3}[.)]s)|;s+(?=[A-ZÁÉÍÓÚÇ])/).map(x=>x.trim()).filter(x=>x.length>15&&x.length<420);const bad=/inscri[cç][aã]o|pagamento|resultado|endere[cç]o|telefone|cronograma|documentos? pessoais?/i;arr=arr.filter(x=>!bad.test(x));return [...new Set(arr)].slice(0,120)}
-analyze.onclick=async()=>{if(!currentFile)return;analyze.disabled=true;analyze.textContent='Analisando...';const box=qs('#analysis');box.classList.remove('hidden');box.innerHTML='<h3>Processando PDF...</h3><p class="muted">Extraindo texto.</p>';try{const {text,pages}=await readPdf(currentFile);const found=detectTopics(text);box.innerHTML='<h3>Análise concluída</h3><p><b>'+pages+'</b> páginas · <b>'+found.length+'</b> possíveis tópicos encontrados.</p><button id="generate" class="btn">Gerar verticalização</button><details style="margin-top:10px"><summary>Ver amostra</summary><ol>'+found.slice(0,15).map(x=>'<li>'+x+'</li>').join('')+'</ol></details>';qs('#generate').onclick=()=>{topics=found.map((content,i)=>({id:i+1,knowledge:'IMPORTADO',area:'A CLASSIFICAR',content,status:'A Estudar',q:0,c:0,e:0,note:''}));localStorage.setItem('ev_zero_topics',JSON.stringify(topics));localStorage.setItem('ev_zero_file',currentFile.name);render();qs('#emptyState').classList.add('hidden');qs('#loadedState').classList.remove('hidden');qs('#summaryText').textContent='Arquivo: '+currentFile.name+' · '+pages+' páginas · '+found.length+' tópicos detectados para revisão.';setView('inicio')}}catch(e){box.innerHTML='<h3>Não foi possível ler o PDF</h3><p class="muted">'+e.message+'</p><p>Se o arquivo for escaneado, será necessário OCR no backend.</p>'}finally{analyze.disabled=false;analyze.textContent='Analisar edital'}};
-function calc(t){return t.q?Math.round(t.c/t.q*100):null}
-function render(){const f=qs('#filter')?.value?.toLowerCase()||'',s=qs('#statusFilter')?.value||'',d=qs('#discFilter')?.value||'';const rows=topics.filter(t=>(!f||(t.content+' '+t.area).toLowerCase().includes(f))&&(!s||t.status===s)&&(!d||t.area===d));qs('#tbody').innerHTML=rows.map(t=>'<tr><td>'+t.id+'</td><td>'+t.knowledge+'</td><td>'+t.area+'</td><td>'+t.content+'</td><td><span class="status gray">'+t.status+'</span></td><td>'+t.q+'</td><td>'+t.c+'</td><td>'+t.e+'</td><td>'+(calc(t)==null?'—':calc(t)+'%')+'</td><td>'+t.note+'</td></tr>').join('');const areas=[...new Set(topics.map(t=>t.area))];qs('#discFilter').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+a+'</option>').join('');qs('#kTopics').textContent=topics.length;qs('#kStudied').textContent=topics.filter(t=>t.status==='Estudado').length;qs('#kQuestions').textContent=topics.reduce((a,b)=>a+b.q,0);const tq=topics.reduce((a,b)=>a+b.q,0),tc=topics.reduce((a,b)=>a+b.c,0);qs('#kPerf').textContent=tq?Math.round(tc/tq*100)+'%':'—'}
-['filter','statusFilter','discFilter'].forEach(id=>qs('#'+id)?.addEventListener(id==='filter'?'input':'change',render));
-qs('#exportCsv').onclick=()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES
-';const csv=h+topics.map(t=>[t.id,t.knowledge,t.area,t.content,t.status,t.q,t.c,t.e,t.note].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('
-');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click()};
-qs('#globalSearch').oninput=e=>{if(topics.length){qs('#filter').value=e.target.value;render();qs('.tab[data-tab="vertical"]')?.click()}}
-localStorage.removeItem('ev_topics'); localStorage.removeItem('ev_tasks'); localStorage.removeItem('ev_seen_popup');
-localStorage.removeItem('ev_zero_topics'); localStorage.removeItem('ev_zero_file');
+let topics = [];
+let currentFile = null;
+
+const qs = (s) => document.querySelector(s);
+const qsa = (s) => [...document.querySelectorAll(s)];
+
+function setView(v) {
+  qsa('.view').forEach(x => x.classList.remove('active'));
+  qs('#view-' + v)?.classList.add('active');
+  qsa('[data-view]').forEach(x => x.classList.toggle('active', x.dataset.view === v));
+  document.body.classList.remove('menuOpen');
+}
+
+qsa('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+qs('#hamb')?.addEventListener('click', () => document.body.classList.toggle('menuOpen'));
+qs('#shade')?.addEventListener('click', () => document.body.classList.remove('menuOpen'));
+
+qsa('.tab').forEach(b => b.addEventListener('click', () => {
+  qsa('.tab').forEach(x => x.classList.remove('active'));
+  qsa('.panel').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  qs('#panel-' + b.dataset.tab)?.classList.add('active');
+}));
+
+const pdf = qs('#pdf');
+const drop = qs('#drop');
+const fileInfo = qs('#fileInfo');
+const analyze = qs('#analyze');
+
+function setFile(f) {
+  if (!f) return;
+  const isPdf = f.type === 'application/pdf' || /\.pdf$/i.test(f.name);
+  if (!isPdf) {
+    alert('Selecione um arquivo PDF.');
+    pdf.value = '';
+    return;
+  }
+  currentFile = f;
+  fileInfo.classList.remove('hidden');
+  fileInfo.innerHTML = '<b>📄 ' + escapeHtml(f.name) + '</b><div class="muted">' + (f.size / 1048576).toFixed(2) + ' MB</div>';
+  analyze.disabled = false;
+  analyze.textContent = 'Analisar edital';
+}
+
+pdf.addEventListener('change', () => setFile(pdf.files?.[0]));
+
+drop.addEventListener('click', () => pdf.click());
+drop.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    pdf.click();
+  }
+});
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault();
+  drop.classList.add('drag');
+}));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => {
+  e.preventDefault();
+  drop.classList.remove('drag');
+}));
+drop.addEventListener('drop', e => {
+  const f = e.dataTransfer?.files?.[0];
+  if (f) setFile(f);
+});
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[ch]));
+}
+
+async function readPdf(file) {
+  const pdfjs = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';
+  const data = new Uint8Array(await file.arrayBuffer());
+  const doc = await pdfjs.getDocument({ data }).promise;
+  let text = '';
+  for (let i = 1; i <= Math.min(doc.numPages, 100); i++) {
+    const page = await doc.getPage(i);
+    const content = await page.getTextContent();
+    text += '\n' + content.items.map(x => x.str).join(' ');
+  }
+  return { text, pages: doc.numPages };
+}
+
+function detectTopics(text) {
+  const clean = text.replace(/\s+/g, ' ').trim();
+  const marker = /conte[uú]do program[aá]tico/i.exec(clean);
+  const chunk = marker ? clean.slice(marker.index, marker.index + 35000) : clean.slice(0, 35000);
+
+  let arr = chunk
+    .split(/(?=\b\d{1,3}[\.)]\s)|;\s+(?=[A-ZÁÉÍÓÚÇ])/)
+    .map(x => x.trim())
+    .filter(x => x.length > 15 && x.length < 420);
+
+  const blacklist = /inscri[cç][aã]o|pagamento|resultado|endere[cç]o|telefone|cronograma|documentos? pessoais?/i;
+  arr = arr.filter(x => !blacklist.test(x));
+
+  return [...new Set(arr)].slice(0, 120);
+}
+
+analyze.addEventListener('click', async () => {
+  if (!currentFile) {
+    alert('Escolha um PDF primeiro.');
+    return;
+  }
+
+  analyze.disabled = true;
+  analyze.textContent = 'Analisando...';
+  const box = qs('#analysis');
+  box.classList.remove('hidden');
+  box.innerHTML = '<h3>Processando PDF...</h3><p class="muted">Extraindo texto do edital.</p>';
+
+  try {
+    const { text, pages } = await readPdf(currentFile);
+    const found = detectTopics(text);
+
+    box.innerHTML =
+      '<h3>Análise concluída</h3>' +
+      '<p><b>' + pages + '</b> páginas · <b>' + found.length + '</b> possíveis tópicos encontrados.</p>' +
+      '<button id="generate" class="btn">Gerar verticalização</button>' +
+      '<details style="margin-top:12px"><summary>Ver amostra detectada</summary><ol>' +
+      found.slice(0, 15).map(x => '<li>' + escapeHtml(x) + '</li>').join('') +
+      '</ol></details>';
+
+    qs('#generate').addEventListener('click', () => {
+      topics = found.map((content, i) => ({
+        id: i + 1,
+        knowledge: 'IMPORTADO',
+        area: 'A CLASSIFICAR',
+        content,
+        status: 'A Estudar',
+        q: 0,
+        c: 0,
+        e: 0,
+        note: ''
+      }));
+
+      render();
+      qs('#emptyState').classList.add('hidden');
+      qs('#loadedState').classList.remove('hidden');
+      qs('#summaryText').textContent =
+        'Arquivo: ' + currentFile.name + ' · ' + pages + ' páginas · ' +
+        found.length + ' tópicos detectados para revisão.';
+      setView('inicio');
+    });
+  } catch (e) {
+    box.innerHTML =
+      '<h3>Não foi possível ler o PDF</h3>' +
+      '<p class="muted">' + escapeHtml(e?.message || String(e)) + '</p>' +
+      '<p>Se o arquivo for escaneado como imagem, será necessário OCR no backend.</p>';
+  } finally {
+    analyze.disabled = false;
+    analyze.textContent = 'Analisar edital';
+  }
+});
+
+function calc(t) {
+  return t.q ? Math.round((t.c / t.q) * 100) : null;
+}
+
+function render() {
+  const f = qs('#filter')?.value?.toLowerCase() || '';
+  const s = qs('#statusFilter')?.value || '';
+  const d = qs('#discFilter')?.value || '';
+
+  const rows = topics.filter(t =>
+    (!f || (t.content + ' ' + t.area).toLowerCase().includes(f)) &&
+    (!s || t.status === s) &&
+    (!d || t.area === d)
+  );
+
+  qs('#tbody').innerHTML = rows.map(t =>
+    '<tr>' +
+      '<td>' + t.id + '</td>' +
+      '<td>' + t.knowledge + '</td>' +
+      '<td>' + t.area + '</td>' +
+      '<td>' + escapeHtml(t.content) + '</td>' +
+      '<td><span class="status gray">' + t.status + '</span></td>' +
+      '<td>' + t.q + '</td><td>' + t.c + '</td><td>' + t.e + '</td>' +
+      '<td>' + (calc(t) == null ? '—' : calc(t) + '%') + '</td>' +
+      '<td>' + escapeHtml(t.note) + '</td>' +
+    '</tr>'
+  ).join('');
+
+  const areas = [...new Set(topics.map(t => t.area))];
+  qs('#discFilter').innerHTML =
+    '<option value="">Todas as disciplinas</option>' +
+    areas.map(a => '<option>' + escapeHtml(a) + '</option>').join('');
+
+  qs('#kTopics').textContent = topics.length;
+  qs('#kStudied').textContent = topics.filter(t => t.status === 'Estudado').length;
+  qs('#kQuestions').textContent = topics.reduce((a, b) => a + b.q, 0);
+
+  const tq = topics.reduce((a, b) => a + b.q, 0);
+  const tc = topics.reduce((a, b) => a + b.c, 0);
+  qs('#kPerf').textContent = tq ? Math.round((tc / tq) * 100) + '%' : '—';
+}
+
+['filter','statusFilter','discFilter'].forEach(id => {
+  const el = qs('#' + id);
+  el?.addEventListener(id === 'filter' ? 'input' : 'change', render);
+});
+
+qs('#exportCsv')?.addEventListener('click', () => {
+  const h = 'SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';
+  const quote = v => '"' + String(v ?? '').replaceAll('"', '""') + '"';
+  const csv = h + topics.map(t =>
+    [t.id,t.knowledge,t.area,t.content,t.status,t.q,t.c,t.e,t.note].map(quote).join(';')
+  ).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'verticalizacao.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+qs('#globalSearch')?.addEventListener('input', e => {
+  if (!topics.length) return;
+  qs('#filter').value = e.target.value;
+  render();
+  qs('.tab[data-tab="vertical"]')?.click();
+});
 </script>
 </body></html>
