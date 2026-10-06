@@ -151,6 +151,7 @@ function normalizeText(text){
     .replace(/[‐‑‒–—]/g,'-')
     .replace(/[ \t]+\n/g,'\n')
     .replace(/\n[ \t]+/g,'\n')
+    .replace(/^\s*\d{1,3}\s*$/gm,'')
     .replace(/\n{3,}/g,'\n\n');
 }
 
@@ -179,6 +180,8 @@ function looksLikeDiscipline(line,next){
   if(/^\d+(?:\.\d+)*\.\s/.test(line)) return false;
   if(/^ANEXO\b/i.test(line) || /^OBSERVA/i.test(line) || /^CONTE[ÚU]DO PROGRAM/i.test(line)) return false;
   if(/^(História do Amapá|Geografia do Amapá|Legislação Institucional)\s*:/i.test(line)) return false;
+  const core=line.endsWith(':')?line.slice(0,-1):line;
+  if(/[.!?]/.test(core) || /\d/.test(core)) return false;
   return /^\d+(?:\.\d+)*\.\s/.test(next) ||
          /^(História do Amapá|Geografia do Amapá|Legislação Institucional)\s*:\s*\d+\./i.test(next);
 }
