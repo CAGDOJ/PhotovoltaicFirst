@@ -65,20 +65,36 @@
 </section>
 
 <section id="view-novo" class="view">
-  <div class="row"><div><h1 style="margin:0">Novo Edital</h1><p class="muted">Selecione o PDF. Primeiro identificamos os cargos; depois você escolhe um para liberar a análise.</p></div></div>
+  <div class="row"><div><h1 style="margin:0">Novo Edital</h1><p class="muted">Siga o fluxo abaixo para verticalizar o edital.</p></div></div>
+
+  <div class="card" style="margin-top:14px">
+    <h3>Fluxo</h3>
+    <div style="display:grid;gap:10px">
+      <div><b>1.</b> Carregar o PDF.</div>
+      <div><b>2.</b> Identificar os cargos.</div>
+      <div><b>3.</b> Escolher o cargo.</div>
+      <div><b>4.</b> Liberar “Analisar edital”.</div>
+      <div><b>5.</b> Gerar a verticalização do cargo escolhido.</div>
+    </div>
+  </div>
+
   <div class="grid2" style="margin-top:14px">
     <div class="card">
       <label for="pdf" style="display:block;font-weight:800;margin-bottom:8px">Arquivo PDF</label>
       <input id="pdf" type="file" accept=".pdf,application/pdf" style="display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff">
       <div id="drop" class="upload" tabindex="0" role="button" style="margin-top:12px"><div style="font-size:48px">⇧</div><h2>Arraste o PDF aqui</h2><p class="muted">Ou clique nesta área para abrir o seletor.</p></div>
       <div id="fileInfo" class="fileBox hidden"></div>
-      <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button>
-      <p class="muted" style="font-size:12px;margin-bottom:0">Após carregar o PDF, escolha o cargo. O botão “Analisar edital” só será liberado depois da escolha.</p>
+      <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Escolha o cargo primeiro</button>
+      <p class="muted" style="font-size:12px;margin-bottom:0">Após carregar o PDF, os cargos encontrados aparecerão abaixo. O botão “Analisar edital” só será liberado depois da escolha.</p>
     </div>
-    <div class="card"><h3>Fluxo do teste</h3><p>1. Carrega o PDF.</p><p>2. Identifica os cargos.</p><p>3. Você escolhe o cargo.</p><p>4. Libera “Analisar edital”.</p><p>5. Gera a verticalização do cargo escolhido.</p><p class="muted">PDF escaneado como imagem ainda precisará de OCR na versão com backend.</p></div>
+    <div class="card">
+      <h3>Etapas detectadas</h3>
+      <p class="muted">O sistema deve ler o Anexo I completo e listar todos os cargos com conteúdo programático.</p>
+    </div>
   </div>
+
   <div id="analysis" class="card hidden" style="margin-top:14px"></div>
-</section>
+</section></section>
 
 <section id="view-editais" class="view"><div class="card emptyHero"><div class="emptyIcon">▣</div><h2>Meus Editais</h2><p class="muted">Nenhum edital salvo.</p><button class="btn" data-view="novo">Adicionar edital</button></div></section>
 <section id="view-plano" class="view"><div class="card emptyHero"><div class="emptyIcon">✓</div><h2>Plano de Estudos</h2><p class="muted">Carregue um edital primeiro.</p><button class="btn" data-view="novo">Carregar edital</button></div></section>
@@ -263,53 +279,42 @@ function normalizeText(text){
 function extractCargoSections(text){
   const t=normalizeText(text);
   const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
+  const normalized=lines.map(searchKey);
 
-  const markers=[];
+  const wanted=[
+    {cargo:'DELEGADO DE POLÍCIA CIVIL',needle:'DELEGADO DE POLICIA CIVIL'},
+    {cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',needle:'OFICIAL INVESTIGADOR DE POLICIA CIVIL'}
+  ];
 
-  for(let i=0;i<lines.length;i++){
-    const k=searchKey(lines[i]);
+  const found=[];
 
-    if(k.includes('DELEGADO DE POLICIA CIVIL')){
-      markers.push({cargo:'DELEGADO DE POLÍCIA CIVIL',line:i});
-      continue;
+  for(const spec of wanted){
+    let hit=-1;
+
+    // Search 1, 2, 3 and 4-line windows so broken titles are still recognized.
+    for(let i=0;i<normalized.length && hit<0;i++){
+      for(let span=1;span<=4 && i+span<=normalized.length;span++){
+        const windowText=normalized.slice(i,i+span).join(' ');
+        if(windowText.includes(spec.needle)){
+          hit=i;
+          break;
+        }
+      }
     }
 
-    if(k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL')){
-      markers.push({cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',line:i});
-      continue;
-    }
-
-    // Fallback for titles broken across two adjacent lines.
-    const next=i+1<lines.length?searchKey(lines[i]+' '+lines[i+1]):k;
-
-    if(next.includes('DELEGADO DE POLICIA CIVIL') && !markers.some(m=>m.cargo==='DELEGADO DE POLÍCIA CIVIL')){
-      markers.push({cargo:'DELEGADO DE POLÍCIA CIVIL',line:i});
-      continue;
-    }
-
-    if(next.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL') && !markers.some(m=>m.cargo==='OFICIAL INVESTIGADOR DE POLÍCIA CIVIL')){
-      markers.push({cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',line:i});
-      continue;
-    }
+    if(hit>=0) found.push({cargo:spec.cargo,line:hit});
   }
 
-  // Remove duplicates caused by line+next-line fallback.
-  const unique=[];
-  for(const m of markers.sort((a,b)=>a.line-b.line)){
-    if(!unique.some(u=>u.cargo===m.cargo)) unique.push(m);
+  found.sort((a,b)=>a.line-b.line);
+
+  if(!found.length){
+    throw new Error('O conteúdo programático foi encontrado, mas nenhum cargo conhecido foi identificado.');
   }
 
-  if(!unique.length){
-    throw new Error('O conteúdo programático foi encontrado, mas não consegui identificar os cargos.');
-  }
-
-  return unique.map((m,i)=>{
+  return found.map((m,i)=>{
     const start=m.line+1;
-    const end=i+1<unique.length?unique[i+1].line:lines.length;
-    return {
-      cargo:m.cargo,
-      body:lines.slice(start,end).join('\n').trim()
-    };
+    const end=i+1<found.length?found[i+1].line:lines.length;
+    return {cargo:m.cargo,body:lines.slice(start,end).join('\n').trim()};
   });
 }
 
@@ -376,7 +381,7 @@ function showCargoStep(sections,pages){
     '<div class="card" style="box-shadow:none;border:2px solid #cfe2ff">'+
       '<div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:6px">ETAPA 2 DE 3</div>'+
       '<h2 style="margin:0 0 6px">Escolha o cargo</h2>'+
-      '<p class="muted">O PDF foi carregado. Agora escolha qual conteúdo programático deseja verticalizar.</p>'+
+      '<p class="muted">O PDF foi carregado. Foram identificados <b>'+sections.length+'</b> cargo(s). Escolha qual conteúdo programático deseja verticalizar.</p>'+
       '<div id="cargoChoices" style="display:grid;gap:12px;margin-top:16px">'+
       sections.map((s,i)=>
         '<button class="btn secondary cargoChoice" data-i="'+i+'" '+
