@@ -222,56 +222,54 @@ function normalizeText(text){
 
 function extractCargoSections(text){
   const t=normalizeText(text);
+  const lines=t.split(/\n/).map(x=>x.trim()).filter(Boolean);
 
-  const patterns=[
-    {
-      cargo:'DELEGADO DE POLÍCIA CIVIL',
-      re:/CONTE[ÚU]DO[\s\S]{0,120}?PROGRAM[ÁA]TICO[\s\S]{0,160}?DELEGADO[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i,
-      fallback:/DELEGADO[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i
-    },
-    {
-      cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',
-      re:/CONTE[ÚU]DO[\s\S]{0,120}?PROGRAM[ÁA]TICO[\s\S]{0,200}?OFICIAL[\s\S]{0,60}?INVESTIGADOR[\s\S]{0,60}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i,
-      fallback:/OFICIAL[\s\S]{0,60}?INVESTIGADOR[\s\S]{0,60}?POL[ÍI]CIA[\s\S]{0,40}?CIVIL/i
+  const markers=[];
+
+  for(let i=0;i<lines.length;i++){
+    const k=searchKey(lines[i]);
+
+    if(k.includes('DELEGADO DE POLICIA CIVIL')){
+      markers.push({cargo:'DELEGADO DE POLÍCIA CIVIL',line:i});
+      continue;
     }
-  ];
 
-  let hits=[];
-  for(const p of patterns){
-    let m=p.re.exec(t);
-    if(!m) m=p.fallback.exec(t);
-    if(m) hits.push({cargo:p.cargo,index:m.index,end:m.index+m[0].length});
-  }
-
-  hits.sort((a,b)=>a.index-b.index);
-
-  if(!hits.length){
-    // Final fallback using accent/punctuation-free text.
-    const key=searchKey(t);
-    const specs=[
-      ['DELEGADO DE POLICIA CIVIL','DELEGADO DE POLÍCIA CIVIL'],
-      ['OFICIAL INVESTIGADOR DE POLICIA CIVIL','OFICIAL INVESTIGADOR DE POLÍCIA CIVIL']
-    ];
-    for(const [needle,cargo] of specs){
-      if(key.includes(needle)){
-        // Locate a broad raw equivalent for slicing.
-        const raw = cargo.startsWith('DELEGADO')
-          ? /DELEGADO[\s\S]{0,100}?POL[ÍI]CIA[\s\S]{0,50}?CIVIL/i
-          : /OFICIAL[\s\S]{0,80}?INVESTIGADOR[\s\S]{0,80}?POL[ÍI]CIA[\s\S]{0,50}?CIVIL/i;
-        const m=raw.exec(t);
-        if(m) hits.push({cargo,index:m.index,end:m.index+m[0].length});
-      }
+    if(k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL')){
+      markers.push({cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',line:i});
+      continue;
     }
-    hits.sort((a,b)=>a.index-b.index);
+
+    // Fallback for titles broken across two adjacent lines.
+    const next=i+1<lines.length?searchKey(lines[i]+' '+lines[i+1]):k;
+
+    if(next.includes('DELEGADO DE POLICIA CIVIL') && !markers.some(m=>m.cargo==='DELEGADO DE POLÍCIA CIVIL')){
+      markers.push({cargo:'DELEGADO DE POLÍCIA CIVIL',line:i});
+      continue;
+    }
+
+    if(next.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL') && !markers.some(m=>m.cargo==='OFICIAL INVESTIGADOR DE POLÍCIA CIVIL')){
+      markers.push({cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',line:i});
+      continue;
+    }
   }
 
-  if(!hits.length){
-    throw new Error('O conteúdo programático foi encontrado, mas os nomes dos cargos não foram reconhecidos no texto extraído.');
+  // Remove duplicates caused by line+next-line fallback.
+  const unique=[];
+  for(const m of markers.sort((a,b)=>a.line-b.line)){
+    if(!unique.some(u=>u.cargo===m.cargo)) unique.push(m);
   }
 
-  return hits.map((h,i)=>{
-    const end=i+1<hits.length?hits[i+1].index:t.length;
-    return {cargo:h.cargo,body:t.slice(h.end,end).trim()};
+  if(!unique.length){
+    throw new Error('O conteúdo programático foi encontrado, mas não consegui identificar os cargos.');
+  }
+
+  return unique.map((m,i)=>{
+    const start=m.line+1;
+    const end=i+1<unique.length?unique[i+1].line:lines.length;
+    return {
+      cargo:m.cargo,
+      body:lines.slice(start,end).join('\n').trim()
+    };
   });
 }
 
@@ -333,12 +331,21 @@ function parseDisciplineTopics(body,cargo){
 function chooseCargoUI(sections,pages){
   const box=qs('#analysis');
   box.classList.remove('hidden');
+
   box.innerHTML=
-    '<h3>Escolha o cargo</h3>'+
-    '<p class="muted">O edital possui mais de um conteúdo programático. A verticalização será feita somente para o cargo escolhido.</p>'+
-    '<div id="cargoChoices" style="display:grid;gap:10px;margin-top:12px">'+
-    sections.map((s,i)=>'<button class="btn secondary cargoChoice" data-i="'+i+'" style="text-align:left;padding:14px">'+esc(s.cargo)+'</button>').join('')+
+    '<div class="card" style="box-shadow:none;border:2px solid #cfe2ff">'+
+      '<h2 style="margin-top:0">Escolha o cargo para verticalizar</h2>'+
+      '<p class="muted">Foram encontrados <b>'+sections.length+'</b> conteúdos programáticos diferentes neste edital.</p>'+
+      '<div id="cargoChoices" style="display:grid;gap:12px;margin-top:16px">'+
+      sections.map((s,i)=>
+        '<button class="btn secondary cargoChoice" data-i="'+i+'" '+
+        'style="text-align:left;padding:16px;font-size:16px;border:1px solid #cfe2ff">'+
+        '🎯 '+esc(s.cargo)+
+        '</button>'
+      ).join('')+
+      '</div>'+
     '</div>';
+
   qsa('.cargoChoice').forEach(btn=>btn.addEventListener('click',()=>{
     const sec=sections[+btn.dataset.i];
     applyCargo(sec,pages);
