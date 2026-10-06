@@ -1,75 +1,183 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#071a2f">
 <title>Edital Vertical</title>
+<meta name="description" content="Verticalização automática de editais em PDF.">
+<link rel="icon" href="./icon.svg?v=3" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg?v=3">
+<link rel="manifest" href="./manifest.webmanifest?v=3">
 <style>
-:root{--navy:#071a2f;--blue:#1677ff;--bg:#f4f7fb;--card:#fff;--text:#15243a;--muted:#6d7a8e;--line:#dfe6ef;--green:#16a36a;--yellow:#f2a500;--red:#ef4444}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{background:linear-gradient(180deg,#071a2f,#0c2948);color:#fff;padding:22px 14px;display:flex;flex-direction:column}
-.brand{font-size:22px;font-weight:800;margin:0 8px 24px}.brand small{display:block;font-size:11px;font-weight:400;color:#aac0d5}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#dce9f6;padding:12px;border-radius:9px;text-align:left;cursor:pointer}.nav button.active,.nav button:hover{background:#1269d8}.main{min-width:0}.top{height:66px;background:#0d2746;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 24px}.top input{width:min(560px,55vw);background:#163657;border:1px solid #385675;color:#fff;padding:10px 12px;border-radius:9px}.content{padding:22px}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.hero{display:grid;grid-template-columns:1fr auto;gap:14px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#eef3f8;padding:5px 9px;border-radius:999px;font-size:12px}.live{color:var(--green);font-weight:700}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.kpi strong{font-size:23px;display:block}.kpi span{color:var(--muted);font-size:12px}.tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:12px;overflow:auto}.tab{border:0;background:transparent;padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}.tab.active{background:#eaf3ff;color:#0e66d7;font-weight:700}.panel{display:none}.panel.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.task{display:grid;grid-template-columns:24px 1fr 80px;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f5}.bars{display:grid;gap:10px}.barrow{display:grid;grid-template-columns:150px 1fr 45px;gap:8px;align-items:center}.bar{height:8px;background:#e8edf3;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}.tablewrap{overflow:auto}.filters{display:grid;grid-template-columns:1fr 190px 190px;gap:8px;margin-bottom:10px}.filters input,.filters select{padding:10px;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;min-width:1050px}th,td{font-size:12px;padding:9px;border-bottom:1px solid #e8edf3;text-align:left}th{background:#f6f8fb}td input,td select{width:100%;padding:6px;border:1px solid #dfe6ef;border-radius:6px}.btn{border:0;background:var(--blue);color:#fff;padding:10px 13px;border-radius:8px;font-weight:700;cursor:pointer}.btn.secondary{background:#fff;color:var(--blue);border:1px solid #9bc3ff}.upload{border:2px dashed #86b8fa;border-radius:12px;padding:42px;text-align:center;cursor:pointer;background:#f8fbff}.notice{position:fixed;right:18px;top:82px;width:360px;background:#fff;border:2px solid #ff6b6b;border-radius:14px;padding:16px;box-shadow:0 25px 70px #0003;z-index:20}.notice h3{margin:0 0 8px}.change{padding:10px;border-radius:8px;margin:7px 0;background:#f8fafc}.critical{background:#fee2e2}.warning{background:#fff3cd}.success{background:#dcfce7}.hidden{display:none!important}.muted{color:var(--muted)}.progress{height:8px;background:#e8edf3;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#16a36a,#22c7a7);width:65%}
-@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.kpis,.grid2{grid-template-columns:1fr 1fr}.hero{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.notice{left:12px;right:12px;width:auto}.top input{width:70vw}}
-@media(max-width:560px){.kpis,.grid2{grid-template-columns:1fr}.content{padding:12px}.top{padding:0 12px}}
+:root{--navy:#071a2f;--navy2:#0d2746;--blue:#1269d8;--cyan:#21c7ff;--bg:#f4f7fb;--card:#fff;--text:#15243a;--muted:#6d7a8e;--line:#dfe6ef;--green:#16a36a;--red:#e14f61;--yellow:#f3ad2b;--shadow:0 14px 34px rgba(13,39,70,.08)}
+*{box-sizing:border-box}html,body{margin:0}body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.hidden{display:none!important}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}.side{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff;padding:18px 14px;display:flex;flex-direction:column;gap:18px;position:sticky;top:0;height:100vh;overflow:auto}.brandLogo{width:100%;max-width:220px;height:auto;display:block}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#dce8f5;padding:12px;border-radius:12px;text-align:left;cursor:pointer;font-weight:700;transition:.16s}.nav button.active,.nav button:hover{background:var(--blue);color:#fff}.sideFoot{margin-top:auto;color:#b9c9da;font-size:12px}.main{min-width:0}.top{position:sticky;top:0;z-index:20;background:rgba(13,39,70,.96);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px;backdrop-filter:blur(12px)}.mobileLogo{display:none;width:42px;height:42px}.search{flex:1;max-width:720px;background:#17385c;border:1px solid #315271;color:#fff;border-radius:12px;padding:11px 13px}.topright{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue));font-weight:800}.content{padding:24px}.view{display:none}.view.active{display:block}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow)}.emptyHero{padding:42px 24px;text-align:center}.emptyHero img{width:92px;height:92px}.emptyIcon{font-size:52px}.btn{border:0;background:var(--blue);color:#fff;padding:12px 15px;border-radius:12px;font-weight:800;cursor:pointer}.btn.secondary{background:#eef4ff;color:#245a9c}.btn:disabled{opacity:.55;cursor:not-allowed}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}.kpi strong{font-size:24px;display:block}.muted{color:var(--muted)}.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tab{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:12px;cursor:pointer;white-space:nowrap;font-weight:700}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}.panel{display:none}.panel.active{display:block}.upload{border:2px dashed #8ebcf6;border-radius:16px;padding:34px;text-align:center;background:#f8fbff;cursor:pointer}.upload.drag{background:#edf6ff}.fileBox{margin-top:12px;padding:12px;border-radius:12px;background:#eef4ff}.filters{display:grid;grid-template-columns:1fr 180px 220px;gap:8px;margin:12px 0}.filters input,.filters select{padding:10px;border:1px solid var(--line);border-radius:10px}.tableWrap{overflow:auto}.tableWrap table{border-collapse:collapse;width:100%;min-width:1040px}.tableWrap th,.tableWrap td{border-bottom:1px solid #e9eef4;padding:9px;text-align:left;font-size:12px}.tableWrap th{background:#f7f9fc}.status{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}.status.gray{background:#eef1f5;color:#607086}.status.green{background:#eaf8f1;color:#118452}.status.yellow{background:#fff5da;color:#a56c00}.hamb,.bottom,.shade{display:none}.build{font-size:11px;color:#9fb5ca;margin-top:6px}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:fixed;left:0;top:0;bottom:0;width:min(320px,88vw);z-index:50;transform:translateX(-102%);transition:.2s}.menuOpen .side{transform:translateX(0)}.shade{position:fixed;inset:0;background:#071a2f99;z-index:45}.menuOpen .shade{display:block}.hamb{display:grid;place-items:center;border:0;background:#17385c;color:#fff;width:42px;height:42px;border-radius:10px}.mobileLogo{display:block}.top{padding:10px}.content{padding:14px 12px 92px}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.topright span{display:none}.bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:35;padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:5px}.bottom button{border:0;background:transparent;padding:8px 4px;border-radius:10px;color:#58697f;font-size:11px}.bottom button.active{background:#eef4ff;color:var(--blue);font-weight:800}}
+@media(max-width:560px){.kpis{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}.emptyHero{padding:28px 16px}.top .search{font-size:14px}.content h1{font-size:25px}.mobileLogo{width:38px;height:38px}}
 </style>
 </head>
 <body>
+<div id="shade" class="shade"></div>
 <div class="app">
-<aside class="side"><div class="brand">📘 Edital Vertical<small>Seu edital, seu plano.</small></div><div class="nav">
-<button class="active">⌂ Início</button><button id="newBtn">＋ Novo Edital</button><button>✓ Plano de Estudos</button><button>◫ Questões</button><button>↻ Revisões</button><button>↗ Desempenho</button><button>♢ Monitor de Editais</button>
-</div></aside>
+<aside class="side">
+  <img src="./logo.svg?v=3" class="brandLogo" alt="Edital Vertical">
+  <nav class="nav">
+    <button class="active" data-view="inicio">⌂ Início</button>
+    <button data-view="editais">▣ Meus Editais</button>
+    <button data-view="novo">＋ Novo Edital</button>
+    <button data-view="plano">✓ Plano de Estudos</button>
+    <button data-view="questoes">◫ Questões</button>
+    <button data-view="revisoes">↻ Revisões</button>
+    <button data-view="desempenho">↗ Desempenho</button>
+    <button data-view="cronograma">▤ Cronograma</button>
+    <button data-view="monitor">♢ Monitor de Editais</button>
+  </nav>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 3 · 06/10/2026</div></div>
+</aside>
 <main class="main">
-<header class="top"><input id="search" placeholder="Buscar disciplina ou conteúdo..."><div>🔔 <b id="bell">1</b> &nbsp; CJ</div></header>
+<header class="top">
+  <button id="hamb" class="hamb" aria-label="Abrir menu">☰</button>
+  <img src="./icon.svg?v=3" class="mobileLogo" alt="">
+  <input id="globalSearch" class="search" placeholder="Buscar no edital carregado..." disabled>
+  <div class="topright">🔔 <span>Sem notificações</span><div class="avatar">CJ</div></div>
+</header>
 <div class="content">
-<div class="row"><div><h1 style="margin:0">Olá, Carlos Júnior</h1><p class="muted">Vamos continuar seu plano de estudos?</p></div><button id="showRet" class="btn secondary">Ver notificações</button></div>
-<section class="card hero"><div><h2 style="margin:0 0 8px">Perito Criminal - Processamento de Dados</h2><div class="chips"><span class="chip">Polícia Civil</span><span class="chip">Cebraspe</span><span class="chip">Edital nº 01/2024</span><span class="chip">214 tópicos</span></div></div><div class="live">● Acompanhando atualizações</div></section>
-<section class="kpis"><div class="card kpi"><span>Progresso geral</span><strong>43,5%</strong><span>93 estudados</span></div><div class="card kpi"><span>Desempenho</span><strong>81,1%</strong><span>1.493 acertos</span></div><div class="card kpi"><span>Prova em</span><strong>73 dias</strong><span>29/11/2026</span></div><div class="card kpi"><span>Próximo prazo</span><strong>5 dias</strong><span>Pagamento</span></div></section>
-<div class="tabs"><button class="tab active" data-tab="today">Plano de hoje</button><button class="tab" data-tab="vertical">Verticalização</button><button class="tab" data-tab="upload">Novo edital PDF</button><button class="tab" data-tab="updates">Retificações</button></div>
-
-<section id="today" class="panel active grid2">
-<div class="card"><h3>Seu plano de hoje</h3><div id="tasks"></div><div class="progress"><span></span></div><small class="muted">65% da meta diária</small></div>
-<div class="card"><h3>Desempenho por disciplina</h3><div id="bars" class="bars"></div></div>
+<section id="view-inicio" class="view active">
+  <div class="row"><div><h1 style="margin:0">Edital Vertical</h1><p class="muted">Envie um edital real para começar a verticalização.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="clearEdital" class="btn secondary hidden">Limpar edital</button><button class="btn" data-view="novo">Carregar PDF</button></div></div>
+  <div id="emptyState" class="card emptyHero" style="margin-top:16px"><img src="./icon.svg?v=3" alt=""><h2>Nenhum edital carregado</h2><p class="muted">O painel começa vazio. Depois do PDF, os dados encontrados aparecem aqui.</p><button class="btn" data-view="novo">Selecionar edital em PDF</button></div>
+  <div id="loadedState" class="hidden">
+    <div class="card" style="margin-top:16px"><div class="row"><div><span class="muted">Edital carregado</span><h2 id="loadedFileName" style="margin:4px 0 0">—</h2></div><span class="status green">PDF analisado</span></div></div>
+    <section class="kpis"><div class="card kpi"><span class="muted">Tópicos detectados</span><strong id="kTopics">0</strong></div><div class="card kpi"><span class="muted">Estudados</span><strong id="kStudied">0</strong></div><div class="card kpi"><span class="muted">Questões registradas</span><strong id="kQuestions">0</strong></div><div class="card kpi"><span class="muted">Desempenho</span><strong id="kPerf">—</strong></div></section>
+    <div class="tabs"><button class="tab active" data-tab="vertical">Verticalização</button><button class="tab" data-tab="resumo">Resumo</button><button class="tab" data-tab="ret">Retificações</button></div>
+    <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Tudo abaixo vem do PDF carregado nesta sessão.</p></div><button id="exportCsv" class="btn secondary">Exportar CSV</button></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+    <section id="panel-resumo" class="panel card"><h3>Resumo do edital</h3><p id="summaryText" class="muted">—</p></section>
+    <section id="panel-ret" class="panel card"><h3>Retificações</h3><p class="muted">Nenhuma retificação monitorada ainda. Configure a fonte oficial no Monitor de Editais.</p></section>
+  </div>
 </section>
 
-<section id="vertical" class="panel card"><div class="row"><div><h3 style="margin:0">Verticalização do edital</h3><p class="muted">No padrão da sua planilha.</p></div><button id="export" class="btn secondary">Exportar CSV</button></div>
-<div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="status"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="disc"><option value="">Todas as disciplinas</option></select></div>
-<div class="tablewrap"><table><thead><tr><th>SEC.</th><th>CONHECIMENTOS</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+<section id="view-novo" class="view">
+  <div class="row"><div><h1 style="margin:0">Novo Edital</h1><p class="muted">Selecione o PDF e a análise começa automaticamente.</p></div></div>
+  <div class="grid2" style="margin-top:14px">
+    <div class="card">
+      <label for="pdf" style="display:block;font-weight:800;margin-bottom:8px">Arquivo PDF</label>
+      <input id="pdf" type="file" accept=".pdf,application/pdf" style="display:block;width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#fff">
+      <div id="drop" class="upload" tabindex="0" role="button" style="margin-top:12px"><div style="font-size:48px">⇧</div><h2>Arraste o PDF aqui</h2><p class="muted">Ou clique nesta área para abrir o seletor.</p></div>
+      <div id="fileInfo" class="fileBox hidden"></div>
+      <button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button>
+      <p class="muted" style="font-size:12px;margin-bottom:0">A análise inicia automaticamente ao escolher o arquivo. O botão permite repetir a análise.</p>
+    </div>
+    <div class="card"><h3>Fluxo do teste</h3><p>1. Lê o texto do PDF.</p><p>2. Procura o conteúdo programático.</p><p>3. Separa possíveis tópicos.</p><p>4. Substitui o painel vazio pela verticalização.</p><p class="muted">PDF escaneado como imagem ainda precisará de OCR na versão com backend.</p></div>
+  </div>
+  <div id="analysis" class="card hidden" style="margin-top:14px"></div>
+</section>
 
-<section id="upload" class="panel grid2"><div class="card"><h3>Novo edital</h3><input id="pdf" type="file" accept="application/pdf" hidden><div id="drop" class="upload"><div style="font-size:38px">⇧</div><b>Arraste ou clique para selecionar o PDF</b><p class="muted">O protótipo registra o arquivo e prepara a verticalização.</p></div><div id="file" class="muted" style="margin:10px 0"></div><button id="analyze" class="btn" disabled>Analisar edital</button></div><div class="card"><h3>O sistema vai procurar</h3><p>✓ cargos e áreas</p><p>✓ conteúdo programático</p><p>✓ cronograma</p><p>✓ requisitos</p><p>✓ retificações</p><p class="muted">A leitura automática completa/OCR entra no backend de produção.</p></div></section>
+<section id="view-editais" class="view"><div class="card emptyHero"><div class="emptyIcon">▣</div><h2>Meus Editais</h2><p class="muted">Nenhum edital salvo.</p><button class="btn" data-view="novo">Adicionar edital</button></div></section>
+<section id="view-plano" class="view"><div class="card emptyHero"><div class="emptyIcon">✓</div><h2>Plano de Estudos</h2><p class="muted">Carregue um edital primeiro.</p><button class="btn" data-view="novo">Carregar edital</button></div></section>
+<section id="view-questoes" class="view"><div class="card emptyHero"><div class="emptyIcon">◫</div><h2>Questões</h2><p class="muted">Sem edital e sem questões registradas.</p></div></section>
+<section id="view-revisoes" class="view"><div class="card emptyHero"><div class="emptyIcon">↻</div><h2>Revisões</h2><p class="muted">Nenhuma revisão agendada.</p></div></section>
+<section id="view-desempenho" class="view"><div class="card emptyHero"><div class="emptyIcon">↗</div><h2>Desempenho</h2><p class="muted">Os indicadores começam em zero.</p></div></section>
+<section id="view-cronograma" class="view"><div class="card emptyHero"><div class="emptyIcon">▤</div><h2>Cronograma</h2><p class="muted">O cronograma será extraído do edital quando possível.</p></div></section>
+<section id="view-monitor" class="view"><div class="card emptyHero"><div class="emptyIcon">♢</div><h2>Monitor de Editais</h2><p class="muted">Após carregar um edital, configure a página oficial para acompanhar retificações.</p></div></section>
+</div>
+</main>
+</div>
 
-<section id="updates" class="panel card"><h3>Histórico de atualizações</h3><div class="change critical"><b>Retificação nº 02/2026</b><div>Data da prova, conteúdo programático, inscrição e número de questões.</div></div><div class="change"><b>Comunicado nº 03</b><div>Local de prova.</div></div><div class="change success"><b>Retificação nº 01</b><div>Requisitos e cronograma.</div></div></section>
-</div></main></div>
+<nav class="bottom"><button class="active" data-view="inicio">⌂<br>Início</button><button data-view="editais">▣<br>Editais</button><button data-view="novo">＋<br>Novo</button><button data-view="monitor">♢<br>Monitor</button><button data-view="desempenho">↗<br>Desempenho</button></nav>
 
-<div id="notice" class="notice hidden"><div class="row"><div><span style="color:#e11d48;font-weight:800">NOVA RETIFICAÇÃO</span><h3>4 alterações encontradas</h3></div><button id="close" class="btn secondary">×</button></div><p class="muted">Perito Criminal - Processamento de Dados</p>
-<div class="change critical"><b>📅 Data da prova alterada</b><div>18/11/2026 → 29/11/2026</div></div>
-<div class="change warning"><b>📚 Novo tópico</b><div>Banco de Dados: Bancos de dados NoSQL.</div></div>
-<div class="change success"><b>⏰ Inscrição prorrogada</b><div>10/10/2026 → 17/10/2026</div></div>
-<div class="change"><b>📝 Questões alteradas</b><div>120 → 130 questões.</div></div>
-<button id="apply" class="btn" style="width:100%;margin-top:8px">Revisar e aplicar</button></div>
+<script type="module">
+let topics=[];
+let currentFile=null;
+let running=false;
+const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
 
-<script>
-const topics=[
-[1,'BÁSICO','Língua Portuguesa','Compreensão e interpretação de textos','Estudado',40,32,8,'Revisar pontos fracos'],
-[2,'BÁSICO','Língua Portuguesa','Tipologia textual','Estudando',20,12,8,''],
-[3,'BÁSICO','Língua Portuguesa','Ortografia oficial','A Estudar',0,0,0,''],
-[4,'BÁSICO','Raciocínio Lógico','Proposições lógicas','Estudado',25,17,8,''],
-[5,'BÁSICO','Raciocínio Lógico','Tabelas-verdade','A Estudar',0,0,0,''],
-[6,'ESPECÍFICO','Processamento de Dados','Banco de Dados','Estudado',70,59,11,'Revisar JOIN'],
-[7,'ESPECÍFICO','Processamento de Dados','Redes de computadores','Estudando',45,31,14,''],
-[8,'ESPECÍFICO','Processamento de Dados','Segurança da informação','A Estudar',0,0,0,'']
-];
-const tasks=[['TCP/IP - IPv4 e IPv6','45 min'],['Direito Constitucional','30 min'],['Banco de Dados - Normalização','20 min'],['Português - 30 questões','40 min']];
-document.querySelector('#tasks').innerHTML=tasks.map(x=>'<div class="task"><input type="checkbox"><div><b>'+x[0]+'</b><small class="muted">Plano inteligente</small></div><b>'+x[1]+'</b></div>').join('');
-const perf=[['Português',82],['Raciocínio Lógico',76],['Direito Constitucional',69],['Processamento de Dados',88],['Legislação Especial',64]];
-document.querySelector('#bars').innerHTML=perf.map(x=>'<div class="barrow"><span>'+x[0]+'</span><div class="bar"><i style="width:'+x[1]+'%"></i></div><b>'+x[1]+'%</b></div>').join('');
-function render(){const q=document.querySelector('#filter').value.toLowerCase(),s=document.querySelector('#status').value,d=document.querySelector('#disc').value;const rows=topics.filter(t=>(!q||(t[2]+' '+t[3]).toLowerCase().includes(q))&&(!s||t[4]===s)&&(!d||t[2]===d));document.querySelector('#tbody').innerHTML=rows.map(t=>{const p=t[5]?Math.round(t[6]/t[5]*100)+'%':'—';return '<tr><td>'+t[0]+'</td><td>'+t[1]+'</td><td>'+t[2]+'</td><td>'+t[3]+'</td><td>'+t[4]+'</td><td>'+t[5]+'</td><td>'+t[6]+'</td><td>'+t[7]+'</td><td>'+p+'</td><td>'+t[8]+'</td></tr>'}).join('')}
-const areas=[...new Set(topics.map(t=>t[2]))];document.querySelector('#disc').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+a+'</option>').join('');
-['filter','status','disc'].forEach(id=>document.querySelector('#'+id).addEventListener(id==='filter'?'input':'change',render));render();
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('#'+b.dataset.tab).classList.add('active')});
-document.querySelector('#newBtn').onclick=()=>document.querySelector('[data-tab="upload"]').click();
-const notice=document.querySelector('#notice');document.querySelector('#showRet').onclick=()=>notice.classList.remove('hidden');document.querySelector('#close').onclick=()=>notice.classList.add('hidden');
-document.querySelector('#apply').onclick=()=>{if(!topics.some(t=>t[3].includes('NoSQL')))topics.push([9,'ESPECÍFICO','Processamento de Dados','Bancos de dados NoSQL','A Estudar',0,0,0,'Adicionado pela Retificação nº 02/2026']);render();notice.classList.add('hidden');document.querySelector('#bell').textContent='0';alert('Retificação aplicada à verticalização.')};
-const pdf=document.querySelector('#pdf'),drop=document.querySelector('#drop'),file=document.querySelector('#file'),an=document.querySelector('#analyze');drop.onclick=()=>pdf.click();pdf.onchange=()=>{if(pdf.files[0]){file.textContent='📄 '+pdf.files[0].name+' · '+(pdf.files[0].size/1048576).toFixed(2)+' MB';an.disabled=false}};an.onclick=()=>{alert('PDF recebido. Na versão de produção, o backend extrairá cargos, conteúdo programático, cronograma e requisitos automaticamente.');document.querySelector('[data-tab="vertical"]').click()};
-document.querySelector('#export').onclick=()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';const csv=h+topics.map(t=>t.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click()};
-setTimeout(()=>notice.classList.remove('hidden'),700);
+function setView(v){
+  qsa('.view').forEach(x=>x.classList.remove('active'));
+  qs('#view-'+v)?.classList.add('active');
+  qsa('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
+  document.body.classList.remove('menuOpen');
+}
+qsa('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+qs('#hamb')?.addEventListener('click',()=>document.body.classList.toggle('menuOpen'));
+qs('#shade')?.addEventListener('click',()=>document.body.classList.remove('menuOpen'));
+qsa('.tab').forEach(b=>b.addEventListener('click',()=>{qsa('.tab').forEach(x=>x.classList.remove('active'));qsa('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');qs('#panel-'+b.dataset.tab)?.classList.add('active')}));
+
+const pdf=qs('#pdf'),drop=qs('#drop'),fileInfo=qs('#fileInfo'),analyze=qs('#analyze'),clear=qs('#clearEdital');
+
+function setFile(f){
+  if(!f)return;
+  if(!(f.type==='application/pdf'||/\.pdf$/i.test(f.name))){alert('Selecione um arquivo PDF.');pdf.value='';return}
+  currentFile=f;
+  fileInfo.classList.remove('hidden');
+  fileInfo.innerHTML='<b>📄 '+esc(f.name)+'</b><div class="muted">'+(f.size/1048576).toFixed(2)+' MB</div>';
+  analyze.disabled=false;
+  setTimeout(runAnalysis,200);
+}
+pdf.addEventListener('change',()=>setFile(pdf.files?.[0]));
+drop.addEventListener('click',()=>pdf.click());
+drop.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pdf.click()}});
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
+drop.addEventListener('drop',e=>{const f=e.dataTransfer?.files?.[0];if(f)setFile(f)});
+
+async function readPdf(file){
+  const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');
+  pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';
+  const data=new Uint8Array(await file.arrayBuffer());
+  const doc=await pdfjs.getDocument({data}).promise;
+  let text='';
+  for(let i=1;i<=Math.min(doc.numPages,100);i++){const p=await doc.getPage(i);const c=await p.getTextContent();text+='\n'+c.items.map(x=>x.str).join(' ')}
+  return{text,pages:doc.numPages};
+}
+function detectTopics(text){
+  const clean=text.replace(/\s+/g,' ').trim();
+  const marker=/conte[uú]do program[aá]tico/i.exec(clean);
+  const chunk=marker?clean.slice(marker.index,marker.index+40000):clean.slice(0,40000);
+  let arr=chunk.split(/(?=\b\d{1,3}[\.)]\s)|;\s+(?=[A-ZÁÉÍÓÚÇ])/).map(x=>x.trim()).filter(x=>x.length>15&&x.length<420);
+  const bad=/inscri[cç][aã]o|pagamento|resultado|endere[cç]o|telefone|documentos? pessoais?/i;
+  return [...new Set(arr.filter(x=>!bad.test(x)))].slice(0,150);
+}
+async function runAnalysis(){
+  if(!currentFile||running)return;
+  running=true;analyze.disabled=true;analyze.textContent='Analisando...';
+  const box=qs('#analysis');box.classList.remove('hidden');box.innerHTML='<h3>Processando PDF...</h3><p class="muted">Extraindo o texto do edital.</p>';
+  try{
+    const{text,pages}=await readPdf(currentFile);
+    const found=detectTopics(text);
+    topics=found.map((content,i)=>({id:i+1,knowledge:'IMPORTADO',area:'A CLASSIFICAR',content,status:'A Estudar',q:0,c:0,e:0,note:''}));
+    render();
+    qs('#emptyState').classList.add('hidden');
+    qs('#loadedState').classList.remove('hidden');
+    clear.classList.remove('hidden');
+    qs('#loadedFileName').textContent=currentFile.name;
+    qs('#summaryText').textContent='Arquivo: '+currentFile.name+' · '+pages+' páginas · '+found.length+' tópicos detectados para revisão.';
+    qs('#globalSearch').disabled=false;
+    box.innerHTML='<h3>PDF carregado e painel atualizado</h3><p><b>'+pages+'</b> páginas · <b>'+found.length+'</b> possíveis tópicos encontrados.</p><button id="seeVertical" class="btn">Ver verticalização</button>';
+    qs('#seeVertical').onclick=()=>{setView('inicio');qs('.tab[data-tab="vertical"]')?.click()};
+    setView('inicio');qs('.tab[data-tab="vertical"]')?.click();
+  }catch(e){
+    box.innerHTML='<h3>Não foi possível ler o PDF</h3><p class="muted">'+esc(e?.message||e)+'</p><p>Se o edital for escaneado, será necessário OCR.</p>';
+  }finally{running=false;analyze.disabled=false;analyze.textContent='Analisar novamente'}
+}
+analyze.addEventListener('click',runAnalysis);
+
+function calc(t){return t.q?Math.round(t.c/t.q*100):null}
+function render(){
+  const f=(qs('#filter')?.value||'').toLowerCase(),s=qs('#statusFilter')?.value||'',d=qs('#discFilter')?.value||'';
+  const rows=topics.filter(t=>(!f||(t.content+' '+t.area).toLowerCase().includes(f))&&(!s||t.status===s)&&(!d||t.area===d));
+  qs('#tbody').innerHTML=rows.map(t=>'<tr><td>'+t.id+'</td><td>'+t.knowledge+'</td><td>'+t.area+'</td><td>'+esc(t.content)+'</td><td><span class="status gray">'+t.status+'</span></td><td>'+t.q+'</td><td>'+t.c+'</td><td>'+t.e+'</td><td>'+(calc(t)==null?'—':calc(t)+'%')+'</td><td>'+esc(t.note)+'</td></tr>').join('');
+  const areas=[...new Set(topics.map(t=>t.area))];
+  qs('#discFilter').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+esc(a)+'</option>').join('');
+  qs('#kTopics').textContent=topics.length;qs('#kStudied').textContent=0;qs('#kQuestions').textContent=0;qs('#kPerf').textContent='—';
+}
+['filter','statusFilter','discFilter'].forEach(id=>qs('#'+id)?.addEventListener(id==='filter'?'input':'change',render));
+qs('#globalSearch')?.addEventListener('input',e=>{if(!topics.length)return;qs('#filter').value=e.target.value;render();qs('.tab[data-tab="vertical"]')?.click()});
+qs('#exportCsv')?.addEventListener('click',()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';const csv=h+topics.map(t=>[t.id,t.knowledge,t.area,t.content,t.status,t.q,t.c,t.e,t.note].map(q).join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click();URL.revokeObjectURL(a.href)});
+clear.addEventListener('click',()=>{topics=[];currentFile=null;pdf.value='';fileInfo.classList.add('hidden');qs('#analysis').classList.add('hidden');qs('#emptyState').classList.remove('hidden');qs('#loadedState').classList.add('hidden');clear.classList.add('hidden');qs('#globalSearch').value='';qs('#globalSearch').disabled=true;analyze.disabled=true;analyze.textContent='Analisar edital';setView('inicio')});
 </script>
-</body></html>
+</body>
+</html>
