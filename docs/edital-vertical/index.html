@@ -1,147 +1,87 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Edital Vertical</title><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='7' y='6' width='42' height='49' rx='8' fill='white' stroke='%231269d8' stroke-width='4'/%3E%3Cpath d='M17 20h19M17 29h14M17 38h9' stroke='%231269d8' stroke-width='4' stroke-linecap='round'/%3E%3Cpath d='M12 51c14 4 28-3 37-17' fill='none' stroke='%2321c7ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Edital Vertical</title>
+<meta name="description" content="Verticalização automática de editais em PDF.">
 <style>
-:root{--navy:#071a2f;--blue:#1677ff;--bg:#f4f7fb;--card:#fff;--text:#15243a;--muted:#6d7a8e;--line:#dfe6ef;--green:#16a36a;--yellow:#f2a500;--red:#ef4444}
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}
-.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh}.side{background:linear-gradient(180deg,#071a2f,#0c2948);color:#fff;padding:22px 14px;display:flex;flex-direction:column}
-.brand{font-size:22px;font-weight:800;margin:0 8px 24px}.brand small{display:block;font-size:11px;font-weight:400;color:#aac0d5}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#dce9f6;padding:12px;border-radius:9px;text-align:left;cursor:pointer}.nav button.active,.nav button:hover{background:#1269d8}.main{min-width:0}.top{height:66px;background:#0d2746;color:#fff;display:flex;justify-content:space-between;align-items:center;padding:0 24px}.top input{width:min(560px,55vw);background:#163657;border:1px solid #385675;color:#fff;padding:10px 12px;border-radius:9px}.content{padding:22px}.row{display:flex;justify-content:space-between;gap:12px;align-items:center}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.hero{display:grid;grid-template-columns:1fr auto;gap:14px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{background:#eef3f8;padding:5px 9px;border-radius:999px;font-size:12px}.live{color:var(--green);font-weight:700}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.kpi strong{font-size:23px;display:block}.kpi span{color:var(--muted);font-size:12px}.tabs{display:flex;gap:4px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin-bottom:12px;overflow:auto}.tab{border:0;background:transparent;padding:10px 14px;border-radius:8px;cursor:pointer;white-space:nowrap}.tab.active{background:#eaf3ff;color:#0e66d7;font-weight:700}.panel{display:none}.panel.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.task{display:grid;grid-template-columns:24px 1fr 80px;gap:10px;padding:10px 0;border-bottom:1px solid #edf1f5}.bars{display:grid;gap:10px}.barrow{display:grid;grid-template-columns:150px 1fr 45px;gap:8px;align-items:center}.bar{height:8px;background:#e8edf3;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--green)}.tablewrap{overflow:auto}.filters{display:grid;grid-template-columns:1fr 190px 190px;gap:8px;margin-bottom:10px}.filters input,.filters select{padding:10px;border:1px solid var(--line);border-radius:8px}table{border-collapse:collapse;width:100%;min-width:1050px}th,td{font-size:12px;padding:9px;border-bottom:1px solid #e8edf3;text-align:left}th{background:#f6f8fb}td input,td select{width:100%;padding:6px;border:1px solid #dfe6ef;border-radius:6px}.btn{border:0;background:var(--blue);color:#fff;padding:10px 13px;border-radius:8px;font-weight:700;cursor:pointer}.btn.secondary{background:#fff;color:var(--blue);border:1px solid #9bc3ff}.upload{border:2px dashed #86b8fa;border-radius:12px;padding:42px;text-align:center;cursor:pointer;background:#f8fbff}.notice{position:fixed;right:18px;top:82px;width:360px;background:#fff;border:2px solid #ff6b6b;border-radius:14px;padding:16px;box-shadow:0 25px 70px #0003;z-index:20}.notice h3{margin:0 0 8px}.change{padding:10px;border-radius:8px;margin:7px 0;background:#f8fafc}.critical{background:#fee2e2}.warning{background:#fff3cd}.success{background:#dcfce7}.hidden{display:none!important}.muted{color:var(--muted)}.progress{height:8px;background:#e8edf3;border-radius:99px;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#16a36a,#22c7a7);width:65%}
-@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.kpis,.grid2{grid-template-columns:1fr 1fr}.hero{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.notice{left:12px;right:12px;width:auto}.top input{width:70vw}}
-@media(max-width:560px){.kpis,.grid2{grid-template-columns:1fr}.content{padding:12px}.top{padding:0 12px}}
-
-/* ===== Edital Vertical v2: branding + mobile ===== */
-.ev-logo{display:inline-grid;width:48px;height:48px;flex:0 0 48px;place-items:center}
-.ev-logo svg{width:100%;height:100%;display:block}
-.brandWrap{display:flex;align-items:center;gap:10px;font-size:20px}
-.brandWrap>span{display:flex;flex-direction:column;min-width:0}
-.brandWrap small{font-size:11px;color:#abc2d7;font-weight:400;margin-top:2px}
-.mobileTop,.mobileShade,.bottomNav{display:none}
-.menuBtn{border:0;background:#17385e;color:#fff;width:42px;height:42px;border-radius:12px;font-size:20px;cursor:pointer}
-.topUser{white-space:nowrap}
-@media(max-width:900px){
-  body{padding-bottom:78px}
-  .app{display:block;min-height:100vh}
-  .side{display:flex!important;position:fixed;z-index:60;left:0;top:0;bottom:0;width:min(310px,88vw);height:100vh;transform:translateX(-102%);transition:transform .22s ease;overflow:auto}
-  body.menuOpen .side{transform:translateX(0)}
-  .mobileShade{position:fixed;inset:0;background:rgba(3,15,28,.55);z-index:55}
-  body.menuOpen .mobileShade{display:block}
-  .top{position:sticky;top:0;z-index:45;height:auto;min-height:68px;padding:10px 12px;gap:10px;display:grid;grid-template-columns:auto 1fr auto}
-  .mobileTop{display:flex;align-items:center;gap:8px}
-  .mobileTop .ev-logo{width:38px;height:38px;flex-basis:38px}
-  .top input{width:100%!important;min-width:0}
-  .topUser span{display:none}
-  .content{padding:14px 12px 20px}
-  .row{align-items:flex-start;gap:10px;flex-wrap:wrap}
-  .hero{grid-template-columns:1fr!important}
-  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px}
-  .kpi{min-width:0}
-  .grid2{grid-template-columns:1fr!important}
-  .filters{grid-template-columns:1fr!important}
-  .card{border-radius:14px}
-  .tabs{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px;-webkit-overflow-scrolling:touch}
-  .tab{white-space:nowrap;flex:0 0 auto}
-  .notice{top:78px!important;left:10px!important;right:10px!important;width:auto!important;max-height:calc(100vh - 98px);overflow:auto}
-  .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  table{min-width:980px!important}
-  .bottomNav{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;position:fixed;z-index:50;left:0;right:0;bottom:0;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-top:1px solid #dde6ef}
-  .bottomNav button{border:0;background:transparent;color:#54667d;border-radius:12px;padding:8px 3px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:18px}
-  .bottomNav button small{font-size:10px;font-weight:700}
-  .bottomNav button.primaryMob{background:#eaf3ff;color:#1269d8}
-}
-@media(max-width:560px){
-  .kpis{grid-template-columns:1fr!important}
-  .top{grid-template-columns:auto 1fr auto}
-  .top input{font-size:14px}
-  .content h1{font-size:24px}
-  .hero h2{font-size:19px}
-  .task{grid-template-columns:22px 1fr!important}
-  .task>*:nth-child(n+3){grid-column:2}
-}
-
+:root{--navy:#071a2f;--navy2:#0d2746;--blue:#1269d8;--cyan:#21c7ff;--bg:#f4f7fb;--card:#fff;--text:#15243a;--muted:#6d7a8e;--line:#dfe6ef;--green:#16a36a;--red:#e14f61;--yellow:#f3ad2b}
+*{box-sizing:border-box}html,body{margin:0}body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}button,input,select{font:inherit}.hidden{display:none!important}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{background:linear-gradient(180deg,var(--navy),var(--navy2));color:#fff;padding:18px 14px;display:flex;flex-direction:column;gap:16px}.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px}.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--cyan));display:grid;place-items:center;font-weight:900}.brand small{display:block;font-size:11px;color:#b9c9da;font-weight:400}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#dce8f5;padding:12px;border-radius:10px;text-align:left;cursor:pointer;font-weight:600}.nav button.active,.nav button:hover{background:var(--blue);color:#fff}.sideFoot{margin-top:auto;color:#b9c9da;font-size:12px}.main{min-width:0}.top{position:sticky;top:0;z-index:20;background:rgba(13,39,70,.95);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:12px 18px;gap:12px}.search{flex:1;max-width:720px;background:#17385c;border:1px solid #315271;color:#fff;border-radius:12px;padding:10px 12px}.topright{display:flex;align-items:center;gap:10px}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue));font-weight:800}.content{padding:22px}.view{display:none}.view.active{display:block}.row{display:flex;justify-content:space-between;align-items:center;gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 12px 28px rgba(13,39,70,.06)}.emptyHero{padding:36px;text-align:center}.emptyIcon{font-size:54px}.btn{border:0;background:var(--blue);color:#fff;padding:11px 14px;border-radius:10px;font-weight:800;cursor:pointer}.btn.secondary{background:#eef4ff;color:#245a9c}.btn:disabled{opacity:.55;cursor:not-allowed}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0}.kpi strong{font-size:22px;display:block}.muted{color:var(--muted)}.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}.tab{border:1px solid var(--line);background:#fff;padding:10px 13px;border-radius:10px;cursor:pointer;white-space:nowrap}.tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}.panel{display:none}.panel.active{display:block}.upload{border:2px dashed #8ebcf6;border-radius:14px;padding:34px;text-align:center;background:#f8fbff;cursor:pointer}.upload.drag{background:#edf6ff}.fileBox{margin-top:12px;padding:10px;border-radius:10px;background:#eef4ff}.filters{display:grid;grid-template-columns:1fr 180px 220px;gap:8px;margin-bottom:10px}.filters input,.filters select{padding:10px;border:1px solid var(--line);border-radius:10px}.tableWrap{overflow:auto}.tableWrap table{border-collapse:collapse;width:100%;min-width:1000px}.tableWrap th,.tableWrap td{border-bottom:1px solid #e9eef4;padding:9px;text-align:left;font-size:12px}.tableWrap th{background:#f7f9fc}.status{display:inline-block;padding:5px 8px;border-radius:999px;font-size:11px;font-weight:700}.status.gray{background:#eef1f5;color:#607086}.bottom{display:none}.hamb{display:none}.mobileShade{display:none}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:fixed;left:0;top:0;bottom:0;width:min(310px,88vw);z-index:50;transform:translateX(-102%);transition:.2s}.menuOpen .side{transform:translateX(0)}.mobileShade{position:fixed;inset:0;background:#071a2f99;z-index:45}.menuOpen .mobileShade{display:block}.hamb{display:block;border:0;background:#17385c;color:#fff;width:40px;height:40px;border-radius:10px}.top{padding:10px}.content{padding:14px 12px 92px}.kpis{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}.filters{grid-template-columns:1fr}.bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:35;padding:8px 6px calc(8px + env(safe-area-inset-bottom));gap:5px}.bottom button{border:0;background:transparent;padding:8px 4px;border-radius:10px;color:#58697f;font-size:11px}.bottom button.active{background:#eef4ff;color:var(--blue);font-weight:800}}
+@media(max-width:560px){.kpis{grid-template-columns:1fr}.row{align-items:flex-start;flex-direction:column}.emptyHero{padding:24px 16px}.top .search{font-size:14px}.topright span{display:none}}
 </style>
 </head>
 <body>
+<div id="shade" class="mobileShade"></div>
 <div class="app">
-<div id="mobileShade" class="mobileShade"></div><aside class="side" id="sideMenu"><div class="brand brandWrap"><span class="ev-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="evg" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#1269d8"/><stop offset="1" stop-color="#21c7ff"/></linearGradient></defs><rect x="7" y="6" width="42" height="49" rx="8" fill="white" stroke="url(#evg)" stroke-width="4"/><path d="M17 20h19M17 29h14M17 38h9" stroke="#1269d8" stroke-width="4" stroke-linecap="round"/><path d="M12 51c14 4 28-3 37-17" fill="none" stroke="url(#evg)" stroke-width="5" stroke-linecap="round"/><path d="M43 25l10 7-12 5z" fill="#21c7ff"/></svg></span><span>Edital Vertical<small>Seu edital, seu plano.</small></span></div><div class="nav">
-<button class="active">⌂ Início</button><button id="newBtn">＋ Novo Edital</button><button>✓ Plano de Estudos</button><button>◫ Questões</button><button>↻ Revisões</button><button>↗ Desempenho</button><button>♢ Monitor de Editais</button>
-</div></aside>
+<aside class="side" id="side">
+  <div class="brand"><div class="logo">EV</div><div>Edital Vertical<small>Seu edital, seu plano.</small></div></div>
+  <nav class="nav">
+    <button class="active" data-view="inicio">⌂ Início</button>
+    <button data-view="editais">▣ Meus Editais</button>
+    <button data-view="novo">＋ Novo Edital</button>
+    <button data-view="plano">✓ Plano de Estudos</button>
+    <button data-view="questoes">◫ Questões</button>
+    <button data-view="revisoes">↻ Revisões</button>
+    <button data-view="desempenho">↗ Desempenho</button>
+    <button data-view="cronograma">▤ Cronograma</button>
+    <button data-view="monitor">♢ Monitor de Editais</button>
+  </nav>
+  <div class="sideFoot">Protótipo de teste · dados zerados</div>
+</aside>
 <main class="main">
-<header class="top"><div class="mobileTop"><button id="menuBtn" class="menuBtn" type="button" aria-label="Abrir menu">☰</button><span class="ev-logo" aria-hidden="true"><svg viewBox="0 0 64 64"><defs><linearGradient id="evg" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#1269d8"/><stop offset="1" stop-color="#21c7ff"/></linearGradient></defs><rect x="7" y="6" width="42" height="49" rx="8" fill="white" stroke="url(#evg)" stroke-width="4"/><path d="M17 20h19M17 29h14M17 38h9" stroke="#1269d8" stroke-width="4" stroke-linecap="round"/><path d="M12 51c14 4 28-3 37-17" fill="none" stroke="url(#evg)" stroke-width="5" stroke-linecap="round"/><path d="M43 25l10 7-12 5z" fill="#21c7ff"/></svg></span></div><input id="search" placeholder="Buscar disciplina ou conteúdo..."><div class="topUser">🔔 <b id="bell">1</b> &nbsp; <span>CJ</span></div></header>
+<header class="top"><button id="hamb" class="hamb">☰</button><input id="globalSearch" class="search" placeholder="Buscar disciplina ou tópico..."><div class="topright">🔔 <span>Sem notificações</span><div class="avatar">CJ</div></div></header>
 <div class="content">
-<div class="row"><div><h1 style="margin:0">Olá, Carlos Júnior</h1><p class="muted">Vamos continuar seu plano de estudos?</p></div><button id="showRet" class="btn secondary">Ver notificações</button></div>
-<section class="card hero"><div><h2 style="margin:0 0 8px">Perito Criminal - Processamento de Dados</h2><div class="chips"><span class="chip">Polícia Civil</span><span class="chip">Cebraspe</span><span class="chip">Edital nº 01/2024</span><span class="chip">214 tópicos</span></div></div><div class="live">● Acompanhando atualizações</div></section>
-<section class="kpis"><div class="card kpi"><span>Progresso geral</span><strong>43,5%</strong><span>93 estudados</span></div><div class="card kpi"><span>Desempenho</span><strong>81,1%</strong><span>1.493 acertos</span></div><div class="card kpi"><span>Prova em</span><strong>73 dias</strong><span>29/11/2026</span></div><div class="card kpi"><span>Próximo prazo</span><strong>5 dias</strong><span>Pagamento</span></div></section>
-<div class="tabs"><button class="tab active" data-tab="today">Plano de hoje</button><button class="tab" data-tab="vertical">Verticalização</button><button class="tab" data-tab="upload">Novo edital PDF</button><button class="tab" data-tab="updates">Retificações</button></div>
-
-<section id="today" class="panel active grid2">
-<div class="card"><h3>Seu plano de hoje</h3><div id="tasks"></div><div class="progress"><span></span></div><small class="muted">65% da meta diária</small></div>
-<div class="card"><h3>Desempenho por disciplina</h3><div id="bars" class="bars"></div></div>
-</section>
-
-<section id="vertical" class="panel card"><div class="row"><div><h3 style="margin:0">Verticalização do edital</h3><p class="muted">No padrão da sua planilha.</p></div><button id="export" class="btn secondary">Exportar CSV</button></div>
-<div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="status"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="disc"><option value="">Todas as disciplinas</option></select></div>
-<div class="tablewrap"><table><thead><tr><th>SEC.</th><th>CONHECIMENTOS</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
-
-<section id="upload" class="panel grid2"><div class="card"><h3>Novo edital</h3><input id="pdf" type="file" accept="application/pdf" hidden><div id="drop" class="upload"><div style="font-size:38px">⇧</div><b>Arraste ou clique para selecionar o PDF</b><p class="muted">O protótipo registra o arquivo e prepara a verticalização.</p></div><div id="file" class="muted" style="margin:10px 0"></div><button id="analyze" class="btn" disabled>Analisar edital</button></div><div class="card"><h3>O sistema vai procurar</h3><p>✓ cargos e áreas</p><p>✓ conteúdo programático</p><p>✓ cronograma</p><p>✓ requisitos</p><p>✓ retificações</p><p class="muted">A leitura automática completa/OCR entra no backend de produção.</p></div></section>
-
-<section id="updates" class="panel card"><h3>Histórico de atualizações</h3><div class="change critical"><b>Retificação nº 02/2026</b><div>Data da prova, conteúdo programático, inscrição e número de questões.</div></div><div class="change"><b>Comunicado nº 03</b><div>Local de prova.</div></div><div class="change success"><b>Retificação nº 01</b><div>Requisitos e cronograma.</div></div></section>
-</div></main></div>
-
-<nav class="bottomNav" aria-label="Navegação móvel">
-<button id="mobHome" class="primaryMob" type="button">⌂<small>Início</small></button>
-<button id="mobVertical" type="button">☷<small>Vertical</small></button>
-<button id="mobNew" type="button">＋<small>Novo</small></button>
-<button id="mobRet" type="button">🔔<small>Retificações</small></button>
-<button id="mobMenu" type="button">☰<small>Menu</small></button>
-</nav>
-<div id="notice" class="notice hidden"><div class="row"><div><span style="color:#e11d48;font-weight:800">NOVA RETIFICAÇÃO</span><h3>4 alterações encontradas</h3></div><button id="close" class="btn secondary">×</button></div><p class="muted">Perito Criminal - Processamento de Dados</p>
-<div class="change critical"><b>📅 Data da prova alterada</b><div>18/11/2026 → 29/11/2026</div></div>
-<div class="change warning"><b>📚 Novo tópico</b><div>Banco de Dados: Bancos de dados NoSQL.</div></div>
-<div class="change success"><b>⏰ Inscrição prorrogada</b><div>10/10/2026 → 17/10/2026</div></div>
-<div class="change"><b>📝 Questões alteradas</b><div>120 → 130 questões.</div></div>
-<button id="apply" class="btn" style="width:100%;margin-top:8px">Revisar e aplicar</button></div>
-
-<script>
-const topics=[
-[1,'BÁSICO','Língua Portuguesa','Compreensão e interpretação de textos','Estudado',40,32,8,'Revisar pontos fracos'],
-[2,'BÁSICO','Língua Portuguesa','Tipologia textual','Estudando',20,12,8,''],
-[3,'BÁSICO','Língua Portuguesa','Ortografia oficial','A Estudar',0,0,0,''],
-[4,'BÁSICO','Raciocínio Lógico','Proposições lógicas','Estudado',25,17,8,''],
-[5,'BÁSICO','Raciocínio Lógico','Tabelas-verdade','A Estudar',0,0,0,''],
-[6,'ESPECÍFICO','Processamento de Dados','Banco de Dados','Estudado',70,59,11,'Revisar JOIN'],
-[7,'ESPECÍFICO','Processamento de Dados','Redes de computadores','Estudando',45,31,14,''],
-[8,'ESPECÍFICO','Processamento de Dados','Segurança da informação','A Estudar',0,0,0,'']
-];
-const tasks=[['TCP/IP - IPv4 e IPv6','45 min'],['Direito Constitucional','30 min'],['Banco de Dados - Normalização','20 min'],['Português - 30 questões','40 min']];
-document.querySelector('#tasks').innerHTML=tasks.map(x=>'<div class="task"><input type="checkbox"><div><b>'+x[0]+'</b><small class="muted">Plano inteligente</small></div><b>'+x[1]+'</b></div>').join('');
-const perf=[['Português',82],['Raciocínio Lógico',76],['Direito Constitucional',69],['Processamento de Dados',88],['Legislação Especial',64]];
-document.querySelector('#bars').innerHTML=perf.map(x=>'<div class="barrow"><span>'+x[0]+'</span><div class="bar"><i style="width:'+x[1]+'%"></i></div><b>'+x[1]+'%</b></div>').join('');
-function render(){const q=document.querySelector('#filter').value.toLowerCase(),s=document.querySelector('#status').value,d=document.querySelector('#disc').value;const rows=topics.filter(t=>(!q||(t[2]+' '+t[3]).toLowerCase().includes(q))&&(!s||t[4]===s)&&(!d||t[2]===d));document.querySelector('#tbody').innerHTML=rows.map(t=>{const p=t[5]?Math.round(t[6]/t[5]*100)+'%':'—';return '<tr><td>'+t[0]+'</td><td>'+t[1]+'</td><td>'+t[2]+'</td><td>'+t[3]+'</td><td>'+t[4]+'</td><td>'+t[5]+'</td><td>'+t[6]+'</td><td>'+t[7]+'</td><td>'+p+'</td><td>'+t[8]+'</td></tr>'}).join('')}
-const areas=[...new Set(topics.map(t=>t[2]))];document.querySelector('#disc').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+a+'</option>').join('');
-['filter','status','disc'].forEach(id=>document.querySelector('#'+id).addEventListener(id==='filter'?'input':'change',render));render();
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelector('#'+b.dataset.tab).classList.add('active')});
-document.querySelector('#newBtn').onclick=()=>document.querySelector('[data-tab="upload"]').click();
-const notice=document.querySelector('#notice');document.querySelector('#showRet').onclick=()=>notice.classList.remove('hidden');document.querySelector('#close').onclick=()=>notice.classList.add('hidden');
-document.querySelector('#apply').onclick=()=>{if(!topics.some(t=>t[3].includes('NoSQL')))topics.push([9,'ESPECÍFICO','Processamento de Dados','Bancos de dados NoSQL','A Estudar',0,0,0,'Adicionado pela Retificação nº 02/2026']);render();notice.classList.add('hidden');document.querySelector('#bell').textContent='0';alert('Retificação aplicada à verticalização.')};
-const pdf=document.querySelector('#pdf'),drop=document.querySelector('#drop'),file=document.querySelector('#file'),an=document.querySelector('#analyze');drop.onclick=()=>pdf.click();pdf.onchange=()=>{if(pdf.files[0]){file.textContent='📄 '+pdf.files[0].name+' · '+(pdf.files[0].size/1048576).toFixed(2)+' MB';an.disabled=false}};an.onclick=()=>{alert('PDF recebido. Na versão de produção, o backend extrairá cargos, conteúdo programático, cronograma e requisitos automaticamente.');document.querySelector('[data-tab="vertical"]').click()};
-document.querySelector('#export').onclick=()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';const csv=h+topics.map(t=>t.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click()};
-
-/* Mobile navigation */
-const menuBtn=document.querySelector('#menuBtn');
-const sideMenu=document.querySelector('#sideMenu');
-const mobileShade=document.querySelector('#mobileShade');
-const toggleMenu=()=>document.body.classList.toggle('menuOpen');
-menuBtn?.addEventListener('click',toggleMenu);
-document.querySelector('#mobMenu')?.addEventListener('click',toggleMenu);
-mobileShade?.addEventListener('click',()=>document.body.classList.remove('menuOpen'));
-document.querySelectorAll('#sideMenu button').forEach(b=>b.addEventListener('click',()=>document.body.classList.remove('menuOpen')));
-document.querySelector('#mobHome')?.addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'});document.querySelector('[data-tab="today"]')?.click()});
-document.querySelector('#mobVertical')?.addEventListener('click',()=>{document.querySelector('[data-tab="vertical"]')?.click();window.scrollTo({top:360,behavior:'smooth'})});
-document.querySelector('#mobNew')?.addEventListener('click',()=>document.querySelector('#newBtn')?.click());
-document.querySelector('#mobRet')?.addEventListener('click',()=>document.querySelector('#showRet')?.click());
-
-setTimeout(()=>notice.classList.remove('hidden'),700);
+  <section id="view-inicio" class="view active">
+    <div class="row"><div><h1 style="margin:0">Edital Vertical</h1><p class="muted">Carregue um edital em PDF para iniciar.</p></div><button class="btn" data-view="novo">Carregar edital em PDF</button></div>
+    <div id="emptyState" class="card emptyHero" style="margin-top:16px"><div class="emptyIcon">📄</div><h2>Nenhum edital carregado</h2><p class="muted">Envie um PDF para o sistema tentar identificar conteúdo programático e gerar a verticalização automaticamente.</p><button class="btn" data-view="novo">Escolher PDF</button></div>
+    <div id="loadedState" class="hidden">
+      <section class="kpis"><div class="card kpi"><span class="muted">Tópicos</span><strong id="kTopics">0</strong></div><div class="card kpi"><span class="muted">Estudados</span><strong id="kStudied">0</strong></div><div class="card kpi"><span class="muted">Questões</span><strong id="kQuestions">0</strong></div><div class="card kpi"><span class="muted">Desempenho</span><strong id="kPerf">—</strong></div></section>
+      <div class="tabs"><button class="tab active" data-tab="vertical">Verticalização</button><button class="tab" data-tab="resumo">Resumo</button><button class="tab" data-tab="ret">Retificações</button></div>
+      <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Revise e ajuste os tópicos encontrados.</p></div><button id="exportCsv" class="btn secondary">Exportar CSV</button></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+      <section id="panel-resumo" class="panel card"><h3>Resumo do edital</h3><p id="summaryText" class="muted">Resumo será preenchido após a análise.</p></section>
+      <section id="panel-ret" class="panel card"><h3>Retificações</h3><p class="muted">Nenhuma retificação detectada neste teste.</p></section>
+    </div>
+  </section>
+  <section id="view-novo" class="view">
+    <div class="row"><div><h1 style="margin:0">Novo Edital</h1><p class="muted">Envie o PDF para testar a extração.</p></div></div>
+    <div class="grid2" style="margin-top:14px"><div class="card"><input id="pdf" type="file" accept="application/pdf" hidden><div id="drop" class="upload"><div style="font-size:48px">⇧</div><h2>Arraste ou clique para selecionar</h2><p class="muted">PDF textual funciona melhor neste protótipo.</p></div><div id="fileInfo" class="fileBox hidden"></div><button id="analyze" class="btn" style="width:100%;margin-top:12px" disabled>Analisar edital</button></div><div class="card"><h3>O teste faz agora</h3><p>✓ lê o texto do PDF</p><p>✓ procura “conteúdo programático”</p><p>✓ quebra trechos em tópicos</p><p>✓ gera a tabela para revisão</p><p class="muted">PDF escaneado ainda exige OCR no backend.</p></div></div>
+    <div id="analysis" class="card hidden" style="margin-top:14px"></div>
+  </section>
+  <section id="view-editais" class="view"><div class="card emptyHero"><div class="emptyIcon">▣</div><h2>Meus Editais</h2><p class="muted">Nenhum edital salvo ainda.</p><button class="btn" data-view="novo">Adicionar primeiro edital</button></div></section>
+  <section id="view-plano" class="view"><div class="card emptyHero"><div class="emptyIcon">✓</div><h2>Plano de Estudos</h2><p class="muted">Carregue um edital para gerar seu plano.</p><button class="btn" data-view="novo">Carregar edital</button></div></section>
+  <section id="view-questoes" class="view"><div class="card emptyHero"><div class="emptyIcon">◫</div><h2>Questões</h2><p class="muted">Sem conteúdo ainda. Acompanhe questões após verticalizar o edital.</p></div></section>
+  <section id="view-revisoes" class="view"><div class="card emptyHero"><div class="emptyIcon">↻</div><h2>Revisões</h2><p class="muted">Nenhuma revisão agendada.</p></div></section>
+  <section id="view-desempenho" class="view"><div class="card emptyHero"><div class="emptyIcon">↗</div><h2>Desempenho</h2><p class="muted">O desempenho aparecerá após o registro de questões.</p></div></section>
+  <section id="view-cronograma" class="view"><div class="card emptyHero"><div class="emptyIcon">▤</div><h2>Cronograma</h2><p class="muted">O cronograma será extraído do edital quando possível.</p></div></section>
+  <section id="view-monitor" class="view"><div class="card emptyHero"><div class="emptyIcon">♢</div><h2>Monitor de Editais</h2><p class="muted">Depois de carregar um edital, você poderá informar a página oficial para monitorar retificações.</p></div></section>
+</div>
+</main>
+</div>
+<nav class="bottom"><button class="active" data-view="inicio">⌂<br>Início</button><button data-view="editais">▣<br>Editais</button><button data-view="novo">＋<br>Novo</button><button data-view="monitor">♢<br>Monitor</button><button data-view="desempenho">↗<br>Desempenho</button></nav>
+<script type="module">
+let topics=[]; let currentFile=null;
+const qs=s=>document.querySelector(s), qsa=s=>[...document.querySelectorAll(s)];
+function setView(v){qsa('.view').forEach(x=>x.classList.remove('active'));qs('#view-'+v)?.classList.add('active');qsa('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));document.body.classList.remove('menuOpen')}
+qsa('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+qs('#hamb').onclick=()=>document.body.classList.toggle('menuOpen');qs('#shade').onclick=()=>document.body.classList.remove('menuOpen');
+qsa('.tab').forEach(b=>b.onclick=()=>{qsa('.tab').forEach(x=>x.classList.remove('active'));qsa('.panel').forEach(x=>x.classList.remove('active'));b.classList.add('active');qs('#panel-'+b.dataset.tab).classList.add('active')});
+const pdf=qs('#pdf'),drop=qs('#drop'),fileInfo=qs('#fileInfo'),analyze=qs('#analyze');drop.onclick=()=>pdf.click();pdf.onchange=()=>setFile(pdf.files[0]);['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));drop.addEventListener('drop',e=>setFile(e.dataTransfer.files[0]));
+function setFile(f){if(!f)return;if(f.type!=='application/pdf'){alert('Selecione um PDF');return}currentFile=f;fileInfo.classList.remove('hidden');fileInfo.innerHTML='<b>📄 '+f.name+'</b><div class="muted">'+(f.size/1048576).toFixed(2)+' MB</div>';analyze.disabled=false}
+async function readPdf(file){const pdfjs=await import('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.min.mjs');pdfjs.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs';const data=new Uint8Array(await file.arrayBuffer());const doc=await pdfjs.getDocument({data}).promise;let text='';for(let i=1;i<=Math.min(doc.numPages,100);i++){const p=await doc.getPage(i);const c=await p.getTextContent();text+='
+'+c.items.map(x=>x.str).join(' ')}return {text,pages:doc.numPages}}
+function detectTopics(text){const clean=text.replace(/s+/g,' ').trim();const m=/conte[uú]do program[aá]tico/i.exec(clean);let chunk=m?clean.slice(m.index,m.index+30000):clean.slice(0,30000);let arr=chunk.split(/(?=d{1,3}[.)]s)|;s+(?=[A-ZÁÉÍÓÚÇ])/).map(x=>x.trim()).filter(x=>x.length>15&&x.length<420);const bad=/inscri[cç][aã]o|pagamento|resultado|endere[cç]o|telefone|cronograma|documentos? pessoais?/i;arr=arr.filter(x=>!bad.test(x));return [...new Set(arr)].slice(0,120)}
+analyze.onclick=async()=>{if(!currentFile)return;analyze.disabled=true;analyze.textContent='Analisando...';const box=qs('#analysis');box.classList.remove('hidden');box.innerHTML='<h3>Processando PDF...</h3><p class="muted">Extraindo texto.</p>';try{const {text,pages}=await readPdf(currentFile);const found=detectTopics(text);box.innerHTML='<h3>Análise concluída</h3><p><b>'+pages+'</b> páginas · <b>'+found.length+'</b> possíveis tópicos encontrados.</p><button id="generate" class="btn">Gerar verticalização</button><details style="margin-top:10px"><summary>Ver amostra</summary><ol>'+found.slice(0,15).map(x=>'<li>'+x+'</li>').join('')+'</ol></details>';qs('#generate').onclick=()=>{topics=found.map((content,i)=>({id:i+1,knowledge:'IMPORTADO',area:'A CLASSIFICAR',content,status:'A Estudar',q:0,c:0,e:0,note:''}));localStorage.setItem('ev_zero_topics',JSON.stringify(topics));localStorage.setItem('ev_zero_file',currentFile.name);render();qs('#emptyState').classList.add('hidden');qs('#loadedState').classList.remove('hidden');qs('#summaryText').textContent='Arquivo: '+currentFile.name+' · '+pages+' páginas · '+found.length+' tópicos detectados para revisão.';setView('inicio')}}catch(e){box.innerHTML='<h3>Não foi possível ler o PDF</h3><p class="muted">'+e.message+'</p><p>Se o arquivo for escaneado, será necessário OCR no backend.</p>'}finally{analyze.disabled=false;analyze.textContent='Analisar edital'}};
+function calc(t){return t.q?Math.round(t.c/t.q*100):null}
+function render(){const f=qs('#filter')?.value?.toLowerCase()||'',s=qs('#statusFilter')?.value||'',d=qs('#discFilter')?.value||'';const rows=topics.filter(t=>(!f||(t.content+' '+t.area).toLowerCase().includes(f))&&(!s||t.status===s)&&(!d||t.area===d));qs('#tbody').innerHTML=rows.map(t=>'<tr><td>'+t.id+'</td><td>'+t.knowledge+'</td><td>'+t.area+'</td><td>'+t.content+'</td><td><span class="status gray">'+t.status+'</span></td><td>'+t.q+'</td><td>'+t.c+'</td><td>'+t.e+'</td><td>'+(calc(t)==null?'—':calc(t)+'%')+'</td><td>'+t.note+'</td></tr>').join('');const areas=[...new Set(topics.map(t=>t.area))];qs('#discFilter').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+a+'</option>').join('');qs('#kTopics').textContent=topics.length;qs('#kStudied').textContent=topics.filter(t=>t.status==='Estudado').length;qs('#kQuestions').textContent=topics.reduce((a,b)=>a+b.q,0);const tq=topics.reduce((a,b)=>a+b.q,0),tc=topics.reduce((a,b)=>a+b.c,0);qs('#kPerf').textContent=tq?Math.round(tc/tq*100)+'%':'—'}
+['filter','statusFilter','discFilter'].forEach(id=>qs('#'+id)?.addEventListener(id==='filter'?'input':'change',render));
+qs('#exportCsv').onclick=()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES
+';const csv=h+topics.map(t=>[t.id,t.knowledge,t.area,t.content,t.status,t.q,t.c,t.e,t.note].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('
+');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click()};
+qs('#globalSearch').oninput=e=>{if(topics.length){qs('#filter').value=e.target.value;render();qs('.tab[data-tab="vertical"]')?.click()}}
+localStorage.removeItem('ev_topics'); localStorage.removeItem('ev_tasks'); localStorage.removeItem('ev_seen_popup');
+localStorage.removeItem('ev_zero_topics'); localStorage.removeItem('ev_zero_file');
 </script>
 </body></html>
