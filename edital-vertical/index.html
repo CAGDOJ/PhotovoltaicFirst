@@ -38,44 +38,70 @@
 .evoCard strong{font-size:22px}.evoUp{color:#118452}.evoDown{color:#c9374e}.evoNeutral{color:#607086}
 .cloudNotice{margin-top:12px;padding:12px;border:1px solid #cfe2ff;background:#f6faff;border-radius:12px;color:#365a82;font-size:13px}
 
-.landingGate{min-height:100vh;background:linear-gradient(180deg,#ffffff 0%,#f4f7fb 100%);color:var(--text);padding:24px}
-.landingWrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.75fr);gap:34px;align-items:center;min-height:calc(100vh - 48px)}
-.landingHero{padding:22px;color:var(--text)}.landingLogo{width:min(430px,92%);height:auto;display:block;margin-bottom:24px}
-.landingHero h1{font-size:clamp(36px,5vw,64px);line-height:1.02;margin:0 0 14px;color:#071a2f}.landingHero p{font-size:18px;line-height:1.65;color:#5f6f82;max-width:720px}
-.featureGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}.featureItem{background:#fff;border:1px solid #dfe6ef;border-radius:16px;padding:15px;box-shadow:0 10px 24px rgba(13,39,70,.05)}.featureItem b{display:block;margin-bottom:5px;color:#071a2f}.featureItem span{color:#68778a;font-size:14px;line-height:1.45}
-.authPanel{background:#fff;color:var(--text);border:1px solid #e1e7ef;border-radius:24px;padding:24px;box-shadow:0 22px 60px rgba(13,39,70,.12)}.authPanel h2{margin:0 0 6px}.authPanel .muted{margin-bottom:18px}
-.authTabs{display:grid;grid-template-columns:1fr 1fr;background:#f1f5f9;border-radius:12px;padding:4px;margin:14px 0}.authTabs button{border:0;background:transparent;border-radius:9px;padding:10px;font-weight:800;color:#607086;cursor:pointer}.authTabs button.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(13,39,70,.08)}
-.authForm{display:none}.authForm.active{display:grid;gap:10px}.authForm label{font-size:13px;font-weight:800}.authForm input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px}.authPrimary{width:100%;border:0;background:var(--blue);color:#fff;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}
-.authDivider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#8a97a8;font-size:12px}.authDivider:before,.authDivider:after{content:"";height:1px;background:#dfe6ef;flex:1}
-.googleLogin{width:100%;border:1px solid #d8e1ea;background:#fff;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}.googleMark{font-size:20px;font-weight:900;color:#4285f4}
+.landingGate{min-height:100vh;background:#f8fafc;color:var(--text);padding:28px;display:flex;align-items:center}
+.landingWrap{width:100%;max-width:1080px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(330px,.72fr);gap:72px;align-items:center}
+.landingHero{padding:8px 0}
+.landingLogo{width:245px;height:auto;display:block;margin-bottom:42px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:900;letter-spacing:.12em;color:#1269d8;background:#eef5ff;border-radius:999px;padding:7px 11px;margin-bottom:18px}
+.landingHero h1{font-size:clamp(40px,5vw,61px);line-height:1.02;letter-spacing:-.045em;margin:0;color:#071a2f;max-width:670px}
+.landingLead{font-size:18px;line-height:1.65;color:#64748b;max-width:620px;margin:22px 0 30px}
+.steps{display:grid;gap:15px;max-width:590px}
+.step{display:flex;align-items:flex-start;gap:14px}
+.step>span{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:grid;place-items:center;background:#1269d8;color:#fff;font-size:13px;font-weight:900}
+.step b{display:block;color:#17263b;font-size:15px;margin:1px 0 3px}
+.step small{display:block;color:#718096;font-size:13px;line-height:1.45}
+.landingHint{margin-top:28px;font-size:12px;color:#8996a8}
+.authPanel{background:#fff;color:var(--text);border:1px solid #e5eaf0;border-radius:22px;padding:28px;box-shadow:0 18px 45px rgba(15,35,60,.08)}
+.authHead h2{font-size:25px;letter-spacing:-.02em;margin:0 0 6px;color:#071a2f}.authHead p{margin:0 0 20px;color:#78879a;font-size:14px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;background:#f3f6f9;border-radius:11px;padding:4px;margin:16px 0}
+.authTabs button{border:0;background:transparent;border-radius:8px;padding:10px;font-weight:800;color:#718096;cursor:pointer}
+.authTabs button.active{background:#fff;color:#1269d8;box-shadow:0 2px 8px rgba(15,35,60,.07)}
+.authForm{display:none}.authForm.active{display:grid;gap:13px}.authForm label{display:block;font-size:12px;font-weight:800;color:#34445a;margin-bottom:5px}.authForm input{width:100%;padding:12px 13px;border:1px solid #dbe3ec;border-radius:10px;background:#fbfcfe;outline:none}.authForm input:focus{border-color:#5da0ef;box-shadow:0 0 0 3px rgba(18,105,216,.09);background:#fff}
+.authPrimary{width:100%;border:0;background:#1269d8;color:#fff;border-radius:10px;padding:12px 14px;font-weight:900;cursor:pointer;box-shadow:0 8px 18px rgba(18,105,216,.16)}
+.authPrimary:hover{background:#0f5fc4}
+.authDivider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#9aa6b5;font-size:11px}.authDivider:before,.authDivider:after{content:"";height:1px;background:#e7ebf0;flex:1}
+.googleLogin{width:100%;border:1px solid #dce3eb;background:#fff;border-radius:10px;padding:11px 13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;position:relative;color:#233247}
+.googleLogin small{position:absolute;right:9px;font-size:9px;font-weight:800;color:#9ba7b5;background:#f1f4f7;border-radius:999px;padding:3px 6px}
+.googleMark{font-size:18px;font-weight:900;color:#4285f4}.disabledGoogle{cursor:not-allowed;opacity:.72}
 .authMsg{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f4f7fb;color:#52647a;font-size:13px;display:none}.authMsg.show{display:block}
-.landingFoot{margin-top:18px;font-size:12px;color:#8392a6;text-align:center}.app.authLocked{display:none!important}.landingGate.hidden{display:none!important}
-@media(max-width:900px){.landingGate{padding:12px}.landingWrap{grid-template-columns:1fr;gap:16px;min-height:auto}.landingHero{padding:10px 4px}.landingLogo{width:min(330px,92%)}.landingHero h1{font-size:38px}.landingHero p{font-size:16px}.featureGrid{grid-template-columns:1fr}.authPanel{padding:20px}}
+.landingFoot{margin-top:20px;padding-top:16px;border-top:1px solid #eef1f5;font-size:11px;color:#9aa6b5;text-align:center}
+.app.authLocked{display:none!important}.landingGate.hidden{display:none!important}
+@media(max-width:900px){.landingGate{padding:24px 16px;align-items:flex-start}.landingWrap{grid-template-columns:1fr;gap:34px;max-width:620px}.landingHero{text-align:center}.landingLogo{width:205px;margin:0 auto 26px}.eyebrow{margin-bottom:14px}.landingHero h1{font-size:40px}.landingLead{font-size:16px;margin:18px auto 24px}.steps{max-width:470px;margin:0 auto;text-align:left}.landingHint{text-align:center}.authPanel{padding:22px}}
+@media(max-width:520px){.landingGate{padding:18px 12px}.landingWrap{gap:26px}.landingLogo{width:185px}.landingHero h1{font-size:34px}.landingLead{font-size:15px}.step small{font-size:12px}.authPanel{border-radius:18px;padding:18px}.authHead h2{font-size:22px}}
 </style>
 </head>
 <body>
 <section id="landingGate" class="landingGate">
   <div class="landingWrap">
     <div class="landingHero">
-      <img src="./logo.svg?v=13" class="landingLogo" alt="Edital Vertical">
-      <h1>Transforme seu edital em um plano de estudo inteligente.</h1>
-      <p>Envie o PDF do edital, escolha o cargo e receba uma verticalização organizada por disciplina e tópico. Registre questões, acompanhe seu desempenho e veja exatamente onde precisa melhorar.</p>
+      <img src="./logo.svg?v=14" class="landingLogo" alt="Edital Vertical">
 
-      <div class="featureGrid">
-        <div class="featureItem"><b>📄 Verticalização automática</b><span>O sistema lê o conteúdo programático e organiza os tópicos na ordem do edital.</span></div>
-        <div class="featureItem"><b>📊 Acompanhamento de desempenho</b><span>Registre questões, acertos e erros e acompanhe sua evolução por matéria.</span></div>
-        <div class="featureItem"><b>☁️ Seus editais salvos</b><span>Ao entrar na sua conta, seus editais e progresso ficam associados ao seu perfil.</span></div>
-        <div class="featureItem"><b>🔔 Monitor de retificações</b><span>Estrutura preparada para acompanhar alterações futuras do edital.</span></div>
+      <div class="eyebrow">ESTUDE O EDITAL COM MAIS CLAREZA</div>
+      <h1>Seu edital organizado.<br>Seu progresso visível.</h1>
+      <p class="landingLead">Envie o PDF, escolha o cargo e transforme o conteúdo programático em um plano de estudo que acompanha sua evolução.</p>
+
+      <div class="steps">
+        <div class="step"><span>1</span><div><b>Envie o edital</b><small>O sistema identifica cargos, matérias e tópicos.</small></div></div>
+        <div class="step"><span>2</span><div><b>Estude e registre</b><small>Marque status, questões, acertos e erros.</small></div></div>
+        <div class="step"><span>3</span><div><b>Acompanhe a evolução</b><small>Veja desempenho, melhorias e pontos fracos.</small></div></div>
       </div>
+
+      <div class="landingHint">Seus editais e progresso ficam vinculados à sua conta.</div>
     </div>
 
     <aside class="authPanel">
-      <h2>Comece agora</h2>
-      <p class="muted">Entre na sua conta ou crie uma nova. Tudo fica na mesma página.</p>
+      <div class="authHead">
+        <h2>Acesse sua conta</h2>
+        <p>Continue seus estudos de onde parou.</p>
+      </div>
 
-      <button id="googleLoginBtn" class="googleLogin" type="button"><span class="googleMark">G</span> Continuar com Google</button>
+      <button id="googleLoginBtn" class="googleLogin disabledGoogle" type="button" aria-disabled="true">
+        <span class="googleMark">G</span>
+        <span>Continuar com Google</span>
+        <small>em configuração</small>
+      </button>
 
-      <div class="authDivider">ou use e-mail</div>
+      <div class="authDivider">ou</div>
 
       <div class="authTabs">
         <button id="tabLogin" class="active" type="button">Entrar</button>
@@ -96,7 +122,7 @@
       </form>
 
       <div id="authMessage" class="authMsg"></div>
-      <div class="landingFoot">Ao continuar, você acessa o painel do Edital Vertical.</div>
+      <div class="landingFoot">Edital Vertical · seus estudos organizados em um só lugar.</div>
     </aside>
   </div>
 </section>
@@ -115,7 +141,7 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 12 · 07/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 13 · 07/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -414,15 +440,7 @@ function updateAuthUI(){
 }
 
 async function loginGoogle(){
-  if(!supabaseClient){
-    showAuthMessage('O login está pronto, mas o banco Supabase ainda precisa ser conectado para liberar o acesso.',true);
-    return;
-  }
-  const {error}=await supabaseClient.auth.signInWithOAuth({
-    provider:'google',
-    options:{redirectTo:location.origin+location.pathname}
-  });
-  if(error) showAuthMessage(error.message,true);
+  showAuthMessage('O login com Google está sendo configurado. Por enquanto, entre ou crie sua conta usando e-mail e senha.');
 }
 async function loginEmail(email,password){
   if(!supabaseClient){
