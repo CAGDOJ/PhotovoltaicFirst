@@ -1,1 +1,26 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 180" role="img" aria-labelledby="t d"><title id="t">Edital Vertical</title><desc id="d">Documento com gráfico ascendente em azul e ciano.</desc><defs><linearGradient id="g" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#1269d8"/><stop offset="1" stop-color="#21c7ff"/></linearGradient></defs><g transform="translate(18 18)"><rect x="0" y="0" width="132" height="144" rx="28" fill="#071a2f"/><path d="M34 26h54l24 24v58c0 16-12 28-28 28H34c-16 0-28-12-28-28V54c0-16 12-28 28-28z" fill="white"/><path d="M88 26v24h24" fill="#dff5ff"/><path d="M31 61h48M31 78h38M31 95h27" stroke="#1269d8" stroke-width="9" stroke-linecap="round"/><path d="M18 124c31 4 58-7 88-39" fill="none" stroke="url(#g)" stroke-width="12" stroke-linecap="round"/><path d="M102 70l20 8-8 20z" fill="#21c7ff"/></g><g font-family="Inter,Segoe UI,Arial,sans-serif" font-weight="800"><text x="178" y="83" font-size="62" fill="#071a2f">Edital</text><text x="178" y="144" font-size="62" fill="url(#g)">Vertical</text></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 180" role="img" aria-labelledby="t d">
+<title id="t">Edital Vertical</title>
+<desc id="d">Logo minimalista com documento e checklist em azul.</desc>
+<defs>
+  <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#1269d8"/>
+    <stop offset="1" stop-color="#2b86ff"/>
+  </linearGradient>
+</defs>
+<g transform="translate(10 14)">
+  <path d="M26 10h76l28 28v104c0 12-10 22-22 22H26c-12 0-22-10-22-22V32c0-12 10-22 22-22z"
+        fill="none" stroke="#071a2f" stroke-width="9" stroke-linejoin="round"/>
+  <path d="M102 10v30h28" fill="url(#b)" stroke="#1269d8" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="44" cy="64" r="13" fill="url(#b)"/>
+  <path d="M38 64l4 4 8-9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="66" y="56" width="44" height="15" rx="7.5" fill="#8fc4ff"/>
+  <circle cx="44" cy="101" r="13" fill="url(#b)"/>
+  <path d="M38 101l4 4 8-9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="66" y="93" width="44" height="15" rx="7.5" fill="#8fc4ff"/>
+  <circle cx="44" cy="138" r="13" fill="url(#b)"/>
+  <path d="M38 138l4 4 8-9" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="66" y="130" width="44" height="15" rx="7.5" fill="#8fc4ff"/>
+</g>
+<text x="178" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="70" font-weight="800" fill="#071a2f">Edital</text>
+<text x="372" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="70" font-weight="800" fill="#1269d8">Vertical</text>
+</svg>
