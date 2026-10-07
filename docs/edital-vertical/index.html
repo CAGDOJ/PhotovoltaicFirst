@@ -41,7 +41,7 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 7 · 07/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 8 · 07/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -58,7 +58,7 @@
     <div class="card" style="margin-top:16px"><div class="row"><div><span class="muted">Edital carregado</span><h2 id="loadedFileName" style="margin:4px 0 0">—</h2></div><span class="status green">PDF analisado</span></div></div>
     <section class="kpis"><div class="card kpi"><span class="muted">Tópicos detectados</span><strong id="kTopics">0</strong></div><div class="card kpi"><span class="muted">Estudados</span><strong id="kStudied">0</strong></div><div class="card kpi"><span class="muted">Questões registradas</span><strong id="kQuestions">0</strong></div><div class="card kpi"><span class="muted">Desempenho</span><strong id="kPerf">—</strong></div></section>
     <div class="tabs"><button class="tab active" data-tab="vertical">Verticalização</button><button class="tab" data-tab="resumo">Resumo</button><button class="tab" data-tab="ret">Retificações</button></div>
-    <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Tudo abaixo vem do PDF carregado nesta sessão.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="exportExcel" class="btn">Exportar Excel</button><button id="exportCsv" class="btn secondary">CSV simples</button></div></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+    <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Tudo abaixo vem do PDF carregado nesta sessão.</p></div><button id="exportExcel" class="btn">Exportar Excel</button></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
     <section id="panel-resumo" class="panel card"><h3>Resumo do edital</h3><p id="summaryText" class="muted">—</p></section>
     <section id="panel-ret" class="panel card"><h3>Retificações</h3><p class="muted">Nenhuma retificação monitorada ainda. Configure a fonte oficial no Monitor de Editais.</p></section>
   </div>
@@ -668,30 +668,6 @@ function safeFilePart(s){
     .replace(/^_+|_+$/g,'')
     .slice(0,80);
 }
-
-qs('#exportCsv')?.addEventListener('click',()=>{
-  const ordered=orderedTopics();
-  const h='ORDEM;ITEM DO EDITAL;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';
-  const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';
-  const csv=h+ordered.map(t=>[
-    t.sourceOrder||t.id,
-    t.itemNumber||'',
-    t.knowledge,
-    t.area,
-    t.content,
-    t.status,
-    t.q,
-    t.c,
-    t.e,
-    t.note
-  ].map(q).join(';')).join('\n');
-
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
-  a.download='EditalVertical_'+safeFilePart(selectedCargoSection?.cargo)+'.csv';
-  a.click();
-  URL.revokeObjectURL(a.href);
-});
 
 qs('#exportExcel')?.addEventListener('click',async()=>{
   if(!window.ExcelJS){
