@@ -62,7 +62,7 @@
 .authDivider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#9aa6b5;font-size:11px}.authDivider:before,.authDivider:after{content:"";height:1px;background:#e7ebf0;flex:1}
 .googleLogin{width:100%;border:1px solid #dce3eb;background:#fff;border-radius:10px;padding:11px 13px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:9px;position:relative;color:#233247}
 .googleLogin small{position:absolute;right:9px;font-size:9px;font-weight:800;color:#9ba7b5;background:#f1f4f7;border-radius:999px;padding:3px 6px}
-.googleMark{font-size:18px;font-weight:900;color:#4285f4}.googleLogin{cursor:pointer}.googleLogin:hover{border-color:#b9c8da;background:#fbfdff}
+.googleMark{font-size:18px;font-weight:900;color:#4285f4}.googleLogin{cursor:pointer}.googleLogin:hover{border-color:#b9c8da;background:#fbfdff}.disabledGoogle{cursor:not-allowed;opacity:.72}
 .authMsg{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f4f7fb;color:#52647a;font-size:13px;display:none}.authMsg.show{display:block}
 .landingFoot{margin-top:20px;padding-top:16px;border-top:1px solid #eef1f5;font-size:11px;color:#9aa6b5;text-align:center}
 .app.authLocked{display:none!important}.landingGate.hidden{display:none!important}
@@ -95,9 +95,10 @@
         <p>Continue seus estudos de onde parou.</p>
       </div>
 
-      <button id="googleLoginBtn" class="googleLogin" type="button">
+      <button id="googleLoginBtn" class="googleLogin disabledGoogle" type="button" aria-disabled="true">
         <span class="googleMark">G</span>
         <span>Continuar com Google</span>
+        <small>finalizando configuração</small>
       </button>
 
       <div class="authDivider">ou</div>
@@ -439,25 +440,7 @@ function updateAuthUI(){
 }
 
 async function loginGoogle(){
-  if(!supabaseClient){
-    showAuthMessage('Não foi possível conectar ao serviço de autenticação. Atualize a página e tente novamente.',true);
-    return;
-  }
-
-  const redirectTo='https://cagdoj.github.io/PhotovoltaicFirst/edital-vertical/';
-
-  const {error}=await supabaseClient.auth.signInWithOAuth({
-    provider:'google',
-    options:{
-      redirectTo,
-      queryParams:{
-        access_type:'offline',
-        prompt:'select_account'
-      }
-    }
-  });
-
-  if(error) showAuthMessage('Não foi possível entrar com Google: '+error.message,true);
+  showAuthMessage('O Google ainda não está habilitado no Supabase. Conclua o provedor Google no painel; enquanto isso, use e-mail e senha.',true);
 }
 async function loginEmail(email,password){
   if(!supabaseClient){
