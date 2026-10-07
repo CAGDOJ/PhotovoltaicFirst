@@ -41,7 +41,7 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 5 · 07/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 6 · 07/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -58,7 +58,7 @@
     <div class="card" style="margin-top:16px"><div class="row"><div><span class="muted">Edital carregado</span><h2 id="loadedFileName" style="margin:4px 0 0">—</h2></div><span class="status green">PDF analisado</span></div></div>
     <section class="kpis"><div class="card kpi"><span class="muted">Tópicos detectados</span><strong id="kTopics">0</strong></div><div class="card kpi"><span class="muted">Estudados</span><strong id="kStudied">0</strong></div><div class="card kpi"><span class="muted">Questões registradas</span><strong id="kQuestions">0</strong></div><div class="card kpi"><span class="muted">Desempenho</span><strong id="kPerf">—</strong></div></section>
     <div class="tabs"><button class="tab active" data-tab="vertical">Verticalização</button><button class="tab" data-tab="resumo">Resumo</button><button class="tab" data-tab="ret">Retificações</button></div>
-    <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Tudo abaixo vem do PDF carregado nesta sessão.</p></div><button id="exportCsv" class="btn secondary">Exportar CSV</button></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
+    <section id="panel-vertical" class="panel card active"><div class="row"><div><h3 style="margin:0">Verticalização gerada</h3><p class="muted">Tudo abaixo vem do PDF carregado nesta sessão.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="exportExcel" class="btn">Exportar Excel</button><button id="exportCsv" class="btn secondary">CSV simples</button></div></div><div class="filters"><input id="filter" placeholder="Buscar conteúdo..."><select id="statusFilter"><option value="">Todos os status</option><option>Estudado</option><option>Estudando</option><option>A Estudar</option></select><select id="discFilter"><option value="">Todas as disciplinas</option></select></div><div class="tableWrap"><table><thead><tr><th>#</th><th>CONHECIMENTO</th><th>ÁREA</th><th>CONTEÚDO</th><th>STATUS</th><th>QUESTÕES</th><th>CERTAS</th><th>ERRADAS</th><th>DESEMPENHO</th><th>ANOTAÇÕES</th></tr></thead><tbody id="tbody"></tbody></table></div></section>
     <section id="panel-resumo" class="panel card"><h3>Resumo do edital</h3><p id="summaryText" class="muted">—</p></section>
     <section id="panel-ret" class="panel card"><h3>Retificações</h3><p class="muted">Nenhuma retificação monitorada ainda. Configure a fonte oficial no Monitor de Editais.</p></section>
   </div>
@@ -107,6 +107,7 @@
 </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <nav class="bottom"><button class="active" data-view="inicio">⌂<br>Início</button><button data-view="editais">▣<br>Editais</button><button data-view="novo">＋<br>Novo</button><button data-view="monitor">♢<br>Monitor</button><button data-view="desempenho">↗<br>Desempenho</button></nav>
 
 <script type="module">
@@ -115,6 +116,7 @@ let currentFile=null;
 let running=false;
 let selectedCargoSection=null;
 let pendingAnalysis=null;
+let examInfo={name:'',edital:'',organizer:'',file:''};
 const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
 
@@ -162,13 +164,14 @@ async function setFile(f){
     '</div>';
 
   try{
-    const {text,pages,annexStart}=await readProgrammaticAnnex(currentFile,(msg)=>{
+    const {text,pages,annexStart,firstPageText}=await readProgrammaticAnnex(currentFile,(msg)=>{
       const p=qs('#analysisProgress');
       if(p)p.textContent=msg;
     });
 
     const sections=extractCargoSections(text);
-    pendingAnalysis={sections,pages,annexStart};
+    examInfo={...extractExamInfo(firstPageText),file:currentFile.name};
+    pendingAnalysis={sections,pages,annexStart,examInfo};
 
     if(!sections.length){
       throw new Error('Nenhum cargo foi identificado no conteúdo programático.');
@@ -208,6 +211,7 @@ async function pageText(doc,pageNum){
 async function readProgrammaticAnnex(file,onProgress){
   const doc=await loadPdf(file);
   const total=doc.numPages;
+  const firstPageText=await pageText(doc,1);
   let annexStart=-1;
 
   const isExactAnnexPage=(txt)=>{
@@ -261,7 +265,7 @@ async function readProgrammaticAnnex(file,onProgress){
     text+='\n'+txt;
   }
 
-  return {text,pages:total,annexStart};
+  return {text,pages:total,annexStart,firstPageText};
 }
 
 function cleanLine(s){
@@ -345,6 +349,33 @@ function normalizeText(text){
     .replace(/\n[ \t]+/g,'\n')
     .replace(/^\s*\d{1,3}\s*$/gm,'')
     .replace(/\n{3,}/g,'\n\n');
+}
+
+
+function extractExamInfo(firstPageText){
+  const lines=normalizeText(firstPageText).split(/\n/).map(cleanLine).filter(Boolean);
+  const editalLine=lines.find(x=>/EDITAL.*CONCURSO P[ÚU]BLICO/i.test(x)) || '';
+  const editalMatch=editalLine.match(/EDITAL\s*N[º°O]?\s*([0-9./-]+)/i);
+  let name=editalLine.replace(/^.*?DE ABERTURA DO\s+/i,'').trim();
+
+  if(!name || name===editalLine){
+    name=(lines.find(x=>/CONCURSO P[ÚU]BLICO/i.test(x))||'').trim();
+  }
+
+  const stateLine=lines.find(x=>/^GOVERNO DO ESTADO DO /i.test(x));
+  if(name && stateLine && /POL[ÍI]CIA CIVIL/i.test(name) && !/ESTADO DO/i.test(name)){
+    const state=stateLine.replace(/^GOVERNO DO /i,'').trim();
+    name=name+' DO '+state;
+  }
+
+  if(!name) name='Concurso Público';
+  const organizer=/FUNDA[CÇ][AÃ]O CESGRANRIO/i.test(firstPageText)?'Fundação Cesgranrio':'';
+
+  return {
+    name,
+    edital:editalMatch?('Edital nº '+editalMatch[1]):'',
+    organizer
+  };
 }
 
 function extractCargoSections(text){
@@ -456,14 +487,19 @@ function parseDisciplineTopics(body,cargo){
     const area=headings[h].name;
     const block=rawLines.slice(start,end).join(' ');
     const items=splitNumberedTopics(block);
-    items.forEach(content=>result.push({
-      id:result.length+1,
-      knowledge:'PROVA OBJETIVA',
-      area,
-      content,
-      status:'A Estudar',
-      q:0,c:0,e:0,note:''
-    }));
+    items.forEach(content=>{
+      const itemMatch=content.match(/^(d+(?:.d+)*)./);
+      result.push({
+        id:result.length+1,
+        sourceOrder:result.length+1,
+        itemNumber:itemMatch?itemMatch[1]:'',
+        knowledge:'PROVA OBJETIVA',
+        area,
+        content,
+        status:'A Estudar',
+        q:0,c:0,e:0,note:''
+      });
+    });
   }
   return result;
 }
@@ -524,7 +560,9 @@ function applyCargo(section,pages){
   qs('#loadedFileName').textContent=currentFile.name+' — '+section.cargo;
   const areas=[...new Set(topics.map(t=>t.area))];
   qs('#summaryText').textContent=
-    'Cargo: '+section.cargo+' · '+pages+' páginas no PDF · '+
+    (examInfo.name?examInfo.name+' · ':'')+
+    (examInfo.edital?examInfo.edital+' · ':'')+
+    'Cargo: '+section.cargo+' · '+pages+' páginas · '+
     areas.length+' disciplinas · '+topics.length+' tópicos verticalizados.';
   qs('#globalSearch').disabled=false;
   const box=qs('#analysis');
@@ -591,7 +629,189 @@ function render(){
 }
 ['filter','statusFilter','discFilter'].forEach(id=>qs('#'+id)?.addEventListener(id==='filter'?'input':'change',render));
 qs('#globalSearch')?.addEventListener('input',e=>{if(!topics.length)return;qs('#filter').value=e.target.value;render();qs('.tab[data-tab="vertical"]')?.click()});
-qs('#exportCsv')?.addEventListener('click',()=>{const h='SEC.;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';const csv=h+topics.map(t=>[t.id,t.knowledge,t.area,t.content,t.status,t.q,t.c,t.e,t.note].map(q).join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'}));a.download='verticalizacao.csv';a.click();URL.revokeObjectURL(a.href)});
+
+function orderedTopics(){
+  return [...topics].sort((a,b)=>(a.sourceOrder||a.id)-(b.sourceOrder||b.id));
+}
+
+function safeFilePart(s){
+  return String(s||'verticalizacao')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-zA-Z0-9_-]+/g,'_')
+    .replace(/^_+|_+$/g,'')
+    .slice(0,80);
+}
+
+qs('#exportCsv')?.addEventListener('click',()=>{
+  const ordered=orderedTopics();
+  const h='ORDEM;ITEM DO EDITAL;CONHECIMENTOS;ÁREA;CONTEÚDO;STATUS;QUESTÕES;CERTAS;ERRADAS;ANOTAÇÕES\n';
+  const q=v=>'"'+String(v??'').replaceAll('"','""')+'"';
+  const csv=h+ordered.map(t=>[
+    t.sourceOrder||t.id,
+    t.itemNumber||'',
+    t.knowledge,
+    t.area,
+    t.content,
+    t.status,
+    t.q,
+    t.c,
+    t.e,
+    t.note
+  ].map(q).join(';')).join('\n');
+
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='EditalVertical_'+safeFilePart(selectedCargoSection?.cargo)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+qs('#exportExcel')?.addEventListener('click',()=>{
+  if(!window.XLSX){
+    alert('Não foi possível carregar o gerador de Excel. Verifique a internet e tente novamente.');
+    return;
+  }
+
+  const ordered=orderedTopics();
+  const cargo=selectedCargoSection?.cargo||'Cargo não informado';
+  const prova=examInfo.name||'Concurso Público';
+  const edital=examInfo.edital||'';
+  const metaLine=[edital,examInfo.organizer].filter(Boolean).join(' · ');
+
+  const rows=[
+    ['EDITAL VERTICAL','','','','','','','','','',''],
+    ['Prova / Concurso',prova,'','','','','','','','',''],
+    ['Cargo escolhido',cargo,'','','','','','','','',''],
+    ['Edital / Banca',metaLine,'','','','','','','','',''],
+    ['Arquivo',examInfo.file||currentFile?.name||'','','','','','','','','',''],
+    [],
+    ['ORDEM','ITEM DO EDITAL','CONHECIMENTOS','ÁREA','CONTEÚDO','STATUS','QUESTÕES','CERTAS','ERRADAS','DESEMPENHO','ANOTAÇÕES']
+  ];
+
+  ordered.forEach(t=>{
+    const perf=t.q?Math.round((t.c/t.q)*100)/100:'';
+    rows.push([
+      t.sourceOrder||t.id,
+      t.itemNumber||'',
+      t.knowledge,
+      t.area,
+      t.content,
+      t.status,
+      t.q,
+      t.c,
+      t.e,
+      perf,
+      t.note||''
+    ]);
+  });
+
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(rows);
+
+  ws['!merges']=[
+    {s:{r:0,c:0},e:{r:0,c:10}},
+    {s:{r:1,c:1},e:{r:1,c:10}},
+    {s:{r:2,c:1},e:{r:2,c:10}},
+    {s:{r:3,c:1},e:{r:3,c:10}},
+    {s:{r:4,c:1},e:{r:4,c:10}}
+  ];
+
+  const navy='071A2F', blue='1269D8', cyan='21C7FF', light='F4F7FB',
+        line='DFE6EF', green='16A36A', white='FFFFFF', text='15243A';
+
+  const title=ws['A1'];
+  title.s={
+    fill:{fgColor:{rgb:navy}},
+    font:{bold:true,color:{rgb:white},sz:20},
+    alignment:{horizontal:'left',vertical:'center'}
+  };
+
+  for(let r=1;r<=4;r++){
+    const a=XLSX.utils.encode_cell({r,c:0});
+    const b=XLSX.utils.encode_cell({r,c:1});
+    if(ws[a]) ws[a].s={font:{bold:true,color:{rgb:blue}},fill:{fgColor:{rgb:light}},alignment:{vertical:'center'}};
+    if(ws[b]) ws[b].s={font:{bold:r===1,color:{rgb:text}},fill:{fgColor:{rgb:light}},alignment:{vertical:'center',wrapText:true}};
+  }
+
+  for(let cidx=0;cidx<=10;cidx++){
+    const cell=ws[XLSX.utils.encode_cell({r:6,c:cidx})];
+    if(cell) cell.s={
+      fill:{fgColor:{rgb:blue}},
+      font:{bold:true,color:{rgb:white}},
+      alignment:{horizontal:'center',vertical:'center',wrapText:true},
+      border:{
+        top:{style:'thin',color:{rgb:blue}},
+        bottom:{style:'thin',color:{rgb:blue}},
+        left:{style:'thin',color:{rgb:blue}},
+        right:{style:'thin',color:{rgb:blue}}
+      }
+    };
+  }
+
+  for(let r=7;r<rows.length;r++){
+    const zebra=(r%2===0)?'F8FBFF':white;
+    for(let cidx=0;cidx<=10;cidx++){
+      const addr=XLSX.utils.encode_cell({r,c:cidx});
+      const cell=ws[addr];
+      if(!cell) continue;
+      cell.s={
+        fill:{fgColor:{rgb:zebra}},
+        font:{color:{rgb:text}},
+        alignment:{vertical:'top',wrapText:true,horizontal:[0,1,6,7,8,9].includes(cidx)?'center':'left'},
+        border:{
+          bottom:{style:'thin',color:{rgb:line}}
+        }
+      };
+    }
+
+    const statusAddr=XLSX.utils.encode_cell({r,c:5});
+    if(ws[statusAddr]){
+      const status=String(ws[statusAddr].v||'');
+      ws[statusAddr].s.fill={fgColor:{rgb:status==='Estudado'?'DCFCE7':status==='Estudando'?'FFF3CD':'EEF1F5'}};
+      ws[statusAddr].s.font={bold:true,color:{rgb:status==='Estudado'?'118452':status==='Estudando'?'A56C00':'607086'}};
+    }
+
+    const perfAddr=XLSX.utils.encode_cell({r,c:9});
+    if(ws[perfAddr] && typeof ws[perfAddr].v==='number'){
+      ws[perfAddr].z='0%';
+      ws[perfAddr].s.font={bold:true,color:{rgb:green}};
+    }
+  }
+
+  ws['!cols']=[
+    {wch:9},{wch:14},{wch:20},{wch:36},{wch:70},{wch:14},
+    {wch:11},{wch:10},{wch:10},{wch:13},{wch:34}
+  ];
+  ws['!rows']=[{hpt:30},{hpt:22},{hpt:22},{hpt:22},{hpt:22},{hpt:8},{hpt:30}];
+  ws['!autofilter']={ref:'A7:K'+rows.length};
+  ws['!freeze']={xSplit:0,ySplit:7,topLeftCell:'A8',activePane:'bottomLeft',state:'frozen'};
+
+  XLSX.utils.book_append_sheet(wb,ws,'Verticalização');
+
+  const areaCounts={};
+  ordered.forEach(t=>areaCounts[t.area]=(areaCounts[t.area]||0)+1);
+  const summaryRows=[
+    ['RESUMO DO EDITAL VERTICAL',''],
+    ['Prova / Concurso',prova],
+    ['Cargo',cargo],
+    ['Total de tópicos',ordered.length],
+    [],
+    ['DISCIPLINA / ÁREA','TÓPICOS'],
+    ...Object.entries(areaCounts)
+  ];
+  const ws2=XLSX.utils.aoa_to_sheet(summaryRows);
+  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:1}}];
+  ws2['A1'].s={fill:{fgColor:{rgb:navy}},font:{bold:true,color:{rgb:white},sz:16}};
+  for(let cidx=0;cidx<2;cidx++){
+    const cell=ws2[XLSX.utils.encode_cell({r:5,c:cidx})];
+    if(cell) cell.s={fill:{fgColor:{rgb:blue}},font:{bold:true,color:{rgb:white}}};
+  }
+  ws2['!cols']=[{wch:58},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,'Resumo');
+
+  XLSX.writeFile(wb,'EditalVertical_'+safeFilePart(cargo)+'.xlsx');
+});
+
 clear.addEventListener('click',()=>{topics=[];currentFile=null;pdf.value='';fileInfo.classList.add('hidden');qs('#analysis').classList.add('hidden');qs('#emptyState').classList.remove('hidden');qs('#loadedState').classList.add('hidden');clear.classList.add('hidden');qs('#globalSearch').value='';qs('#globalSearch').disabled=true;analyze.disabled=true;analyze.textContent='Analisar edital';setView('inicio')});
 </script>
 </body>
