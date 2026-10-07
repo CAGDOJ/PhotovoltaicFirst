@@ -371,6 +371,7 @@ async function initSupabase(){
   supabaseClient.auth.onAuthStateChange((_event,session)=>{
     currentUser=session?.user||null;
     updateAuthUI();
+    if(currentUser) loadCloudEditals().catch(()=>{});
   });
 }
 function showAuthMessage(message,isError=false){
@@ -403,6 +404,7 @@ function updateAuthUI(){
     qs('#userEmail').textContent=currentUser.email||'';
     qs('#userPhoto').src=meta.avatar_url||'./icon.svg?v=12';
     qs('#syncState').textContent='Conta conectada';
+    loadCloudEditals().catch(()=>{});
   }else{
     gate?.classList.remove('hidden');
     app?.classList.add('authLocked');
@@ -441,6 +443,67 @@ async function registerEmail(name,email,password){
   });
   if(error){showAuthMessage(error.message,true);return;}
   if(!data.session) showAuthMessage('Conta criada. Verifique seu e-mail para confirmar o cadastro.');
+}
+
+
+async function loadCloudEditals(){
+  if(!supabaseClient||!currentUser) return;
+
+  const {data:editais,error}=await supabaseClient
+    .from('editais')
+    .select('*')
+    .eq('user_id',currentUser.id)
+    .order('updated_at',{ascending:false});
+
+  if(error||!editais) return;
+
+  const local=localEditals();
+  const byKey=new Map(local.map(x=>[x.key,x]));
+
+  for(const ed of editais){
+    const {data:cloudTopics}=await supabaseClient
+      .from('topicos')
+      .select('*')
+      .eq('edital_id',ed.id)
+      .order('source_order',{ascending:true});
+
+    const key=ed.file_hash+'::'+ed.cargo;
+    const record={
+      key,
+      cloudId:ed.id,
+      fileHash:ed.file_hash,
+      fileName:ed.file_name||'',
+      examInfo:{
+        name:ed.exam_name||'',
+        edital:ed.edital_no||'',
+        organizer:ed.organizer||'',
+        file:ed.file_name||''
+      },
+      cargo:ed.cargo,
+      topics:(cloudTopics||[]).map(t=>({
+        id:t.source_order,
+        sourceOrder:t.source_order,
+        itemNumber:t.item_number||'',
+        knowledge:t.knowledge||'PROVA OBJETIVA',
+        area:t.area||'',
+        content:t.content||'',
+        status:t.status||'A Estudar',
+        q:+t.questions||0,
+        c:+t.correct||0,
+        e:+t.wrong||0,
+        note:t.note||''
+      })),
+      updatedAt:ed.updated_at||new Date().toISOString()
+    };
+
+    const existing=byKey.get(key);
+    if(!existing || new Date(record.updatedAt)>=new Date(existing.updatedAt||0)){
+      byKey.set(key,record);
+    }
+  }
+
+  saveLocalEditals([...byKey.values()].sort((a,b)=>new Date(b.updatedAt||0)-new Date(a.updatedAt||0)));
+  renderSavedEditals();
 }
 
 async function syncCurrentToCloud(){
