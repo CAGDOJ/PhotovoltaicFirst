@@ -23,6 +23,20 @@
 .spinner{width:34px;height:34px;border:4px solid #cfe2ff;border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite;flex:0 0 34px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loadingBox b{display:block;margin-bottom:3px}.loadingBox span{color:var(--muted);font-size:13px}
+
+.authBtn{border:1px solid #315271;background:#17385c;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+.userChip{display:flex;align-items:center;gap:8px;background:#17385c;border:1px solid #315271;padding:6px 10px;border-radius:14px}
+.userChip img{width:30px;height:30px;border-radius:50%;object-fit:cover}
+.userChip small{display:block;color:#bdd0e4}
+.savedGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.savedCard{border:1px solid var(--line);border-radius:16px;padding:16px;background:#fff;box-shadow:var(--shadow)}
+.savedCard h3{margin:4px 0 8px}.savedCard .meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.savedCard .meta span{background:#eef4ff;color:#245a9c;padding:6px 9px;border-radius:999px;font-size:12px;font-weight:700}
+.topicInput,.topicSelect{width:100%;min-width:70px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.topicNum{width:72px;text-align:center}
+.evolutionGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.evoCard{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+.evoCard strong{font-size:22px}.evoUp{color:#118452}.evoDown{color:#c9374e}.evoNeutral{color:#607086}
+.cloudNotice{margin-top:12px;padding:12px;border:1px solid #cfe2ff;background:#f6faff;border-radius:12px;color:#365a82;font-size:13px}
 </style>
 </head>
 <body>
@@ -41,18 +55,23 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 8 · 07/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 9 · 07/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
   <button id="hamb" class="hamb" aria-label="Abrir menu">☰</button>
   <img src="./icon.svg?v=3" class="mobileLogo" alt="">
   <input id="globalSearch" class="search" placeholder="Buscar no edital carregado..." disabled>
-  <div class="topright">🔔 <span>Sem notificações</span><div class="avatar">CJ</div></div>
+  <div class="topright">
+      <span id="syncState">Modo local</span>
+      <button id="authBtn" class="authBtn">Entrar com Google</button>
+      <div id="userChip" class="userChip hidden"><img id="userPhoto" alt=""><div><b id="userName"></b><small id="userEmail"></small></div><button id="logoutBtn" class="authBtn" style="padding:6px 8px">Sair</button></div>
+    </div>
 </header>
 <div class="content">
 <section id="view-inicio" class="view active">
   <div class="row"><div><h1 style="margin:0">Edital Vertical</h1><p class="muted">Envie um edital real para começar a verticalização.</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="clearEdital" class="btn secondary hidden">Limpar edital</button><button class="btn" data-view="novo">Carregar PDF</button></div></div>
+  <div id="cloudInfo" class="cloudNotice">Se entrar com Google, seus editais, questões e evolução poderão ficar vinculados à sua conta. Enquanto o banco não estiver conectado, o site salva neste dispositivo.</div>
   <div id="emptyState" class="card emptyHero" style="margin-top:16px"><img src="./icon.svg?v=3" alt=""><h2>Nenhum edital carregado</h2><p class="muted">O painel começa vazio. Depois do PDF, os dados encontrados aparecem aqui.</p><button class="btn" data-view="novo">Selecionar edital em PDF</button></div>
   <div id="loadedState" class="hidden">
     <div class="card" style="margin-top:16px"><div class="row"><div><span class="muted">Edital carregado</span><h2 id="loadedFileName" style="margin:4px 0 0">—</h2></div><span class="status green">PDF analisado</span></div></div>
@@ -96,11 +115,11 @@
   <div id="analysis" class="card hidden" style="margin-top:14px"></div>
 </section></section>
 
-<section id="view-editais" class="view"><div class="card emptyHero"><div class="emptyIcon">▣</div><h2>Meus Editais</h2><p class="muted">Nenhum edital salvo.</p><button class="btn" data-view="novo">Adicionar edital</button></div></section>
+<section id="view-editais" class="view"><div class="row"><div><h1 style="margin:0">Meus Editais</h1><p class="muted">Seus editais e progressos salvos.</p></div><button class="btn" data-view="novo">+ Adicionar edital</button></div><div id="savedEditals" class="savedGrid" style="margin-top:16px"></div></section>
 <section id="view-plano" class="view"><div class="card emptyHero"><div class="emptyIcon">✓</div><h2>Plano de Estudos</h2><p class="muted">Carregue um edital primeiro.</p><button class="btn" data-view="novo">Carregar edital</button></div></section>
 <section id="view-questoes" class="view"><div class="card emptyHero"><div class="emptyIcon">◫</div><h2>Questões</h2><p class="muted">Sem edital e sem questões registradas.</p></div></section>
 <section id="view-revisoes" class="view"><div class="card emptyHero"><div class="emptyIcon">↻</div><h2>Revisões</h2><p class="muted">Nenhuma revisão agendada.</p></div></section>
-<section id="view-desempenho" class="view"><div class="card emptyHero"><div class="emptyIcon">↗</div><h2>Desempenho</h2><p class="muted">Os indicadores começam em zero.</p></div></section>
+<section id="view-desempenho" class="view"><div class="row"><div><h1 style="margin:0">Desempenho</h1><p class="muted">Evolução por matéria com base nas questões registradas.</p></div></div><div id="performanceContent" style="margin-top:16px"></div></section>
 <section id="view-cronograma" class="view"><div class="card emptyHero"><div class="emptyIcon">▤</div><h2>Cronograma</h2><p class="muted">O cronograma será extraído do edital quando possível.</p></div></section>
 <section id="view-monitor" class="view"><div class="card emptyHero"><div class="emptyIcon">♢</div><h2>Monitor de Editais</h2><p class="muted">Após carregar um edital, configure a página oficial para acompanhar retificações.</p></div></section>
 </div>
@@ -109,6 +128,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="./supabase-config.js?v=1"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <nav class="bottom"><button class="active" data-view="inicio">⌂<br>Início</button><button data-view="editais">▣<br>Editais</button><button data-view="novo">＋<br>Novo</button><button data-view="monitor">♢<br>Monitor</button><button data-view="desempenho">↗<br>Desempenho</button></nav>
 
 <script type="module">
@@ -118,6 +139,10 @@ let running=false;
 let selectedCargoSection=null;
 let pendingAnalysis=null;
 let examInfo={name:'',edital:'',organizer:'',file:''};
+let currentFileHash='';
+let currentEditalId='';
+let currentUser=null;
+let supabaseClient=null;
 const qs=s=>document.querySelector(s),qsa=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
 
@@ -126,6 +151,8 @@ function setView(v){
   qs('#view-'+v)?.classList.add('active');
   qsa('[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
   document.body.classList.remove('menuOpen');
+  if(v==='editais') renderSavedEditals();
+  if(v==='desempenho') renderPerformance();
 }
 qsa('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
 qs('#hamb')?.addEventListener('click',()=>document.body.classList.toggle('menuOpen'));
@@ -134,6 +161,210 @@ qsa('.tab').forEach(b=>b.addEventListener('click',()=>{qsa('.tab').forEach(x=>x.
 
 const pdf=qs('#pdf'),drop=qs('#drop'),fileInfo=qs('#fileInfo'),analyze=qs('#analyze'),clear=qs('#clearEdital');
 
+
+function localEditals(){
+  try{return JSON.parse(localStorage.getItem('ev_saved_editals')||'[]')}catch{return []}
+}
+function saveLocalEditals(items){
+  localStorage.setItem('ev_saved_editals',JSON.stringify(items));
+}
+function historyStore(){
+  try{return JSON.parse(localStorage.getItem('ev_history')||'[]')}catch{return []}
+}
+function saveHistory(items){
+  localStorage.setItem('ev_history',JSON.stringify(items.slice(-2000)));
+}
+async function sha256File(file){
+  const buf=await file.arrayBuffer();
+  const hash=await crypto.subtle.digest('SHA-256',buf);
+  return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function editalKey(hash,cargo){
+  return hash+'::'+cargo;
+}
+function findSavedEdital(hash,cargo){
+  return localEditals().find(x=>x.key===editalKey(hash,cargo));
+}
+function persistCurrentEdital(){
+  if(!selectedCargoSection || !currentFileHash || !topics.length) return;
+  const key=editalKey(currentFileHash,selectedCargoSection.cargo);
+  const all=localEditals();
+  const idx=all.findIndex(x=>x.key===key);
+  const record={
+    key,
+    fileHash:currentFileHash,
+    fileName:currentFile?.name||examInfo.file||'',
+    examInfo,
+    cargo:selectedCargoSection.cargo,
+    topics,
+    updatedAt:new Date().toISOString()
+  };
+  if(idx>=0) all[idx]=record; else all.unshift(record);
+  saveLocalEditals(all);
+  currentEditalId=key;
+  syncCurrentToCloud().catch(()=>{});
+}
+function restoreSavedEdital(saved){
+  topics=(saved.topics||[]).map(x=>({...x}));
+  examInfo=saved.examInfo||examInfo;
+  currentEditalId=saved.key;
+  render();
+  qs('#emptyState').classList.add('hidden');
+  qs('#loadedState').classList.remove('hidden');
+  clear.classList.remove('hidden');
+  qs('#loadedFileName').textContent=(saved.fileName||'Edital')+' — '+saved.cargo;
+  const areas=[...new Set(topics.map(t=>t.area))];
+  qs('#summaryText').textContent=(examInfo.name?examInfo.name+' · ':'')+'Cargo: '+saved.cargo+' · '+areas.length+' disciplinas · '+topics.length+' tópicos salvos.';
+  qs('#globalSearch').disabled=false;
+  setView('inicio');
+}
+function recordAreaSnapshot(area){
+  const areaTopics=topics.filter(t=>t.area===area);
+  const q=areaTopics.reduce((a,b)=>a+(+b.q||0),0);
+  const c=areaTopics.reduce((a,b)=>a+(+b.c||0),0);
+  const e=areaTopics.reduce((a,b)=>a+(+b.e||0),0);
+  if(!q) return;
+  const hist=historyStore();
+  hist.push({
+    editalKey:currentEditalId,
+    area,
+    questions:q,
+    correct:c,
+    wrong:e,
+    accuracy:c/q,
+    at:new Date().toISOString()
+  });
+  saveHistory(hist);
+}
+function areaStats(){
+  const areas=[...new Set(topics.map(t=>t.area))];
+  return areas.map(area=>{
+    const arr=topics.filter(t=>t.area===area);
+    const q=arr.reduce((a,b)=>a+(+b.q||0),0);
+    const c=arr.reduce((a,b)=>a+(+b.c||0),0);
+    const accuracy=q?c/q:null;
+    const hist=historyStore().filter(h=>h.editalKey===currentEditalId&&h.area===area);
+    let previous=null;
+    if(hist.length>=2) previous=hist[hist.length-2].accuracy;
+    else if(hist.length===1) previous=hist[0].accuracy;
+    return {area,q,c,accuracy,previous};
+  });
+}
+function renderSavedEditals(){
+  const el=qs('#savedEditals'); if(!el) return;
+  const items=localEditals();
+  if(!items.length){
+    el.innerHTML='<div class="card emptyHero" style="grid-column:1/-1"><div class="emptyIcon">▣</div><h2>Nenhum edital salvo</h2><p class="muted">Carregue seu primeiro PDF e o progresso ficará salvo neste dispositivo.</p><button class="btn" data-view="novo">Adicionar edital</button></div>';
+    el.querySelector('[data-view="novo"]')?.addEventListener('click',()=>setView('novo'));
+    return;
+  }
+  el.innerHTML=items.map((x,i)=>{
+    const qsTotal=(x.topics||[]).reduce((a,b)=>a+(+b.q||0),0);
+    const ac=(x.topics||[]).reduce((a,b)=>a+(+b.c||0),0);
+    const perf=qsTotal?Math.round(ac/qsTotal*100)+'%':'—';
+    return '<article class="savedCard"><span class="status green">Salvo</span><h3>'+esc(x.examInfo?.name||x.fileName||'Edital')+'</h3><p class="muted">'+esc(x.cargo||'')+'</p><div class="meta"><span>'+(x.topics?.length||0)+' tópicos</span><span>'+qsTotal+' questões</span><span>'+perf+' desempenho</span></div><button class="btn openSaved" data-i="'+i+'">Continuar estudando</button></article>';
+  }).join('');
+  qsa('.openSaved').forEach(b=>b.addEventListener('click',()=>{
+    const item=items[+b.dataset.i];
+    selectedCargoSection={cargo:item.cargo,body:''};
+    currentFileHash=item.fileHash||'';
+    currentFile={name:item.fileName||'Edital salvo'};
+    restoreSavedEdital(item);
+  }));
+}
+function renderPerformance(){
+  const el=qs('#performanceContent'); if(!el) return;
+  if(!topics.length){
+    el.innerHTML='<div class="card emptyHero"><div class="emptyIcon">↗</div><h2>Sem dados de desempenho</h2><p class="muted">Abra um edital salvo e registre questões.</p></div>';
+    return;
+  }
+  const stats=areaStats();
+  el.innerHTML='<div class="evolutionGrid">'+stats.map(s=>{
+    const now=s.accuracy==null?null:Math.round(s.accuracy*1000)/10;
+    const prev=s.previous==null?null:Math.round(s.previous*1000)/10;
+    const delta=(now!=null&&prev!=null)?Math.round((now-prev)*10)/10:null;
+    const cls=delta>0?'evoUp':delta<0?'evoDown':'evoNeutral';
+    const arrow=delta>0?'↑':delta<0?'↓':'→';
+    return '<article class="evoCard"><div class="muted">'+esc(s.area)+'</div><strong>'+(now==null?'—':now+'%')+'</strong><div>'+s.q+' questões · '+s.c+' acertos</div><div class="'+cls+'" style="margin-top:8px;font-weight:800">'+(delta==null?'Sem comparação ainda':arrow+' '+Math.abs(delta)+' p.p. vs. registro anterior')+'</div></article>';
+  }).join('')+'</div>';
+}
+function updateTopicFromRow(id,field,value){
+  const t=topics.find(x=>x.id===id); if(!t) return;
+  if(['q','c','e'].includes(field)) value=Math.max(0,parseInt(value||0,10)||0);
+  t[field]=value;
+  if(field==='q' && t.c>t.q) t.c=t.q;
+  if(field==='c'){ if(t.c>t.q)t.q=t.c; t.e=Math.max(0,t.q-t.c); }
+  if(field==='e'){ if(t.e>t.q)t.q=t.e; t.c=Math.max(0,t.q-t.e); }
+  persistCurrentEdital();
+  if(['q','c','e'].includes(field)) recordAreaSnapshot(t.area);
+  render();
+}
+async function initSupabase(){
+  const cfg=window.EDITAL_VERTICAL_SUPABASE||{};
+  if(!cfg.url||!cfg.anonKey||!window.supabase){
+    qs('#syncState').textContent='Modo local';
+    return;
+  }
+  supabaseClient=window.supabase.createClient(cfg.url,cfg.anonKey);
+  const {data}=await supabaseClient.auth.getSession();
+  currentUser=data.session?.user||null;
+  updateAuthUI();
+  supabaseClient.auth.onAuthStateChange((_event,session)=>{
+    currentUser=session?.user||null;
+    updateAuthUI();
+  });
+}
+function updateAuthUI(){
+  const btn=qs('#authBtn'),chip=qs('#userChip');
+  if(currentUser){
+    btn.classList.add('hidden'); chip.classList.remove('hidden');
+    const meta=currentUser.user_metadata||{};
+    qs('#userName').textContent=meta.full_name||meta.name||'Usuário';
+    qs('#userEmail').textContent=currentUser.email||'';
+    qs('#userPhoto').src=meta.avatar_url||'./icon.svg?v=3';
+    qs('#syncState').textContent='Conta conectada';
+  }else{
+    btn.classList.remove('hidden'); chip.classList.add('hidden');
+    qs('#syncState').textContent=supabaseClient?'Não conectado':'Modo local';
+  }
+}
+async function loginGoogle(){
+  if(!supabaseClient){
+    alert('A tela de login Google já está preparada. Falta conectar o projeto Supabase para ativar o login e o salvamento na nuvem.');
+    return;
+  }
+  await supabaseClient.auth.signInWithOAuth({
+    provider:'google',
+    options:{redirectTo:location.origin+location.pathname}
+  });
+}
+async function syncCurrentToCloud(){
+  if(!supabaseClient||!currentUser||!selectedCargoSection||!currentFileHash||!topics.length) return;
+  const payload={
+    user_id:currentUser.id,
+    file_hash:currentFileHash,
+    file_name:currentFile?.name||examInfo.file||'',
+    exam_name:examInfo.name||'',
+    edital_no:examInfo.edital||'',
+    organizer:examInfo.organizer||'',
+    cargo:selectedCargoSection.cargo,
+    updated_at:new Date().toISOString()
+  };
+  const {data:edital,error}=await supabaseClient.from('editais')
+    .upsert(payload,{onConflict:'user_id,file_hash,cargo'})
+    .select().single();
+  if(error||!edital)return;
+  const rows=topics.map(t=>({
+    edital_id:edital.id,user_id:currentUser.id,source_order:t.sourceOrder||t.id,
+    item_number:t.itemNumber||'',knowledge:t.knowledge||'',area:t.area||'',
+    content:t.content||'',status:t.status||'A Estudar',questions:+t.q||0,
+    correct:+t.c||0,wrong:+t.e||0,note:t.note||'',updated_at:new Date().toISOString()
+  }));
+  await supabaseClient.from('topicos').upsert(rows,{onConflict:'edital_id,source_order'});
+}
+qs('#authBtn')?.addEventListener('click',loginGoogle);
+qs('#logoutBtn')?.addEventListener('click',async()=>{if(supabaseClient)await supabaseClient.auth.signOut();});
+initSupabase().catch(()=>{});
 async function setFile(f){
   if(!f)return;
   if(!(f.type==='application/pdf'||/\.pdf$/i.test(f.name))){
@@ -143,6 +374,7 @@ async function setFile(f){
   }
 
   currentFile=f;
+  currentFileHash=await sha256File(f);
   selectedCargoSection=null;
   pendingAnalysis=null;
   topics=[];
@@ -537,11 +769,12 @@ function showCargoStep(sections,pages){
     btn.style.borderColor='var(--blue)';
 
     selectedCargoSection=sections[+btn.dataset.i];
+    const saved=findSavedEdital(currentFileHash,selectedCargoSection.cargo);
 
     const msg=qs('#cargoSelectedMsg');
     msg.classList.remove('hidden');
     msg.innerHTML='<b>Cargo selecionado:</b> '+esc(selectedCargoSection.cargo)+
-      '<div class="muted" style="margin-top:4px">Agora o botão “Analisar edital” foi liberado.</div>';
+      '<div class="muted" style="margin-top:4px">'+(saved?'Progresso salvo encontrado. Ao analisar, vamos recuperar suas estatísticas.':'Agora o botão “Analisar edital” foi liberado.')+'</div>';
 
     analyze.disabled=false;
     analyze.textContent='Analisar edital';
@@ -566,6 +799,7 @@ function applyCargo(section,pages){
     'Cargo: '+section.cargo+' · '+pages+' páginas · '+
     areas.length+' disciplinas · '+topics.length+' tópicos verticalizados.';
   qs('#globalSearch').disabled=false;
+  persistCurrentEdital();
   const box=qs('#analysis');
   box.innerHTML=
     '<h3>Verticalização gerada corretamente</h3>'+
@@ -603,8 +837,15 @@ async function runAnalysis(){
     '</div>';
 
   try{
-    topics=parseDisciplineTopics(selectedCargoSection.body,selectedCargoSection.cargo);
-    applyCargo(selectedCargoSection,pendingAnalysis?.pages||0);
+    const saved=findSavedEdital(currentFileHash,selectedCargoSection.cargo);
+    if(saved){
+      restoreSavedEdital(saved);
+      const box=qs('#analysis');
+      box.innerHTML='<h3>Progresso recuperado</h3><p>Este edital já estava salvo. Suas questões, status e anotações foram restaurados.</p>';
+    }else{
+      topics=parseDisciplineTopics(selectedCargoSection.body,selectedCargoSection.cargo);
+      applyCargo(selectedCargoSection,pendingAnalysis?.pages||0);
+    }
   }catch(e){
     box.innerHTML=
       '<h3>Não foi possível verticalizar o cargo selecionado</h3>'+
@@ -623,10 +864,38 @@ function calc(t){return t.q?Math.round(t.c/t.q*100):null}
 function render(){
   const f=(qs('#filter')?.value||'').toLowerCase(),s=qs('#statusFilter')?.value||'',d=qs('#discFilter')?.value||'';
   const rows=topics.filter(t=>(!f||(t.content+' '+t.area).toLowerCase().includes(f))&&(!s||t.status===s)&&(!d||t.area===d));
-  qs('#tbody').innerHTML=rows.map(t=>'<tr><td>'+t.id+'</td><td>'+t.knowledge+'</td><td>'+t.area+'</td><td>'+esc(t.content)+'</td><td><span class="status gray">'+t.status+'</span></td><td>'+t.q+'</td><td>'+t.c+'</td><td>'+t.e+'</td><td>'+(calc(t)==null?'—':calc(t)+'%')+'</td><td>'+esc(t.note)+'</td></tr>').join('');
+
+  qs('#tbody').innerHTML=rows.map(t=>{
+    const pct=calc(t);
+    return '<tr>'+
+      '<td>'+(t.sourceOrder||t.id)+'</td>'+
+      '<td>'+esc(t.knowledge)+'</td>'+
+      '<td>'+esc(t.area)+'</td>'+
+      '<td>'+esc(t.content)+'</td>'+
+      '<td><select class="topicSelect topicStatus" data-id="'+t.id+'"><option '+(t.status==='A Estudar'?'selected':'')+'>A Estudar</option><option '+(t.status==='Estudando'?'selected':'')+'>Estudando</option><option '+(t.status==='Estudado'?'selected':'')+'>Estudado</option></select></td>'+
+      '<td><input class="topicInput topicNum topicQ" data-id="'+t.id+'" type="number" min="0" value="'+(+t.q||0)+'"></td>'+
+      '<td><input class="topicInput topicNum topicC" data-id="'+t.id+'" type="number" min="0" value="'+(+t.c||0)+'"></td>'+
+      '<td><input class="topicInput topicNum topicE" data-id="'+t.id+'" type="number" min="0" value="'+(+t.e||0)+'"></td>'+
+      '<td><b>'+(pct==null?'—':pct+'%')+'</b></td>'+
+      '<td><input class="topicInput topicNote" data-id="'+t.id+'" value="'+esc(t.note||'')+'"></td>'+
+    '</tr>';
+  }).join('');
+
+  qsa('.topicStatus').forEach(el=>el.addEventListener('change',()=>updateTopicFromRow(+el.dataset.id,'status',el.value)));
+  qsa('.topicQ').forEach(el=>el.addEventListener('change',()=>updateTopicFromRow(+el.dataset.id,'q',el.value)));
+  qsa('.topicC').forEach(el=>el.addEventListener('change',()=>updateTopicFromRow(+el.dataset.id,'c',el.value)));
+  qsa('.topicE').forEach(el=>el.addEventListener('change',()=>updateTopicFromRow(+el.dataset.id,'e',el.value)));
+  qsa('.topicNote').forEach(el=>el.addEventListener('change',()=>updateTopicFromRow(+el.dataset.id,'note',el.value)));
+
   const areas=[...new Set(topics.map(t=>t.area))];
-  qs('#discFilter').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option>'+esc(a)+'</option>').join('');
-  qs('#kTopics').textContent=topics.length;qs('#kStudied').textContent=0;qs('#kQuestions').textContent=0;qs('#kPerf').textContent='—';
+  qs('#discFilter').innerHTML='<option value="">Todas as disciplinas</option>'+areas.map(a=>'<option '+(a===d?'selected':'')+'>'+esc(a)+'</option>').join('');
+
+  const tq=topics.reduce((a,b)=>a+(+b.q||0),0);
+  const tc=topics.reduce((a,b)=>a+(+b.c||0),0);
+  qs('#kTopics').textContent=topics.length;
+  qs('#kStudied').textContent=topics.filter(t=>t.status==='Estudado').length;
+  qs('#kQuestions').textContent=tq;
+  qs('#kPerf').textContent=tq?Math.round(tc/tq*1000)/10+'%':'—';
 }
 ['filter','statusFilter','discFilter'].forEach(id=>qs('#'+id)?.addEventListener(id==='filter'?'input':'change',render));
 qs('#globalSearch')?.addEventListener('input',e=>{if(!topics.length)return;qs('#filter').value=e.target.value;render();qs('.tab[data-tab="vertical"]')?.click()});
@@ -806,7 +1075,7 @@ qs('#exportExcel')?.addEventListener('click',async()=>{
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 });
-clear.addEventListener('click',()=>{topics=[];currentFile=null;pdf.value='';fileInfo.classList.add('hidden');qs('#analysis').classList.add('hidden');qs('#emptyState').classList.remove('hidden');qs('#loadedState').classList.add('hidden');clear.classList.add('hidden');qs('#globalSearch').value='';qs('#globalSearch').disabled=true;analyze.disabled=true;analyze.textContent='Analisar edital';setView('inicio')});
+clear.addEventListener('click',()=>{topics=[];currentFile=null;currentFileHash='';currentEditalId='';selectedCargoSection=null;pdf.value='';fileInfo.classList.add('hidden');qs('#analysis').classList.add('hidden');qs('#emptyState').classList.remove('hidden');qs('#loadedState').classList.add('hidden');clear.classList.add('hidden');qs('#globalSearch').value='';qs('#globalSearch').disabled=true;analyze.disabled=true;analyze.textContent='Analisar edital';setView('inicio')});
 </script>
 </body>
 </html>
