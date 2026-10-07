@@ -693,8 +693,8 @@ qs('#exportCsv')?.addEventListener('click',()=>{
   URL.revokeObjectURL(a.href);
 });
 
-qs('#exportExcel')?.addEventListener('click',()=>{
-  if(!window.XLSX){
+qs('#exportExcel')?.addEventListener('click',async()=>{
+  if(!window.ExcelJS){
     alert('Não foi possível carregar o gerador de Excel. Verifique a internet e tente novamente.');
     return;
   }
@@ -703,142 +703,133 @@ qs('#exportExcel')?.addEventListener('click',()=>{
   const cargo=selectedCargoSection?.cargo||'Cargo não informado';
   const prova=examInfo.name||'Concurso Público';
   const edital=examInfo.edital||'';
-  const metaLine=[edital,examInfo.organizer].filter(Boolean).join(' · ');
+  const banca=examInfo.organizer||'';
+  const metaLine=[edital,banca].filter(Boolean).join(' · ');
 
-  const rows=[
-    ['EDITAL VERTICAL','','','','','','','','','',''],
-    ['Prova / Concurso',prova,'','','','','','','','',''],
-    ['Cargo escolhido',cargo,'','','','','','','','',''],
-    ['Edital / Banca',metaLine,'','','','','','','','',''],
-    ['Arquivo',examInfo.file||currentFile?.name||'','','','','','','','','',''],
-    [],
-    ['ORDEM','ITEM DO EDITAL','CONHECIMENTOS','ÁREA','CONTEÚDO','STATUS','QUESTÕES','CERTAS','ERRADAS','DESEMPENHO','ANOTAÇÕES']
+  const wb=new ExcelJS.Workbook();
+  wb.creator='Edital Vertical';
+  wb.subject=prova+' - '+cargo;
+  wb.title='Verticalização do Edital';
+  wb.created=new Date();
+
+  const ws=wb.addWorksheet('Verticalização',{views:[{state:'frozen',ySplit:8}]});
+  ws.columns=[
+    {key:'ordem',width:10},{key:'item',width:15},{key:'conhecimento',width:20},
+    {key:'area',width:38},{key:'conteudo',width:74},{key:'status',width:16},
+    {key:'questoes',width:12},{key:'certas',width:10},{key:'erradas',width:10},
+    {key:'desempenho',width:14},{key:'anotacoes',width:36}
   ];
 
-  ordered.forEach(t=>{
-    const perf=t.q?Math.round((t.c/t.q)*100)/100:'';
-    rows.push([
-      t.sourceOrder||t.id,
-      t.itemNumber||'',
-      t.knowledge,
-      t.area,
-      t.content,
-      t.status,
-      t.q,
-      t.c,
-      t.e,
-      perf,
-      t.note||''
-    ]);
+  try{
+    const logoBase64=await logoPngBase64();
+    const logoId=wb.addImage({base64:logoBase64,extension:'png'});
+    ws.addImage(logoId,{tl:{col:0,row:0},ext:{width:360,height:101}});
+  }catch(e){
+    ws.mergeCells('A1:D3');
+    ws.getCell('A1').value='EDITAL VERTICAL';
+    ws.getCell('A1').font={bold:true,size:22,color:{argb:'FF071A2F'}};
+    ws.getCell('A1').alignment={vertical:'middle',horizontal:'left'};
+  }
+
+  ws.mergeCells('E1:K1');
+  ws.getCell('E1').value='VERTICALIZAÇÃO DO EDITAL';
+  ws.getCell('E1').font={bold:true,size:18,color:{argb:'FFFFFFFF'}};
+  ws.getCell('E1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF071A2F'}};
+  ws.getCell('E1').alignment={vertical:'middle',horizontal:'center'};
+
+  const meta=[
+    ['Prova / Concurso',prova],['Cargo escolhido',cargo],
+    ['Edital / Banca',metaLine],['Arquivo',examInfo.file||currentFile?.name||'']
+  ];
+  for(let i=0;i<meta.length;i++){
+    const row=2+i;
+    ws.getCell(row,5).value=meta[i][0];
+    ws.getCell(row,5).font={bold:true,color:{argb:'FF1269D8'}};
+    ws.getCell(row,5).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F7FB'}};
+    ws.mergeCells(row,6,row,11);
+    ws.getCell(row,6).value=meta[i][1];
+    ws.getCell(row,6).font={bold:i===1,color:{argb:'FF15243A'}};
+    ws.getCell(row,6).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F7FB'}};
+    ws.getCell(row,6).alignment={vertical:'middle',wrapText:true};
+  }
+
+  [30,24,24,24,24,8,8,32].forEach((h,i)=>ws.getRow(i+1).height=h);
+
+  const headerRow=8;
+  const headers=['ORDEM','ITEM DO EDITAL','CONHECIMENTOS','ÁREA','CONTEÚDO','STATUS','QUESTÕES','CERTAS','ERRADAS','DESEMPENHO','ANOTAÇÕES'];
+  ws.getRow(headerRow).values=headers;
+  ws.getRow(headerRow).eachCell(cell=>{
+    cell.font={bold:true,color:{argb:'FFFFFFFF'}};
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1269D8'}};
+    cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+    cell.border={top:{style:'thin',color:{argb:'FF1269D8'}},bottom:{style:'thin',color:{argb:'FF1269D8'}},left:{style:'thin',color:{argb:'FF1269D8'}},right:{style:'thin',color:{argb:'FF1269D8'}}};
   });
 
-  const wb=XLSX.utils.book_new();
-  const ws=XLSX.utils.aoa_to_sheet(rows);
-
-  ws['!merges']=[
-    {s:{r:0,c:0},e:{r:0,c:10}},
-    {s:{r:1,c:1},e:{r:1,c:10}},
-    {s:{r:2,c:1},e:{r:2,c:10}},
-    {s:{r:3,c:1},e:{r:3,c:10}},
-    {s:{r:4,c:1},e:{r:4,c:10}}
-  ];
-
-  const navy='071A2F', blue='1269D8', cyan='21C7FF', light='F4F7FB',
-        line='DFE6EF', green='16A36A', white='FFFFFF', text='15243A';
-
-  const title=ws['A1'];
-  title.s={
-    fill:{fgColor:{rgb:navy}},
-    font:{bold:true,color:{rgb:white},sz:20},
-    alignment:{horizontal:'left',vertical:'center'}
-  };
-
-  for(let r=1;r<=4;r++){
-    const a=XLSX.utils.encode_cell({r,c:0});
-    const b=XLSX.utils.encode_cell({r,c:1});
-    if(ws[a]) ws[a].s={font:{bold:true,color:{rgb:blue}},fill:{fgColor:{rgb:light}},alignment:{vertical:'center'}};
-    if(ws[b]) ws[b].s={font:{bold:r===1,color:{rgb:text}},fill:{fgColor:{rgb:light}},alignment:{vertical:'center',wrapText:true}};
-  }
-
-  for(let cidx=0;cidx<=10;cidx++){
-    const cell=ws[XLSX.utils.encode_cell({r:6,c:cidx})];
-    if(cell) cell.s={
-      fill:{fgColor:{rgb:blue}},
-      font:{bold:true,color:{rgb:white}},
-      alignment:{horizontal:'center',vertical:'center',wrapText:true},
-      border:{
-        top:{style:'thin',color:{rgb:blue}},
-        bottom:{style:'thin',color:{rgb:blue}},
-        left:{style:'thin',color:{rgb:blue}},
-        right:{style:'thin',color:{rgb:blue}}
-      }
-    };
-  }
-
-  for(let r=7;r<rows.length;r++){
-    const zebra=(r%2===0)?'F8FBFF':white;
-    for(let cidx=0;cidx<=10;cidx++){
-      const addr=XLSX.utils.encode_cell({r,c:cidx});
-      const cell=ws[addr];
-      if(!cell) continue;
-      cell.s={
-        fill:{fgColor:{rgb:zebra}},
-        font:{color:{rgb:text}},
-        alignment:{vertical:'top',wrapText:true,horizontal:[0,1,6,7,8,9].includes(cidx)?'center':'left'},
-        border:{
-          bottom:{style:'thin',color:{rgb:line}}
-        }
-      };
+  ordered.forEach((t,idx)=>{
+    const rowNum=headerRow+1+idx;
+    const row=ws.getRow(rowNum);
+    row.values=[
+      t.sourceOrder||t.id,t.itemNumber||'',t.knowledge,t.area,t.content,t.status,
+      t.q,t.c,t.e,t.q?{formula:'IF(G'+rowNum+'=0,"",H'+rowNum+'/G'+rowNum+')'}:'',t.note||''
+    ];
+    row.eachCell((cell,colNumber)=>{
+      cell.alignment={vertical:'top',wrapText:true,horizontal:[1,2,7,8,9,10].includes(colNumber)?'center':'left'};
+      cell.font={color:{argb:'FF15243A'},size:10};
+      cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:rowNum%2===0?'FFF8FBFF':'FFFFFFFF'}};
+      cell.border={bottom:{style:'thin',color:{argb:'FFDFE6EF'}}};
+    });
+    const statusCell=row.getCell(6);
+    if(t.status==='Estudado'){
+      statusCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFDCFCE7'}};
+      statusCell.font={bold:true,color:{argb:'FF118452'}};
+    }else if(t.status==='Estudando'){
+      statusCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF3CD'}};
+      statusCell.font={bold:true,color:{argb:'FFA56C00'}};
+    }else{
+      statusCell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEEF1F5'}};
+      statusCell.font={bold:true,color:{argb:'FF607086'}};
     }
+    row.getCell(10).numFmt='0%';
+  });
+  ws.autoFilter={from:{row:headerRow,column:1},to:{row:headerRow,column:11}};
 
-    const statusAddr=XLSX.utils.encode_cell({r,c:5});
-    if(ws[statusAddr]){
-      const status=String(ws[statusAddr].v||'');
-      ws[statusAddr].s.fill={fgColor:{rgb:status==='Estudado'?'DCFCE7':status==='Estudando'?'FFF3CD':'EEF1F5'}};
-      ws[statusAddr].s.font={bold:true,color:{rgb:status==='Estudado'?'118452':status==='Estudando'?'A56C00':'607086'}};
-    }
-
-    const perfAddr=XLSX.utils.encode_cell({r,c:9});
-    if(ws[perfAddr] && typeof ws[perfAddr].v==='number'){
-      ws[perfAddr].z='0%';
-      ws[perfAddr].s.font={bold:true,color:{rgb:green}};
-    }
+  const resumo=wb.addWorksheet('Resumo');
+  resumo.columns=[{width:56},{width:18}];
+  try{
+    const logoBase64=await logoPngBase64();
+    const logoId2=wb.addImage({base64:logoBase64,extension:'png'});
+    resumo.addImage(logoId2,{tl:{col:0,row:0},ext:{width:320,height:90}});
+  }catch(e){}
+  resumo.mergeCells('A4:B4');
+  resumo.getCell('A4').value='RESUMO DO EDITAL VERTICAL';
+  resumo.getCell('A4').font={bold:true,size:16,color:{argb:'FFFFFFFF'}};
+  resumo.getCell('A4').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF071A2F'}};
+  resumo.getCell('A4').alignment={horizontal:'center',vertical:'middle'};
+  resumo.getCell('A5').value='Prova / Concurso'; resumo.getCell('B5').value=prova;
+  resumo.getCell('A6').value='Cargo'; resumo.getCell('B6').value=cargo;
+  resumo.getCell('A7').value='Edital / Banca'; resumo.getCell('B7').value=metaLine;
+  resumo.getCell('A8').value='Total de tópicos'; resumo.getCell('B8').value=ordered.length;
+  for(let r=5;r<=8;r++){
+    resumo.getCell(r,1).font={bold:true,color:{argb:'FF1269D8'}};
+    resumo.getCell(r,1).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F7FB'}};
+    resumo.getCell(r,2).fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF4F7FB'}};
+    resumo.getCell(r,2).alignment={wrapText:true};
   }
-
-  ws['!cols']=[
-    {wch:9},{wch:14},{wch:20},{wch:36},{wch:70},{wch:14},
-    {wch:11},{wch:10},{wch:10},{wch:13},{wch:34}
-  ];
-  ws['!rows']=[{hpt:30},{hpt:22},{hpt:22},{hpt:22},{hpt:22},{hpt:8},{hpt:30}];
-  ws['!autofilter']={ref:'A7:K'+rows.length};
-  ws['!freeze']={xSplit:0,ySplit:7,topLeftCell:'A8',activePane:'bottomLeft',state:'frozen'};
-
-  XLSX.utils.book_append_sheet(wb,ws,'Verticalização');
-
   const areaCounts={};
   ordered.forEach(t=>areaCounts[t.area]=(areaCounts[t.area]||0)+1);
-  const summaryRows=[
-    ['RESUMO DO EDITAL VERTICAL',''],
-    ['Prova / Concurso',prova],
-    ['Cargo',cargo],
-    ['Total de tópicos',ordered.length],
-    [],
-    ['DISCIPLINA / ÁREA','TÓPICOS'],
-    ...Object.entries(areaCounts)
-  ];
-  const ws2=XLSX.utils.aoa_to_sheet(summaryRows);
-  ws2['!merges']=[{s:{r:0,c:0},e:{r:0,c:1}}];
-  ws2['A1'].s={fill:{fgColor:{rgb:navy}},font:{bold:true,color:{rgb:white},sz:16}};
-  for(let cidx=0;cidx<2;cidx++){
-    const cell=ws2[XLSX.utils.encode_cell({r:5,c:cidx})];
-    if(cell) cell.s={fill:{fgColor:{rgb:blue}},font:{bold:true,color:{rgb:white}}};
-  }
-  ws2['!cols']=[{wch:58},{wch:14}];
-  XLSX.utils.book_append_sheet(wb,ws2,'Resumo');
+  resumo.getCell('A10').value='DISCIPLINA / ÁREA'; resumo.getCell('B10').value='TÓPICOS';
+  resumo.getRow(10).eachCell(cell=>{cell.font={bold:true,color:{argb:'FFFFFFFF'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF1269D8'}};});
+  let rr=11;
+  for(const [area,count] of Object.entries(areaCounts)){resumo.getCell(rr,1).value=area;resumo.getCell(rr,2).value=count;rr++;}
 
-  XLSX.writeFile(wb,'EditalVertical_'+safeFilePart(cargo)+'.xlsx');
+  const buffer=await wb.xlsx.writeBuffer();
+  const blob=new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='EditalVertical_'+safeFilePart(cargo)+'.xlsx';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 });
-
 clear.addEventListener('click',()=>{topics=[];currentFile=null;pdf.value='';fileInfo.classList.add('hidden');qs('#analysis').classList.add('hidden');qs('#emptyState').classList.remove('hidden');qs('#loadedState').classList.add('hidden');clear.classList.add('hidden');qs('#globalSearch').value='';qs('#globalSearch').disabled=true;analyze.disabled=true;analyze.textContent='Analisar edital';setView('inicio')});
 </script>
 </body>
