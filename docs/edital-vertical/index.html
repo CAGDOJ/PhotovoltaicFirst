@@ -37,11 +37,71 @@
 .evoCard{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
 .evoCard strong{font-size:22px}.evoUp{color:#118452}.evoDown{color:#c9374e}.evoNeutral{color:#607086}
 .cloudNotice{margin-top:12px;padding:12px;border:1px solid #cfe2ff;background:#f6faff;border-radius:12px;color:#365a82;font-size:13px}
+
+.landingGate{min-height:100vh;background:linear-gradient(145deg,#06172a 0%,#0d2746 55%,#1269d8 140%);color:#fff;padding:24px}
+.landingWrap{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(340px,.75fr);gap:34px;align-items:center;min-height:calc(100vh - 48px)}
+.landingHero{padding:22px}.landingLogo{width:min(420px,92%);height:auto;display:block;background:#fff;border-radius:20px;padding:12px 16px;margin-bottom:24px}
+.landingHero h1{font-size:clamp(36px,5vw,64px);line-height:1.02;margin:0 0 14px}.landingHero p{font-size:18px;line-height:1.65;color:#d8e6f5;max-width:720px}
+.featureGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:24px}.featureItem{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:15px}.featureItem b{display:block;margin-bottom:5px}.featureItem span{color:#c9d8e8;font-size:14px;line-height:1.45}
+.authPanel{background:#fff;color:var(--text);border-radius:24px;padding:24px;box-shadow:0 28px 80px rgba(0,0,0,.32)}.authPanel h2{margin:0 0 6px}.authPanel .muted{margin-bottom:18px}
+.authTabs{display:grid;grid-template-columns:1fr 1fr;background:#f1f5f9;border-radius:12px;padding:4px;margin:14px 0}.authTabs button{border:0;background:transparent;border-radius:9px;padding:10px;font-weight:800;color:#607086;cursor:pointer}.authTabs button.active{background:#fff;color:var(--blue);box-shadow:0 2px 8px rgba(13,39,70,.08)}
+.authForm{display:none}.authForm.active{display:grid;gap:10px}.authForm label{font-size:13px;font-weight:800}.authForm input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px}.authPrimary{width:100%;border:0;background:var(--blue);color:#fff;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer}
+.authDivider{display:flex;align-items:center;gap:10px;margin:16px 0;color:#8a97a8;font-size:12px}.authDivider:before,.authDivider:after{content:"";height:1px;background:#dfe6ef;flex:1}
+.googleLogin{width:100%;border:1px solid #d8e1ea;background:#fff;border-radius:11px;padding:12px 14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}.googleMark{font-size:20px;font-weight:900;color:#4285f4}
+.authMsg{margin-top:12px;padding:10px 12px;border-radius:10px;background:#f4f7fb;color:#52647a;font-size:13px;display:none}.authMsg.show{display:block}
+.landingFoot{margin-top:18px;font-size:12px;color:#8392a6;text-align:center}.app.authLocked{display:none!important}.landingGate.hidden{display:none!important}
+@media(max-width:900px){.landingGate{padding:12px}.landingWrap{grid-template-columns:1fr;gap:16px;min-height:auto}.landingHero{padding:10px 4px}.landingLogo{width:min(330px,92%)}.landingHero h1{font-size:38px}.landingHero p{font-size:16px}.featureGrid{grid-template-columns:1fr}.authPanel{padding:20px}}
 </style>
 </head>
 <body>
+<section id="landingGate" class="landingGate">
+  <div class="landingWrap">
+    <div class="landingHero">
+      <img src="./logo.svg?v=3" class="landingLogo" alt="Edital Vertical">
+      <h1>Transforme seu edital em um plano de estudo inteligente.</h1>
+      <p>Envie o PDF do edital, escolha o cargo e receba uma verticalização organizada por disciplina e tópico. Registre questões, acompanhe seu desempenho e veja exatamente onde precisa melhorar.</p>
+
+      <div class="featureGrid">
+        <div class="featureItem"><b>📄 Verticalização automática</b><span>O sistema lê o conteúdo programático e organiza os tópicos na ordem do edital.</span></div>
+        <div class="featureItem"><b>📊 Acompanhamento de desempenho</b><span>Registre questões, acertos e erros e acompanhe sua evolução por matéria.</span></div>
+        <div class="featureItem"><b>☁️ Seus editais salvos</b><span>Ao entrar na sua conta, seus editais e progresso ficam associados ao seu perfil.</span></div>
+        <div class="featureItem"><b>🔔 Monitor de retificações</b><span>Estrutura preparada para acompanhar alterações futuras do edital.</span></div>
+      </div>
+    </div>
+
+    <aside class="authPanel">
+      <h2>Comece agora</h2>
+      <p class="muted">Entre na sua conta ou crie uma nova. Tudo fica na mesma página.</p>
+
+      <button id="googleLoginBtn" class="googleLogin" type="button"><span class="googleMark">G</span> Continuar com Google</button>
+
+      <div class="authDivider">ou use e-mail</div>
+
+      <div class="authTabs">
+        <button id="tabLogin" class="active" type="button">Entrar</button>
+        <button id="tabRegister" type="button">Criar conta</button>
+      </div>
+
+      <form id="loginForm" class="authForm active">
+        <div><label for="loginEmail">E-mail</label><input id="loginEmail" type="email" autocomplete="email" required placeholder="seuemail@gmail.com"></div>
+        <div><label for="loginPassword">Senha</label><input id="loginPassword" type="password" autocomplete="current-password" required minlength="6" placeholder="Sua senha"></div>
+        <button class="authPrimary" type="submit">Entrar</button>
+      </form>
+
+      <form id="registerForm" class="authForm">
+        <div><label for="registerName">Nome</label><input id="registerName" type="text" autocomplete="name" required placeholder="Seu nome"></div>
+        <div><label for="registerEmail">E-mail</label><input id="registerEmail" type="email" autocomplete="email" required placeholder="seuemail@gmail.com"></div>
+        <div><label for="registerPassword">Senha</label><input id="registerPassword" type="password" autocomplete="new-password" required minlength="6" placeholder="Mínimo 6 caracteres"></div>
+        <button class="authPrimary" type="submit">Criar minha conta</button>
+      </form>
+
+      <div id="authMessage" class="authMsg"></div>
+      <div class="landingFoot">Ao continuar, você acessa o painel do Edital Vertical.</div>
+    </aside>
+  </div>
+</section>
 <div id="shade" class="shade"></div>
-<div class="app">
+<div class="app authLocked" id="appShell">
 <aside class="side">
   <img src="./logo.svg?v=3" class="brandLogo" alt="Edital Vertical">
   <nav class="nav">
@@ -55,7 +115,7 @@
     <button data-view="cronograma">▤ Cronograma</button>
     <button data-view="monitor">♢ Monitor de Editais</button>
   </nav>
-  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 9 · 07/10/2026</div></div>
+  <div class="sideFoot">Nenhum edital pré-carregado.<div class="build">Versão 10 · 07/10/2026</div></div>
 </aside>
 <main class="main">
 <header class="top">
@@ -63,8 +123,7 @@
   <img src="./icon.svg?v=3" class="mobileLogo" alt="">
   <input id="globalSearch" class="search" placeholder="Buscar no edital carregado..." disabled>
   <div class="topright">
-      <span id="syncState">Modo local</span>
-      <button id="authBtn" class="authBtn">Entrar com Google</button>
+      <span id="syncState">Conta</span>
       <div id="userChip" class="userChip hidden"><img id="userPhoto" alt=""><div><b id="userName"></b><small id="userEmail"></small></div><button id="logoutBtn" class="authBtn" style="padding:6px 8px">Sair</button></div>
     </div>
 </header>
@@ -314,30 +373,76 @@ async function initSupabase(){
     updateAuthUI();
   });
 }
+function showAuthMessage(message,isError=false){
+  const el=qs('#authMessage');
+  if(!el)return;
+  el.textContent=message;
+  el.classList.add('show');
+  el.style.background=isError?'#fff0f2':'#f0f8ff';
+  el.style.color=isError?'#b4233a':'#365a82';
+}
+function setAuthTab(mode){
+  const login=mode==='login';
+  qs('#tabLogin')?.classList.toggle('active',login);
+  qs('#tabRegister')?.classList.toggle('active',!login);
+  qs('#loginForm')?.classList.toggle('active',login);
+  qs('#registerForm')?.classList.toggle('active',!login);
+  qs('#authMessage')?.classList.remove('show');
+}
 function updateAuthUI(){
-  const btn=qs('#authBtn'),chip=qs('#userChip');
+  const chip=qs('#userChip');
+  const gate=qs('#landingGate');
+  const app=qs('#appShell');
+
   if(currentUser){
-    btn.classList.add('hidden'); chip.classList.remove('hidden');
+    gate?.classList.add('hidden');
+    app?.classList.remove('authLocked');
+    chip?.classList.remove('hidden');
     const meta=currentUser.user_metadata||{};
     qs('#userName').textContent=meta.full_name||meta.name||'Usuário';
     qs('#userEmail').textContent=currentUser.email||'';
     qs('#userPhoto').src=meta.avatar_url||'./icon.svg?v=3';
     qs('#syncState').textContent='Conta conectada';
   }else{
-    btn.classList.remove('hidden'); chip.classList.add('hidden');
-    qs('#syncState').textContent=supabaseClient?'Não conectado':'Modo local';
+    gate?.classList.remove('hidden');
+    app?.classList.add('authLocked');
+    chip?.classList.add('hidden');
+    qs('#syncState').textContent='Conta';
   }
 }
+
 async function loginGoogle(){
   if(!supabaseClient){
-    alert('A tela de login Google já está preparada. Falta conectar o projeto Supabase para ativar o login e o salvamento na nuvem.');
+    showAuthMessage('O login está pronto, mas o banco Supabase ainda precisa ser conectado para liberar o acesso.',true);
     return;
   }
-  await supabaseClient.auth.signInWithOAuth({
+  const {error}=await supabaseClient.auth.signInWithOAuth({
     provider:'google',
     options:{redirectTo:location.origin+location.pathname}
   });
+  if(error) showAuthMessage(error.message,true);
 }
+async function loginEmail(email,password){
+  if(!supabaseClient){
+    showAuthMessage('O banco Supabase ainda não foi conectado.',true);
+    return;
+  }
+  const {error}=await supabaseClient.auth.signInWithPassword({email,password});
+  if(error) showAuthMessage(error.message,true);
+}
+async function registerEmail(name,email,password){
+  if(!supabaseClient){
+    showAuthMessage('O banco Supabase ainda não foi conectado.',true);
+    return;
+  }
+  const {data,error}=await supabaseClient.auth.signUp({
+    email,password,
+    options:{data:{full_name:name}}
+  });
+  if(error){showAuthMessage(error.message,true);return;}
+  if(!data.session) showAuthMessage('Conta criada. Verifique seu e-mail para confirmar o cadastro.');
+}
+
 async function syncCurrentToCloud(){
   if(!supabaseClient||!currentUser||!selectedCargoSection||!currentFileHash||!topics.length) return;
   const payload={
@@ -362,8 +467,24 @@ async function syncCurrentToCloud(){
   }));
   await supabaseClient.from('topicos').upsert(rows,{onConflict:'edital_id,source_order'});
 }
-qs('#authBtn')?.addEventListener('click',loginGoogle);
-qs('#logoutBtn')?.addEventListener('click',async()=>{if(supabaseClient)await supabaseClient.auth.signOut();});
+qs('#googleLoginBtn')?.addEventListener('click',loginGoogle);
+qs('#tabLogin')?.addEventListener('click',()=>setAuthTab('login'));
+qs('#tabRegister')?.addEventListener('click',()=>setAuthTab('register'));
+qs('#loginForm')?.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  await loginEmail(qs('#loginEmail').value.trim(),qs('#loginPassword').value);
+});
+qs('#registerForm')?.addEventListener('submit',async(e)=>{
+  e.preventDefault();
+  await registerEmail(qs('#registerName').value.trim(),qs('#registerEmail').value.trim(),qs('#registerPassword').value);
+});
+qs('#logoutBtn')?.addEventListener('click',async()=>{
+  if(supabaseClient) await supabaseClient.auth.signOut();
+  currentUser=null;
+  updateAuthUI();
+});
+setAuthTab('login');
+updateAuthUI();
 initSupabase().catch(()=>{});
 async function setFile(f){
   if(!f)return;
