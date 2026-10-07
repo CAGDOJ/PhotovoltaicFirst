@@ -211,16 +211,16 @@ async function readProgrammaticAnnex(file,onProgress){
   let annexStart=-1;
 
   const isExactAnnexPage=(txt)=>{
-    const k=searchKey(txt);
-    return (k.includes('ANEXO I') || k.includes('ANEXO 1')) &&
-           k.includes('CONTEUDO PROGRAMATICO');
+    const k=compactKey(txt);
+    return (k.includes('ANEXOI') || k.includes('ANEXO1')) &&
+           k.includes('CONTEUDOPROGRAMATICO');
   };
 
   const isCargoProgramPage=(txt)=>{
-    const k=searchKey(txt);
-    return k.includes('CONTEUDO PROGRAMATICO') &&
-      (k.includes('DELEGADO DE POLICIA CIVIL') ||
-       k.includes('OFICIAL INVESTIGADOR DE POLICIA CIVIL'));
+    const k=compactKey(txt);
+    return k.includes('CONTEUDOPROGRAMATICO') &&
+      (k.includes('DELEGADODEPOLICIACIVIL') ||
+       k.includes('OFICIALINVESTIGADORDEPOLICIACIVIL'));
   };
 
   // IMPORTANT: find the actual ANEXO I first, not the later Oficial heading.
@@ -256,8 +256,8 @@ async function readProgrammaticAnnex(file,onProgress){
   for(let p=annexStart;p<=total;p++){
     onProgress?.('Lendo conteúdo programático... página '+p+' de '+total);
     const txt=await pageText(doc,p);
-    const k=searchKey(txt);
-    if(p>annexStart && (k.includes('ANEXO II') || k.includes('ANEXO 2'))) break;
+    const k=compactKey(txt);
+    if(p>annexStart && (k.includes('ANEXOII') || k.includes('ANEXO2'))) break;
     text+='\n'+txt;
   }
 
@@ -311,6 +311,32 @@ function normalizedWithMap(input){
   return {key,map};
 }
 
+function compactKey(s){
+  return searchKey(s).replace(/\s+/g,'');
+}
+
+function compactNormalizedWithMap(input){
+  const raw=String(input||'');
+  let key='';
+  const map=[];
+
+  for(let i=0;i<raw.length;i++){
+    const expanded=raw[i]
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g,'')
+      .toUpperCase();
+
+    for(const ch of expanded){
+      if(/[A-Z0-9]/.test(ch)){
+        key+=ch;
+        map.push(i);
+      }
+    }
+  }
+
+  return {key,map};
+}
+
 function normalizeText(text){
   return text
     .replace(/\u00ad/g,'')
@@ -323,11 +349,11 @@ function normalizeText(text){
 
 function extractCargoSections(text){
   const t=normalizeText(text);
-  const nm=normalizedWithMap(t);
+  const nm=compactNormalizedWithMap(t);
 
   const wanted=[
-    {cargo:'DELEGADO DE POLÍCIA CIVIL',needle:'DELEGADO DE POLICIA CIVIL'},
-    {cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',needle:'OFICIAL INVESTIGADOR DE POLICIA CIVIL'}
+    {cargo:'DELEGADO DE POLÍCIA CIVIL',needle:'DELEGADODEPOLICIACIVIL'},
+    {cargo:'OFICIAL INVESTIGADOR DE POLÍCIA CIVIL',needle:'OFICIALINVESTIGADORDEPOLICIACIVIL'}
   ];
 
   const found=[];
