@@ -118,7 +118,7 @@ async function checkConnectionMonitor(){
   ]);
   if(!sr.ok||!mr.ok)throw new Error('status '+sr.status+', resultados '+mr.status);
   const status=await sr.json(),manifest=await mr.json();
-  const parseStamp=s=>{const m=String(s||'').match(/^(\\d{4})-(\\d{2})-(\\d{2})[ T](\\d{2}):(\\d{2}):(\\d{2})$/);return m?new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5],+m[6]).getTime():NaN;};
+  const parseStamp=s=>{const t=Date.parse(String(s||'').replace(' ','T'));return Number.isFinite(t)?t:NaN;};
   // The PC formats timestamps in its local timezone; conservatively handle stale dates.
   const last=parseStamp(status.updated_at),sync=parseStamp(manifest.updated_at);
   const minutes=(Date.now()-last)/60000, syncMinutes=(Date.now()-sync)/60000;
