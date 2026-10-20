@@ -22,9 +22,10 @@ footer{color:var(--muted);font-size:11px;padding:4px 0 16px}
 <body>
 <header>
   <img class="logo" src="../pvfirst-icon.svg" alt="PV-First">
-  <div><h1>PV-First</h1><div class="sub">Resultados centralizados no GitHub • mesma base para PC, celular e web</div></div>
+  <div><h1>PV-First</h1></div>
 </header>
 <main>
+  <section class="panel" aria-live="polite" style="margin-bottom:12px;padding:12px 16px"><strong>Estado da conexão com o PC: </strong><span id="pcConnection">Consultando último status...</span><div class="small" id="pcLastSeen"></div></section>
   <section class="toolbar">
     <div class="field"><label>Perfil</label><select id="fProfile"><option value="">Todos</option></select></div>
     <div class="field"><label>Fonte</label><select id="fSource"><option value="">Todas</option><option>PHOTOVOLTAIC</option><option>PHOTOVOLTAIC+GRID</option><option>GRID</option></select></div>
@@ -64,6 +65,37 @@ footer{color:var(--muted);font-size:11px;padding:4px 0 16px}
   <footer>Fonte central: <b>docs/results/all.csv</b>. O PC envia execuções válidas para esta base; todos os dispositivos leem o mesmo conjunto.</footer>
 </main>
 <script>
+
+// A string "RUNNING" do status é apenas o último relato, não prova funcionamento atual.
+async function updatePcConnection(){
+ const statusEl=document.getElementById('pcConnection');
+ const seenEl=document.getElementById('pcLastSeen');
+ try{
+  const r=await fetch('status/pvfirst_status.json?v='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  let stamp=String(j.updated_at_iso||'').trim();
+  if(!stamp && j.updated_at)stamp=String(j.updated_at).trim().replace(' ','T')+'-03:00';
+  const last=Date.parse(stamp);
+  if(!Number.isFinite(last))throw new Error('data de atualização inválida');
+  const ageMin=Math.max(0,Math.floor((Date.now()-last)/60000));
+  const ago=ageMin>=1440?Math.floor(ageMin/1440)+' dia(s)':ageMin>=60?Math.floor(ageMin/60)+' hora(s)':ageMin+' minuto(s)';
+  seenEl.textContent='Última comunicação do PC: '+(j.updated_at||stamp)+' (há aproximadamente '+ago+').';
+  if(ageMin>10){
+    statusEl.textContent='SEM ATUALIZAÇÃO RECENTE — não é possível confirmar coleta ativa.';
+    statusEl.style.color='#b42318';
+  }else{
+    statusEl.textContent='Comunicação recente com o PC. Estado informado: '+String(j.status||j.agent||'indefinido');
+    statusEl.style.color='#1f7a3f';
+  }
+ }catch(e){
+  statusEl.textContent='STATUS INDISPONÍVEL — não é possível confirmar coleta ativa.';
+  statusEl.style.color='#b42318';
+  seenEl.textContent='Falha ao consultar PC: '+e.message;
+ }
+}
+updatePcConnection();
+setInterval(updatePcConnection,60000);
 const CSV='results/all.csv';let all=[];
 function parseCsv(text){const lines=text.replace(/^\uFEFF/,'').split(/\r?\n/).filter(x=>x.trim());if(lines.length<2)return[];function row(line){let a=[],c='',q=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(q&&line[i+1]==='"'){c+='"';i++;}else q=!q}else if(ch===';'&&!q){a.push(c);c=''}else c+=ch}a.push(c);return a}const h=row(lines[0]);return lines.slice(1).map(l=>{const v=row(l),o={};h.forEach((k,i)=>o[k]=v[i]??'');return o})}
 function n(v){const x=Number(String(v??'').replace(',','.'));return Number.isFinite(x)?x:0}function fmt(v,d=3){return n(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d})}
