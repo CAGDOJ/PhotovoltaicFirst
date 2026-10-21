@@ -6,9 +6,9 @@
     "last_action":  "heartbeat",
     "last_command_id":  "",
     "last_result":  "Agente ativo aguardando comandos",
-    "status":  "OK: Novo CSV local salvo. Sincronizando GitHub...",
+    "status":  "OK: Coleta em standby/finalizada",
     "env":  "READY|Ubuntu",
-    "log":  "Energia vinda da GRID      : 138.043 kWh\nCO2 emitido pela GRID      : 13804.3 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 404640 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 17:58:20\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 7.33421 W/m2\nPotencia PV disponivel   : 61.9036 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 3.43909 kWh\nEnergia vinda da GRID      : 140.186 kWh\nCO2 emitido pela GRID      : 14018.6 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 418658 gCO2 no dia\nSIMULACAO FINALIZADA",
-    "agent_log":  "[2026-10-21 15:42:35] Status enviado ao GitHub via API.\n[2026-10-21 15:42:35] Baseline do comando atual registrado sem reexecutar: 1792607290224-e503e3037b17c8\n[2026-10-21 15:57:46] Status enviado ao GitHub via API.\n[2026-10-21 16:12:53] Status enviado ao GitHub via API.\n[2026-10-21 16:28:01] Status enviado ao GitHub via API.\n[2026-10-21 16:43:08] Status enviado ao GitHub via API.\n[2026-10-21 16:58:15] Status enviado ao GitHub via API.\n[2026-10-21 17:13:23] Status enviado ao GitHub via API.\n[2026-10-21 17:28:30] Status enviado ao GitHub via API.\n[2026-10-21 17:43:37] Status enviado ao GitHub via API.",
-    "updated_at":  "2026-10-21 17:58:42"
+    "log":  "",
+    "agent_log":  "[2026-10-21 15:42:35] Baseline do comando atual registrado sem reexecutar: 1792607290224-e503e3037b17c8\n[2026-10-21 15:57:46] Status enviado ao GitHub via API.\n[2026-10-21 16:12:53] Status enviado ao GitHub via API.\n[2026-10-21 16:28:01] Status enviado ao GitHub via API.\n[2026-10-21 16:43:08] Status enviado ao GitHub via API.\n[2026-10-21 16:58:15] Status enviado ao GitHub via API.\n[2026-10-21 17:13:23] Status enviado ao GitHub via API.\n[2026-10-21 17:28:30] Status enviado ao GitHub via API.\n[2026-10-21 17:43:37] Status enviado ao GitHub via API.\n[2026-10-21 17:58:45] Status enviado ao GitHub via API.",
+    "updated_at":  "2026-10-21 18:13:49"
 }
