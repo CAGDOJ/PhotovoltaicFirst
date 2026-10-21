@@ -9,6 +9,6 @@
     "status":  "OK: Coleta em standby/finalizada",
     "env":  "READY|Ubuntu",
     "log":  "",
-    "agent_log":  "[2026-10-21 15:42:35] Baseline do comando atual registrado sem reexecutar: 1792607290224-e503e3037b17c8\n[2026-10-21 15:57:46] Status enviado ao GitHub via API.\n[2026-10-21 16:12:53] Status enviado ao GitHub via API.\n[2026-10-21 16:28:01] Status enviado ao GitHub via API.\n[2026-10-21 16:43:08] Status enviado ao GitHub via API.\n[2026-10-21 16:58:15] Status enviado ao GitHub via API.\n[2026-10-21 17:13:23] Status enviado ao GitHub via API.\n[2026-10-21 17:28:30] Status enviado ao GitHub via API.\n[2026-10-21 17:43:37] Status enviado ao GitHub via API.\n[2026-10-21 17:58:45] Status enviado ao GitHub via API.",
-    "updated_at":  "2026-10-21 18:13:49"
+    "agent_log":  "[2026-10-21 15:57:46] Status enviado ao GitHub via API.\n[2026-10-21 16:12:53] Status enviado ao GitHub via API.\n[2026-10-21 16:28:01] Status enviado ao GitHub via API.\n[2026-10-21 16:43:08] Status enviado ao GitHub via API.\n[2026-10-21 16:58:15] Status enviado ao GitHub via API.\n[2026-10-21 17:13:23] Status enviado ao GitHub via API.\n[2026-10-21 17:28:30] Status enviado ao GitHub via API.\n[2026-10-21 17:43:37] Status enviado ao GitHub via API.\n[2026-10-21 17:58:45] Status enviado ao GitHub via API.\n[2026-10-21 18:13:52] Status enviado ao GitHub via API.",
+    "updated_at":  "2026-10-21 18:28:57"
 }
