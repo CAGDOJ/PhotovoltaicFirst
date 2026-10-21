@@ -18,17 +18,18 @@
 <div class="wrap">
   <div class="card">
     <div class="statusline"><strong>PC</strong><span id="agentBadge" class="badge">consultando</span></div>
-    <div id="status" class="muted" style="margin-top:10px">Aguardando status...</div>
+    <div id="status" class="muted" style="margin-top:10px">Aguardando status...</div><div id="progress" class="muted" style="font-weight:700;margin-top:7px"></div>
   </div>
 
   <div class="card">
-    <strong>Comandos</strong>
+    <strong>Comandos</strong><div class="muted">Iniciar e parar manualmente funciona mesmo fora do agendamento. O horário automático retoma o controle na próxima transição.</div>
     <div class="grid" style="margin-top:12px">
       <button class="btn primary" onclick="sendCommand('runonce')">RODAR TESTE</button>
       <button class="btn green" onclick="sendCommand('start')">INICIAR COLETA</button>
       <button class="btn red wide" onclick="sendCommand('pause')">PARAR COLETA</button>
       <button class="btn light" onclick="sendCommand('verify')">VERIFICAR PC</button>
       <button class="btn light" onclick="sendCommand('dashboard')">GERAR PAINEL</button>
+      <button class="btn light wide" onclick="sendCommand('lock')">BLOQUEAR TELAS DO PC</button>
     </div>
   </div>
 
@@ -68,10 +69,68 @@ function headers(){const h={'Accept':'application/vnd.github+json'};if(tok())h.A
 async function saveToken(){const t=tok();if(!t){document.getElementById('tokenState').textContent='Informe o token.';return}localStorage.setItem('pvfirst_mobile_token',t);const r=await fetch('https://api.github.com/user',{headers:{Accept:'application/vnd.github+json',Authorization:'Bearer '+t},cache:'no-store'});document.getElementById('tokenState').textContent=r.ok?'Token validado.':'Token recusado pelo GitHub: HTTP '+r.status}
 function clearToken(){localStorage.removeItem('pvfirst_mobile_token');document.getElementById('token').value='';document.getElementById('tokenState').textContent='Token removido deste navegador.'}
 async function getCommandFile(){const r=await fetch(API+COMMAND+'?ref='+BRANCH+'&_='+Date.now(),{headers:headers(),cache:'no-store'});if(r.status===404)return null;if(!r.ok)throw new Error('GitHub HTTP '+r.status);return r.json()}
-async function sendCommand(action){if(!tok()){alert('Abra Configuração do controle e salve o token primeiro.');return}const st=document.getElementById('status');st.textContent='Enviando '+action+'...';try{const old=await getCommandFile();const obj={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action,from:'pvfirst_mobile_v48',created_at:new Date().toISOString()};const body={message:'PV-First remoto: '+action,branch:BRANCH,content:b64(JSON.stringify(obj,null,2))};if(old?.sha)body.sha=old.sha;const r=await fetch(API+COMMAND,{method:'PUT',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+await r.text());st.textContent='Comando enviado. Aguardando o PC...';setTimeout(loadStatus,3500)}catch(e){st.textContent='Falha ao enviar comando: '+e.message}}
+let activeRequest=null;
+function actionName(v){return ({runonce:'Rodar teste',start:'Iniciar coleta',pause:'Parar coleta',verify:'Verificar PC',dashboard:'Gerar painel',lock:'Bloquear telas'})[v]||v}
+function latestStatusId(j){return String(j.last_command_id||'')}
+async function watchCommand(obj){
+  const state=document.getElementById('progress');const t0=Date.now();let seen=false;
+  const limit=obj.action==='runonce'?150000:90000;
+  while(Date.now()-t0<limit && activeRequest===obj.id){
+    await new Promise(r=>setTimeout(r,5000));
+    try{
+      const j=await loadStatus();
+      if(!j)continue;
+      if(latestStatusId(j)===obj.id){
+        seen=true;
+        const result=String(j.last_result||'');
+        const waiting=String(j.agent||'').toLowerCase()==='executando' || /recebido no pc/i.test(result);
+        if(waiting){state.textContent='PC recebeu o comando e está executando...';continue}
+        const failed=/erro|falha|codigo [1-9]|http 4|http 5/i.test(result);
+        state.textContent=(failed?'Falha ao executar: ':'Comando processado pelo PC: ')+result;
+        return;
+      }
+      state.textContent=seen?'Atualizando resultado no PC...':'Comando enviado. Aguardando confirmação do PC...';
+    }catch(e){state.textContent='Sem retorno recente. Tentando novamente...'}
+  }
+  if(activeRequest===obj.id){state.textContent='Sem confirmação recente do PC. Verifique se o agente está online; o envio ao GitHub não garante execução.'}
+}
+async function sendCommand(action){
+ if(action==='lock'&&!confirm('Bloquear todas as telas do PC? Para desbloquear será necessário o PIN ou senha do Windows.'))return;
+ if(!tok()){alert('Abra Configuração do controle e salve o token primeiro.');return}
+ const st=document.getElementById('status');const progress=document.getElementById('progress');
+ if(activeRequest){progress.textContent='Existe um comando sendo acompanhado. Aguarde a confirmação antes de enviar outro.';return}
+ const obj={id:String(Date.now())+'-'+Math.random().toString(16).slice(2),action,from:'pvfirst_mobile',created_at:new Date().toISOString()};
+ st.textContent='Enviando '+actionName(action)+'...';progress.textContent='Transmitindo para o GitHub...';
+ try{
+   const old=await getCommandFile();
+   const body={message:'PV-First remoto: '+action,branch:BRANCH,content:b64(JSON.stringify(obj,null,2))};
+   if(old&&old.sha)body.sha=old.sha;
+   let r=await fetch(API+COMMAND,{method:'PUT',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify(body)});
+   if(r.status===409){const newer=await getCommandFile();if(newer&&newer.sha){body.sha=newer.sha;r=await fetch(API+COMMAND,{method:'PUT',headers:{...headers(),'Content-Type':'application/json'},body:JSON.stringify(body)})}}
+   if(!r.ok)throw new Error('GitHub HTTP '+r.status+': '+(await r.text()).slice(0,180));
+   activeRequest=obj.id;
+   progress.textContent='Comando enviado. Aguardando o PC executar...';
+   await watchCommand(obj);
+ }catch(e){progress.textContent='Não foi possível enviar: '+e.message}
+ finally{if(activeRequest===obj.id)activeRequest=null;await loadStatus()}
+}
+
 function compact(text){const ks=['Cidade detectada','Hora local','Perfil selecionado','Irradiancia ajustada','Potencia PV disponivel','Energia total do data center','Energia vinda da PV','Energia vinda da GRID','CO2 emitido pela GRID','CO2 evitado pela PV','MODO DA FONTE','SIMULACAO FINALIZADA','SEM INTERNET'];const ls=(text||'').split(/\r?\n/).filter(Boolean).filter(x=>ks.some(k=>x.includes(k)));return ls.slice(-15).join('\n')||'Sem resultado recente.'}
-async function loadStatus(){try{const r=await fetch(RAW+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();const b=document.getElementById('agentBadge');b.textContent=(j.agent||'desconhecido').toUpperCase();b.className='badge '+((j.agent==='rodando'||j.agent==='executando')?'ok':'warn');document.getElementById('status').textContent='PC: '+(j.pc||'-')+' | '+(j.status||'-')+'\nÚltima ação: '+(j.last_action||'-')+' | '+(j.last_result||'-')+'\nAtualizado: '+(j.updated_at||'-');document.getElementById('summary').textContent=compact(j.log||'')}catch(e){document.getElementById('agentBadge').textContent='SEM STATUS';document.getElementById('agentBadge').className='badge warn';document.getElementById('status').textContent='Não foi possível consultar o PC: '+e.message}}
-loadToken();loadStatus();setInterval(loadStatus,30000);
+async function loadStatus(){
+ try{
+  const r=await fetch(RAW+'?v='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();const b=document.getElementById('agentBadge');
+  const d=String(j.updated_at||'').replace(' ','T');
+  const age=Date.now()-new Date(d).getTime();const fresh=Number.isFinite(age)&&age>=-300000&&age<1200000;
+  b.textContent=fresh?'PC ONLINE':'SEM ATUALIZAÇÃO';b.className='badge '+(fresh?'ok':'warn');
+  document.getElementById('status').textContent='PC: '+(j.pc||'-')+' | '+(j.status||'-')+'\nÚltima ação: '+(j.last_action||'-')+' | '+(j.last_result||'-')+'\nAtualizado: '+(j.updated_at||'-');
+  document.getElementById('summary').textContent=compact(j.log||'');
+  return j;
+ }catch(e){document.getElementById('agentBadge').textContent='SEM STATUS';document.getElementById('agentBadge').className='badge warn';document.getElementById('status').textContent='Não foi possível consultar o PC: '+e.message;return null}
+}
+
+loadToken();loadStatus();setInterval(loadStatus,15000);
 let deferredPrompt=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBtn').style.display='block'});document.getElementById('installBtn').addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById('installBtn').style.display='none'});if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw-v48.js').catch(()=>{});
 </script>
 </body></html>
