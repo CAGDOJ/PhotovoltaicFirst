@@ -8,6 +8,6 @@
     "status":  "OK: Aguardando acao",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "",
-    "agent_log":  "[2026-10-21 15:02:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
-    "updated_at":  "2026-10-21 15:02:16"
+    "agent_log":  "[2026-10-21 15:10:10] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
+    "updated_at":  "2026-10-21 15:10:10"
 }
