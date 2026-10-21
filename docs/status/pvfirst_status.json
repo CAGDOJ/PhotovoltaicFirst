@@ -1,13 +1,13 @@
 {
-    "pc":  "DESKTOP-7341US6",
+    "pc":  "ATIC-03",
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "last_action":  "heartbeat",
     "last_result":  "Agente ativo aguardando comandos",
-    "status":  "RUNNING: Coleta solar continua",
-    "env":  "READY|Ubuntu",
-    "log":  "Energia vinda da GRID      : 143.625 kWh\nCO2 emitido pela GRID      : 14362.5 gCO2 nesta execucao\nMODO DA FONTE: GRID\nCO2 emitido pela GRID      : 2.79061e+06 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 18:45:47\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 0 W/m2\nPotencia PV disponivel   : 0 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 0 kWh\nEnergia vinda da GRID      : 143.625 kWh\nCO2 emitido pela GRID      : 14362.5 gCO2 nesta execucao\nMODO DA FONTE: GRID\nCO2 emitido pela GRID      : 2.80498e+06 gCO2 no dia\nSIMULACAO FINALIZADA",
-    "agent_log":  "[2026-09-26 16:15:02] Status enviado ao GitHub via API.\n[2026-09-26 16:30:10] Status enviado ao GitHub via API.\n[2026-09-26 16:45:18] Status enviado ao GitHub via API.\n[2026-09-26 17:00:24] Status enviado ao GitHub via API.\n[2026-09-26 17:15:28] Status enviado ao GitHub via API.\n[2026-09-26 17:30:33] Status enviado ao GitHub via API.\n[2026-09-26 17:45:38] Status enviado ao GitHub via API.\n[2026-09-26 18:00:43] Status enviado ao GitHub via API.\n[2026-09-26 18:15:47] Status enviado ao GitHub via API.\n[2026-09-26 18:30:51] Status enviado ao GitHub via API.",
-    "updated_at":  "2026-09-26 18:45:55"
+    "status":  "RUNNING: Coleta continua 24h em segundo plano",
+    "env":  "UNKNOWN|Aguardando verificacao",
+    "log":  "",
+    "agent_log":  "[2026-10-21 14:32:08] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-10-21 14:32:09] Falha ao enviar status via API: O servidor remoto retornou um erro: (401) Não Autorizado.\n[2026-10-21 14:32:10] Baseline do comando atual registrado sem reexecutar: 1790122613081-ea1e8266fe4478",
+    "updated_at":  "2026-10-21 14:47:15"
 }
