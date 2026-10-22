@@ -3,12 +3,12 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "heartbeat",
+    "last_action":  "",
     "last_command_id":  "",
-    "last_result":  "Agente ativo aguardando comandos",
+    "last_result":  "Agente V50 iniciado",
     "status":  "OK: Novo CSV local salvo. Sincronizando GitHub...",
     "env":  "READY|Ubuntu",
-    "log":  "Energia vinda da GRID      : 54.938 kWh\nCO2 emitido pela GRID      : 5493.8 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 602301 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 15:23:39\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 188.143 W/m2\nPotencia PV disponivel   : 1579.7 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 87.7609 kWh\nEnergia vinda da GRID      : 55.8641 kWh\nCO2 emitido pela GRID      : 5586.41 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 607887 gCO2 no dia\nSIMULACAO FINALIZADA",
-    "agent_log":  "[2026-10-22 12:52:41] Status enviado ao GitHub via API.\n[2026-10-22 13:07:51] Status enviado ao GitHub via API.\n[2026-10-22 13:22:58] Status enviado ao GitHub via API.\n[2026-10-22 13:38:05] Status enviado ao GitHub via API.\n[2026-10-22 13:53:13] Status enviado ao GitHub via API.\n[2026-10-22 14:08:21] Status enviado ao GitHub via API.\n[2026-10-22 14:23:29] Status enviado ao GitHub via API.\n[2026-10-22 14:38:36] Status enviado ao GitHub via API.\n[2026-10-22 14:53:44] Status enviado ao GitHub via API.\n[2026-10-22 15:08:53] Status enviado ao GitHub via API.",
-    "updated_at":  "2026-10-22 15:23:59"
+    "log":  "Energia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 668607 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 16:17:10\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 304.313 W/m2\nPotencia PV disponivel   : 2544.68 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 141.371 kWh\nEnergia vinda da GRID      : 2.25408 kWh\nCO2 emitido pela GRID      : 225.408 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 668833 gCO2 no dia\nSIMULACAO FINALIZADA",
+    "agent_log":  "[2026-10-22 13:22:58] Status enviado ao GitHub via API.\n[2026-10-22 13:38:05] Status enviado ao GitHub via API.\n[2026-10-22 13:53:13] Status enviado ao GitHub via API.\n[2026-10-22 14:08:21] Status enviado ao GitHub via API.\n[2026-10-22 14:23:29] Status enviado ao GitHub via API.\n[2026-10-22 14:38:36] Status enviado ao GitHub via API.\n[2026-10-22 14:53:44] Status enviado ao GitHub via API.\n[2026-10-22 15:08:53] Status enviado ao GitHub via API.\n[2026-10-22 15:24:01] Status enviado ao GitHub via API.\n[2026-10-22 16:17:22] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
+    "updated_at":  "2026-10-22 16:17:22"
 }
