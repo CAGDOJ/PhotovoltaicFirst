@@ -3,12 +3,12 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "",
+    "last_action":  "heartbeat",
     "last_command_id":  "",
-    "last_result":  "Agente V50 iniciado",
+    "last_result":  "Agente ativo aguardando comandos",
     "status":  "OK: Novo CSV local salvo. Sincronizando GitHub...",
     "env":  "READY|Ubuntu",
-    "log":  "Energia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 10:26:27\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 657.448 W/m2\nPotencia PV disponivel   : 5548.01 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 143.625 kWh\nEnergia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA",
-    "agent_log":  "[2026-11-04 08:38:21] Status enviado ao GitHub via API.\n[2026-11-04 08:53:28] Status enviado ao GitHub via API.\n[2026-11-04 09:08:34] Status enviado ao GitHub via API.\n[2026-11-04 09:23:40] Status enviado ao GitHub via API.\n[2026-11-04 09:38:46] Status enviado ao GitHub via API.\n[2026-11-04 09:53:53] Status enviado ao GitHub via API.\n[2026-11-04 10:08:59] Status enviado ao GitHub via API.\n[2026-11-04 10:24:05] Status enviado ao GitHub via API.\n[2026-11-04 10:39:12] Status enviado ao GitHub via API.\n[2026-11-08 10:26:52] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
-    "updated_at":  "2026-11-08 10:26:52"
+    "log":  "Energia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 10:41:31\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 728.918 W/m2\nPotencia PV disponivel   : 6140.6 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 143.625 kWh\nEnergia vinda da GRID      : 0 kWh\nCO2 emitido pela GRID      : 0 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC\nCO2 emitido pela GRID      : 0 gCO2 no dia\nSIMULACAO FINALIZADA",
+    "agent_log":  "[2026-11-04 08:53:28] Status enviado ao GitHub via API.\n[2026-11-04 09:08:34] Status enviado ao GitHub via API.\n[2026-11-04 09:23:40] Status enviado ao GitHub via API.\n[2026-11-04 09:38:46] Status enviado ao GitHub via API.\n[2026-11-04 09:53:53] Status enviado ao GitHub via API.\n[2026-11-04 10:08:59] Status enviado ao GitHub via API.\n[2026-11-04 10:24:05] Status enviado ao GitHub via API.\n[2026-11-04 10:39:12] Status enviado ao GitHub via API.\n[2026-11-08 10:26:52] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-11-08 10:26:54] Status enviado ao GitHub via API.",
+    "updated_at":  "2026-11-08 10:42:13"
 }
