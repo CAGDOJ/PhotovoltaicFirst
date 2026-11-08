@@ -1,13 +1,13 @@
 {
     "pc":  "ATIC-03",
-    "agent":  "executando",
+    "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
     "last_action":  "start",
-    "last_result":  "Comando recebido no PC",
+    "last_result":  "Comando iniciado: solar_background.cmd",
     "status":  "FAIL: Processo WSL/SimGrid encerrou durante a inicializacao (codigo ); veja _interno\\coleta_erro_detalhado.txt",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "",
-    "agent_log":  "[2026-10-21 15:02:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-10-21 15:02:19] Status enviado ao GitHub via API.\n[2026-10-21 15:02:19] Baseline do comando atual registrado sem reexecutar: 1790122613081-ea1e8266fe4478\n[2026-11-08 10:24:48] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-11-08 10:24:50] Status enviado ao GitHub via API.\n[2026-11-08 10:24:51] Novo comando recebido: id=1792607290224-e503e3037b17c8 action=start",
-    "updated_at":  "2026-11-08 10:24:51"
+    "agent_log":  "[2026-10-21 15:02:16] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-10-21 15:02:19] Status enviado ao GitHub via API.\n[2026-10-21 15:02:19] Baseline do comando atual registrado sem reexecutar: 1790122613081-ea1e8266fe4478\n[2026-11-08 10:24:48] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-11-08 10:24:50] Status enviado ao GitHub via API.\n[2026-11-08 10:24:51] Novo comando recebido: id=1792607290224-e503e3037b17c8 action=start\n[2026-11-08 10:24:53] Status enviado ao GitHub via API.\n[2026-11-08 10:24:53] Resultado: Comando iniciado: solar_background.cmd",
+    "updated_at":  "2026-11-08 10:24:53"
 }
