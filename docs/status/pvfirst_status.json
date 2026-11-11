@@ -3,12 +3,12 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "heartbeat",
+    "last_action":  "",
     "last_command_id":  "",
-    "last_result":  "Agente ativo aguardando comandos",
+    "last_result":  "Agente V50 iniciado",
     "status":  "OK: Novo CSV local salvo. Sincronizando GitHub...",
     "env":  "READY|Ubuntu",
-    "log":  "Energia vinda da GRID      : 143.625 kWh\nCO2 emitido pela GRID      : 14362.5 gCO2 nesta execucao\nMODO DA FONTE: GRID\nCO2 emitido pela GRID      : 3.87373e+06 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 19:20:55\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 0 W/m2\nPotencia PV disponivel   : 0 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 0 kWh\nEnergia vinda da GRID      : 143.625 kWh\nCO2 emitido pela GRID      : 14362.5 gCO2 nesta execucao\nMODO DA FONTE: GRID\nCO2 emitido pela GRID      : 3.88809e+06 gCO2 no dia\nSIMULACAO FINALIZADA",
-    "agent_log":  "[2026-11-10 17:15:49] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-11-10 17:20:10] Falha ao enviar status via API: Impossível conectar-se ao servidor remoto\n[2026-11-10 17:21:10] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-11-10 17:35:17] Status enviado ao GitHub via API.\n[2026-11-10 17:50:23] Status enviado ao GitHub via API.\n[2026-11-10 18:05:29] Status enviado ao GitHub via API.\n[2026-11-10 18:20:36] Status enviado ao GitHub via API.\n[2026-11-10 18:35:41] Status enviado ao GitHub via API.\n[2026-11-10 18:50:47] Status enviado ao GitHub via API.\n[2026-11-10 19:05:54] Status enviado ao GitHub via API.",
-    "updated_at":  "2026-11-10 19:20:58"
+    "log":  "Energia vinda da GRID      : 60.5105 kWh\nCO2 emitido pela GRID      : 6051.05 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 17881.2 gCO2 no dia\nSIMULACAO FINALIZADA\nCidade detectada : Belem\nHora local       : 14:58:09\nPerfil selecionado : hpc_extreme\nIrradiancia ajustada     : 176.484 W/m2\nPotencia PV disponivel   : 1477.4 kW\nEnergia total do data center   : 143.625 kWh\nEnergia total do data center : 143.625 kWh\nEnergia vinda da PV        : 82.0779 kWh\nEnergia vinda da GRID      : 61.5471 kWh\nCO2 emitido pela GRID      : 6154.71 gCO2 nesta execucao\nMODO DA FONTE: PHOTOVOLTAIC+GRID\nCO2 emitido pela GRID      : 24036 gCO2 no dia\nSIMULACAO FINALIZADA",
+    "agent_log":  "[2026-11-10 17:21:10] Controle remoto temporariamente sem conectividade. O simulador local continua normal.\n[2026-11-10 17:35:17] Status enviado ao GitHub via API.\n[2026-11-10 17:50:23] Status enviado ao GitHub via API.\n[2026-11-10 18:05:29] Status enviado ao GitHub via API.\n[2026-11-10 18:20:36] Status enviado ao GitHub via API.\n[2026-11-10 18:35:41] Status enviado ao GitHub via API.\n[2026-11-10 18:50:47] Status enviado ao GitHub via API.\n[2026-11-10 19:05:54] Status enviado ao GitHub via API.\n[2026-11-10 19:21:00] Status enviado ao GitHub via API.\n[2026-11-11 14:58:11] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
+    "updated_at":  "2026-11-11 14:58:11"
 }
