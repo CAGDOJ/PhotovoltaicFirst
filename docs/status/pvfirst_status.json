@@ -3,12 +3,12 @@
     "agent":  "rodando",
     "repo":  "CAGDOJ/PhotovoltaicFirst",
     "branch":  "main",
-    "last_action":  "",
+    "last_action":  "heartbeat",
     "last_command_id":  "",
-    "last_result":  "Agente V50 iniciado",
+    "last_result":  "Agente ativo aguardando comandos",
     "status":  "OK: Aguardando acao",
     "env":  "UNKNOWN|Aguardando verificacao",
     "log":  "",
-    "agent_log":  "[2026-11-19 19:05:54] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.",
-    "updated_at":  "2026-11-19 19:05:54"
+    "agent_log":  "[2026-11-19 19:05:54] Agente V50 iniciado. Comunicacao PC \u003c-\u003e GitHub usa API; SSH nao e necessario para status/comandos.\n[2026-11-19 19:05:56] Status enviado ao GitHub via API.\n[2026-11-19 19:05:57] Baseline do comando atual registrado sem reexecutar: 1792607290224-e503e3037b17c8",
+    "updated_at":  "2026-11-19 19:22:14"
 }
